@@ -242,7 +242,7 @@ func _show_main_menu() -> void:
     help_button.pressed.connect(_show_help)
     content.add_child(help_button)
 
-    var mode := DIFFICULTIES[difficulty]
+    var mode: Dictionary = DIFFICULTIES[difficulty]
     var mode_label := Label.new()
     mode_label.text = "المستوى الحالي: %s" % mode["name"]
     mode_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
