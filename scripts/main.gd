@@ -554,11 +554,11 @@ func _show_results() -> void:
         best_score = score
     _save_player_data()
 
+    var points_per_question := 10 + current_level * 2
     _clear_content()
     _add_heading("انتهى التحدّي!", "أحسنت! هذه حصيلتك في هذه الجولة")
     _add_stat_card("نتيجتك — المستوى %d" % current_level, "⭐  %d / %d نقطة" % [score, question_order.size() * points_per_question])
     _add_stat_card("أفضل نتيجة شخصية", "🏆  %d نقطة" % best_score)
-    var points_per_question := 10 + current_level * 2
     var percent := int(round(float(correct_answers) / float(question_order.size()) * 100.0))
     var level_message := ""
     if percent >= 60 and current_level == unlocked_level and unlocked_level < 10:
