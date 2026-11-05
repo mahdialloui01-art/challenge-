@@ -51,6 +51,8 @@ func _ready() -> void:
     add_child(question_timer)
     _load_questions()
     _load_player_data()
+    if music_player != null:
+        music_player.stream_paused = not music_enabled
     _build_interface()
     _show_main_menu()
 
@@ -244,6 +246,9 @@ func _build_interface() -> void:
     page.add_child(footer_label)
 
 func _clear_content() -> void:
+    if question_timer != null:
+        question_timer.stop()
+    time_label = null
     for child in content.get_children():
         child.queue_free()
 
@@ -426,8 +431,7 @@ func _start_level(level: int) -> void:
     for i in range(questions.size()):
         question_order.append(i)
     question_order.shuffle()
-    var requested_count: int = int(DIFFICULTIES[difficulty]["count"])
-    question_order.resize(mini(requested_count, question_order.size()))
+    question_order.resize(mini(5, question_order.size()))
     _display_question()
 
 func _display_question() -> void:
