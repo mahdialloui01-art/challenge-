@@ -80,6 +80,10 @@ func _process(_delta: float) -> void:
             music_playback.push_buffer(buffer)
     if question_timer != null and question_timer.time_left > 0.0 and time_label != null and is_instance_valid(time_label):
         time_label.text = "⏱  الوقت المتبقي: %d ثانية" % int(ceil(question_timer.time_left))
+    for gem in get_tree().get_nodes_in_group("map_gems"):
+        if is_instance_valid(gem):
+            gem.rotate_y(delta * 0.9)
+            gem.rotate_x(delta * 0.35)
 
 func _music_sample(sample_index: int) -> float:
     var t := fposmod(float(sample_index) / MUSIC_RATE, MUSIC_LOOP_SECONDS)
