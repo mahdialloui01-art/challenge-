@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [main]
+    branches: [main, map-progression-redesign]
   workflow_dispatch:
 
 permissions:
