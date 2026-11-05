@@ -108,48 +108,242 @@ func _music_sample(sample_index: int) -> float:
     return clampf((kick + snare + hats + melody + bass) * 0.72, -0.95, 0.95)
 
 func _build_3d_world() -> void:
+    # A layered floating-island world map built from real 3D meshes.
     var camera := Camera3D.new()
-    camera.position = Vector3(0, 0, 9)
+    camera.position = Vector3(0, 0, 12)
+    camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+    camera.size = 15.5
     camera.current = true
     add_child(camera)
 
-    var light := DirectionalLight3D.new()
-    light.rotation_degrees = Vector3(-35, -25, 0)
-    light.light_energy = 1.4
-    add_child(light)
+    var environment := WorldEnvironment.new()
+    var env := Environment.new()
+    env.background_mode = Environment.BG_SKY
+    var sky := Sky.new()
+    var sky_material := ProceduralSkyMaterial.new()
+    sky_material.sky_top_color = Color(0.012, 0.025, 0.085)
+    sky_material.sky_horizon_color = Color(0.055, 0.12, 0.24)
+    sky_material.ground_bottom_color = Color(0.012, 0.02, 0.06)
+    sky_material.ground_horizon_color = Color(0.025, 0.07, 0.15)
+    sky.sky_material = sky_material
+    env.sky = sky
+    env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+    env.ambient_light_color = Color(0.34, 0.48, 0.78)
+    env.ambient_light_energy = 0.8
+    env.glow_enabled = true
+    env.glow_intensity = 0.55
+    environment.environment = env
+    add_child(environment)
 
-    var colors := [
-        Color(0.20, 0.75, 1.0), Color(0.55, 0.35, 1.0),
-        Color(0.10, 0.95, 0.75), Color(1.0, 0.65, 0.25)
+    var key_light := DirectionalLight3D.new()
+    key_light.rotation_degrees = Vector3(-42, -25, -18)
+    key_light.light_energy = 1.65
+    key_light.shadow_enabled = true
+    add_child(key_light)
+
+    var fill_light := OmniLight3D.new()
+    fill_light.position = Vector3(-4, 4, 5)
+    fill_light.light_color = Color(0.22, 0.62, 1.0)
+    fill_light.light_energy = 2.0
+    fill_light.omni_range = 18.0
+    add_child(fill_light)
+
+    # Distant stars and a subtle orbital halo.
+    for i in range(64):
+        var star := MeshInstance3D.new()
+        var star_mesh := SphereMesh.new()
+        star_mesh.radius = 0.018 if i % 4 else 0.032
+        star_mesh.height = star_mesh.radius * 2.0
+        star.mesh = star_mesh
+        var star_mat := StandardMaterial3D.new()
+        star_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+        star_mat.albedo_color = Color(0.48, 0.72, 1.0, 0.82)
+        star_mat.emission_enabled = true
+        star_mat.emission = Color(0.18, 0.42, 1.0)
+        star.material_override = star_mat
+        var angle := float(i) * 2.399
+        var radius := 5.0 + float((i * 7) % 9) * 0.48
+        star.position = Vector3(cos(angle) * radius, sin(angle * 1.37) * 6.0, -5.0 - float(i % 5))
+        add_child(star)
+
+    var world_specs := [
+        {"p": Vector3(-3.4, 3.0, 0), "c": Color(0.12, 0.65, 0.46), "name": "وادي المعرفة"},
+        {"p": Vector3(2.9, 1.55, -0.2), "c": Color(0.18, 0.56, 0.32), "name": "غابة الألغاز"},
+        {"p": Vector3(-2.8, -0.1, 0.1), "c": Color(0.15, 0.48, 0.78), "name": "مدينة العلوم"},
+        {"p": Vector3(3.0, -1.8, 0), "c": Color(0.52, 0.34, 0.72), "name": "قلعة العباقرة"},
+        {"p": Vector3(-0.1, -3.55, -0.2), "c": Color(0.82, 0.53, 0.20), "name": "قمة الأساطير"}
     ]
-    for i in range(12):
-        var orb := MeshInstance3D.new()
-        var sphere := SphereMesh.new()
-        sphere.radius = 0.28 if i % 3 == 0 else 0.16
-        sphere.height = sphere.radius * 2.0
-        orb.mesh = sphere
-        var material := StandardMaterial3D.new()
-        material.albedo_color = colors[i % colors.size()]
-        material.emission_enabled = true
-        material.emission = colors[i % colors.size()] * 0.45
-        orb.material_override = material
-        var angle := TAU * float(i) / 12.0
-        orb.position = Vector3(cos(angle) * 4.5, sin(angle * 1.7) * 3.0, -1.5)
-        add_child(orb)
+    for i in range(world_specs.size()):
+        _add_map_island(world_specs[i]["p"], world_specs[i]["c"], i)
 
-    var ring := MeshInstance3D.new()
-    var torus := TorusMesh.new()
-    torus.inner_radius = 2.7
-    torus.outer_radius = 2.78
-    ring.mesh = torus
-    ring.position = Vector3(0, 0, -2.0)
-    ring.rotation_degrees = Vector3(22, 0, 12)
-    var ring_material := StandardMaterial3D.new()
-    ring_material.albedo_color = Color(0.25, 0.45, 1.0, 0.45)
-    ring_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-    ring_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-    ring.material_override = ring_material
-    add_child(ring)
+    # Glowing stepping-stone trail connecting the five floating worlds.
+    for i in range(4):
+        var a: Vector3 = world_specs[i]["p"]
+        var b: Vector3 = world_specs[i + 1]["p"]
+        for step in range(1, 5):
+            var t := float(step) / 5.0
+            var pebble := MeshInstance3D.new()
+            var pebble_mesh := SphereMesh.new()
+            pebble_mesh.radius = 0.075
+            pebble_mesh.height = 0.10
+            pebble.mesh = pebble_mesh
+            pebble.position = a.lerp(b, t) + Vector3(0, 0, -0.45)
+            var pebble_mat := StandardMaterial3D.new()
+            pebble_mat.albedo_color = Color(0.22, 0.78, 1.0)
+            pebble_mat.emission_enabled = true
+            pebble_mat.emission = Color(0.08, 0.42, 1.0) * 1.8
+            pebble.material_override = pebble_mat
+            add_child(pebble)
+
+func _map_material(color: Color, glow: float = 0.0) -> StandardMaterial3D:
+    var material := StandardMaterial3D.new()
+    material.albedo_color = color
+    material.roughness = 0.78
+    if glow > 0.0:
+        material.emission_enabled = true
+        material.emission = color * glow
+    return material
+
+func _add_map_island(position: Vector3, tint: Color, world_index: int) -> void:
+    var island := Node3D.new()
+    island.position = position
+    add_child(island)
+
+    var base := MeshInstance3D.new()
+    var base_mesh := SphereMesh.new()
+    base_mesh.radius = 1.48 if world_index == 4 else 1.30
+    base_mesh.height = 1.10
+    base.mesh = base_mesh
+    base.scale = Vector3(1.18, 0.48, 0.82)
+    base.position = Vector3(0, -0.38, 0)
+    base.material_override = _map_material(Color(0.055, 0.12, 0.23))
+    island.add_child(base)
+
+    var top := MeshInstance3D.new()
+    var top_mesh := CylinderMesh.new()
+    top_mesh.top_radius = 1.25
+    top_mesh.bottom_radius = 1.42
+    top_mesh.height = 0.22
+    top.mesh = top_mesh
+    top.position = Vector3(0, -0.05, 0)
+    top.material_override = _map_material(tint)
+    island.add_child(top)
+
+    var rim := MeshInstance3D.new()
+    var rim_mesh := TorusMesh.new()
+    rim_mesh.inner_radius = 1.17
+    rim_mesh.outer_radius = 1.22
+    rim.mesh = rim_mesh
+    rim.position = Vector3(0, 0.08, 0)
+    rim.material_override = _map_material(tint.lightened(0.28), 0.45)
+    island.add_child(rim)
+
+    # Landmark structure unique to each world.
+    if world_index == 0 or world_index == 2:
+        _add_map_tower(island, Vector3(0, 0.42, 0), tint, world_index == 2)
+    elif world_index == 1:
+        for tree_index in range(5):
+            var angle := TAU * float(tree_index) / 5.0
+            _add_map_tree(island, Vector3(cos(angle) * 0.78, 0.20, sin(angle) * 0.48))
+    elif world_index == 3:
+        _add_map_castle(island, tint)
+    else:
+        _add_map_tower(island, Vector3(0, 0.48, 0), tint, true)
+        var crown := MeshInstance3D.new()
+        var crown_mesh := PrismMesh.new()
+        crown_mesh.size = Vector3(0.72, 0.62, 0.72)
+        crown.mesh = crown_mesh
+        crown.position = Vector3(0, 1.42, 0)
+        crown.material_override = _map_material(Color(1.0, 0.76, 0.25), 1.1)
+        island.add_child(crown)
+
+    for gem_index in range(3):
+        var gem := MeshInstance3D.new()
+        var gem_mesh := SphereMesh.new()
+        gem_mesh.radius = 0.095
+        gem_mesh.height = 0.19
+        gem.mesh = gem_mesh
+        gem.position = Vector3(-0.72 + float(gem_index) * 0.72, 0.35, 0.55)
+        gem.material_override = _map_material(Color(0.38, 0.86, 1.0), 1.6)
+        gem.add_to_group("map_gems")
+        island.add_child(gem)
+
+func _add_map_tree(parent: Node3D, at: Vector3) -> void:
+    var trunk := MeshInstance3D.new()
+    var trunk_mesh := CylinderMesh.new()
+    trunk_mesh.top_radius = 0.07
+    trunk_mesh.bottom_radius = 0.11
+    trunk_mesh.height = 0.48
+    trunk.mesh = trunk_mesh
+    trunk.position = at + Vector3(0, 0.24, 0)
+    trunk.material_override = _map_material(Color(0.28, 0.13, 0.08))
+    parent.add_child(trunk)
+
+    var leaves := MeshInstance3D.new()
+    var leaves_mesh := SphereMesh.new()
+    leaves_mesh.radius = 0.30
+    leaves_mesh.height = 0.58
+    leaves.mesh = leaves_mesh
+    leaves.position = at + Vector3(0, 0.62, 0)
+    leaves.material_override = _map_material(Color(0.12, 0.52, 0.31), 0.18)
+    parent.add_child(leaves)
+
+func _add_map_tower(parent: Node3D, at: Vector3, tint: Color, crystal: bool) -> void:
+    var pillar := MeshInstance3D.new()
+    var pillar_mesh := CylinderMesh.new()
+    pillar_mesh.top_radius = 0.28
+    pillar_mesh.bottom_radius = 0.42
+    pillar_mesh.height = 1.05
+    pillar.mesh = pillar_mesh
+    pillar.position = at + Vector3(0, 0.53, 0)
+    pillar.material_override = _map_material(Color(0.72, 0.78, 0.91))
+    parent.add_child(pillar)
+
+    var cap := MeshInstance3D.new()
+    var cap_mesh := PrismMesh.new()
+    cap_mesh.size = Vector3(0.72, 0.62, 0.72)
+    cap.mesh = cap_mesh
+    cap.position = at + Vector3(0, 1.32, 0)
+    cap.material_override = _map_material(tint.lightened(0.28), 0.35)
+    parent.add_child(cap)
+
+    if crystal:
+        var shard := MeshInstance3D.new()
+        var shard_mesh := PrismMesh.new()
+        shard_mesh.size = Vector3(0.38, 0.72, 0.38)
+        shard.mesh = shard_mesh
+        shard.position = at + Vector3(0, 1.78, 0)
+        shard.rotation_degrees = Vector3(0, 45, 0)
+        shard.material_override = _map_material(Color(0.35, 0.9, 1.0), 1.8)
+        shard.add_to_group("map_gems")
+        parent.add_child(shard)
+
+func _add_map_castle(parent: Node3D, tint: Color) -> void:
+    var keep := MeshInstance3D.new()
+    var keep_mesh := BoxMesh.new()
+    keep_mesh.size = Vector3(0.9, 0.92, 0.7)
+    keep.mesh = keep_mesh
+    keep.position = Vector3(0, 0.58, 0)
+    keep.material_override = _map_material(Color(0.62, 0.65, 0.82))
+    parent.add_child(keep)
+    for x in [-0.52, 0.52]:
+        for z in [-0.34, 0.34]:
+            var turret := MeshInstance3D.new()
+            var turret_mesh := CylinderMesh.new()
+            turret_mesh.top_radius = 0.12
+            turret_mesh.bottom_radius = 0.18
+            turret_mesh.height = 1.12
+            turret.mesh = turret_mesh
+            turret.position = Vector3(x, 0.62, z)
+            turret.material_override = _map_material(tint.lightened(0.42))
+            parent.add_child(turret)
+            var roof := MeshInstance3D.new()
+            var roof_mesh := PrismMesh.new()
+            roof_mesh.size = Vector3(0.38, 0.38, 0.38)
+            roof.mesh = roof_mesh
+            roof.position = Vector3(x, 1.34, z)
+            roof.material_override = _map_material(Color(0.95, 0.64, 0.26), 0.25)
+            parent.add_child(roof)
 
 func _load_questions() -> void:
     if not FileAccess.file_exists(QUESTIONS_PATH):
@@ -194,7 +388,7 @@ func _build_interface() -> void:
 
     var tint := ColorRect.new()
     tint.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    tint.color = Color(0.025, 0.035, 0.10, 0.84)
+    tint.color = Color(0.018, 0.028, 0.075, 0.48)
     root.add_child(tint)
 
     var margin := MarginContainer.new()
@@ -394,21 +588,39 @@ func _show_help() -> void:
 
 func _show_world_map() -> void:
     _clear_content()
-    _add_heading("خريطة العوالم", "اختر عالمك… وكل عالم يخفي تحدّياً أقوى")
+    _add_heading("رحلة العباقرة", "خمسة عوالم عائمة… افتح طريقك نحو القمة")
     var names := ["وادي المعرفة", "غابة الألغاز", "مدينة العلوم", "قلعة العباقرة", "قمة الأساطير"]
-    var icons := ["🌄", "🌳", "🔬", "🏰", "👑"]
+    var subtitles := ["بوابة البداية", "أسرار الطبيعة", "مختبر التحدّي", "مواجهة الحراس", "الاختبار الأسطوري"]
+    var icons := ["✦", "♣", "⚗", "♜", "♛"]
     for world in range(5):
         var first_level := world * 2 + 1
-        var last_level := first_level + 1
         var locked := first_level > unlocked_level
-        var caption := "%s  %s\nالمستويان %d و %d%s" % [icons[world], names[world], first_level, last_level, "  🔒 مغلق" if locked else "  👑 تحدّي الزعيم"]
-        var button := _make_button(caption)
-        button.custom_minimum_size.y = 88
+        var status := "🔒 مقفل" if locked else ("★ العالم الحالي" if first_level <= unlocked_level and unlocked_level < first_level + 2 else "✓ متاح")
+        var card := PanelContainer.new()
+        var style := StyleBoxFlat.new()
+        style.bg_color = Color(0.035, 0.075, 0.16, 0.92) if not locked else Color(0.025, 0.04, 0.085, 0.9)
+        style.border_color = Color(0.22, 0.72, 1.0, 0.9) if not locked else Color(0.22, 0.30, 0.45, 0.65)
+        style.set_border_width_all(2)
+        style.set_corner_radius_all(16)
+        style.content_margin_left = 14
+        style.content_margin_right = 14
+        style.content_margin_top = 8
+        style.content_margin_bottom = 8
+        card.add_theme_stylebox_override("panel", style)
+        var button := Button.new()
+        button.text = "%s   %s\n%s     %s" % [icons[world], names[world], subtitles[world], status]
+        button.custom_minimum_size = Vector2(0, 66)
+        button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        button.alignment = HORIZONTAL_ALIGNMENT_RIGHT
+        button.add_theme_font_size_override("font_size", 18)
+        button.add_theme_color_override("font_color", Color(0.92, 0.97, 1.0) if not locked else Color(0.55, 0.62, 0.75))
+        button.flat = true
         button.disabled = locked
         if not locked:
             button.pressed.connect(_show_world_levels.bind(world))
-        content.add_child(button)
-    var back := _make_button("→   العودة للرئيسية")
+        card.add_child(button)
+        content.add_child(card)
+    var back := _make_button("⌂   العودة للرئيسية")
     back.pressed.connect(_show_main_menu)
     content.add_child(back)
 
