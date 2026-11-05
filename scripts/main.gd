@@ -748,7 +748,7 @@ func _show_world_levels(world: int) -> void:
         stage_card.add_theme_stylebox_override("panel", stage_style)
         var stage_button := Button.new()
         var symbol := "👑" if index == 1 else ("★" if completed else ("🔒" if locked else "◆"))
-        var stage_name := "الزعيم الأخير" if index == 1 else stage_titles[index]
+        var stage_name: String = "الزعيم الأخير" if index == 1 else stage_titles[index]
         stage_button.text = "%s   %s  •  %s\n%s  |  %d ثانية لكل سؤال" % [symbol, stage_name, stage_state, stage_descriptions[index], maxi(8, 22 - (level - 1))]
         stage_button.custom_minimum_size = Vector2(0, 80)
         stage_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -976,11 +976,15 @@ func _show_results() -> void:
         unlocked_level += 1
         if unlocked_level == 11:
             level_message = "🏆 اكتملت الرحلة! أنت أسطورة العباقرة!"
+        elif current_level % 2 == 0:
+            level_message = "🎉 اكتملت الخريطة! فُتحت الخريطة التالية."
         else:
-            level_message = "🎉 فتحت المرحلة %d والخريطة التالية!" % unlocked_level
+            level_message = "🎉 فتحت المرحلة %d داخل الخريطة!" % unlocked_level
         _save_player_data()
-    elif percent < 60:
+    elif percent < 60 and current_level == unlocked_level:
         level_message = "تحتاج 60%% على الأقل لفتح المرحلة التالية. حاول مجدداً!"
+    elif percent < 60:
+        level_message = "أعد هذه المرحلة وحاول تحسين نتيجتك!"
     else:
         level_message = "أنت متقدم في الرحلة! واصل التحدّي."
     var result_text := Label.new()
