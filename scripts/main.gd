@@ -7,6 +7,7 @@ var question_order: Array[int] = []
 var question_index := 0
 var score := 0
 var answered := false
+var showing_results := false
 var question_label: Label
 var category_label: Label
 var progress_label: Label
@@ -191,6 +192,7 @@ func _start_game() -> void:
         feedback_label.text = "تعذّر تحميل الأسئلة. تحقق من ملف البيانات."
         return
     score = 0
+    showing_results = false
     question_index = 0
     question_order.clear()
     for i in range(questions.size()):
@@ -238,6 +240,9 @@ func _select_answer(selected: String) -> void:
         next_button.text = "عرض النتيجة"
 
 func _next_question() -> void:
+    if showing_results:
+        _start_game()
+        return
     if not answered:
         return
     if question_index >= question_order.size() - 1:
@@ -254,8 +259,7 @@ func _show_results() -> void:
     progress_label.text = "🏆 إنجاز جديد"
     next_button.text = "العب من جديد"
     next_button.disabled = false
-    next_button.pressed.disconnect(_next_question)
-    next_button.pressed.connect(_start_game)
+    showing_results = true
 
 func _clear_answers() -> void:
     for child in answers_box.get_children():
