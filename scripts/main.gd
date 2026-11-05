@@ -67,7 +67,7 @@ func _setup_music() -> void:
     music_player.play()
     music_playback = music_player.get_stream_playback() as AudioStreamGeneratorPlayback
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
     if music_enabled and music_playback != null:
         var frames := music_playback.get_frames_available()
         if frames > 0:
