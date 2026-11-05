@@ -1,0 +1,69 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    name: Export Android APK
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: |
+          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          yes | sdkmanager --licenses
+
+      - name: Download Godot 4.4.1 and export templates
+        run: |
+          GODOT_VERSION="4.4.1"
+          mkdir -p "$HOME/godot" "$HOME/.local/share/godot/export_templates/$GODOT_VERSION.stable"
+          wget -q "https://github.com/godotengine/godot/releases/download/$GODOT_VERSION-stable/Godot_v$GODOT_VERSION-stable_linux.x86_64.zip" -O "$HOME/godot/godot.zip"
+          unzip -q "$HOME/godot/godot.zip" -d "$HOME/godot"
+          wget -q "https://github.com/godotengine/godot/releases/download/$GODOT_VERSION-stable/Godot_v$GODOT_VERSION-stable_export_templates.tpz" -O "$HOME/godot/templates.tpz"
+          mkdir -p "$HOME/godot/templates"
+          unzip -q "$HOME/godot/templates.tpz" -d "$HOME/godot/templates"
+          cp "$HOME/godot/templates/templates/"* "$HOME/.local/share/godot/export_templates/$GODOT_VERSION.stable/"
+          chmod +x "$HOME/godot/Godot_v$GODOT_VERSION-stable_linux.x86_64"
+
+      - name: Configure Godot Android SDK paths
+        run: |
+          mkdir -p "$HOME/.config/godot"
+          cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+          [resource]
+          export/android/android_sdk_path = "$ANDROID_HOME"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          EOF
+
+      - name: Import project
+        run: "$HOME/godot/Godot_v4.4.1-stable_linux.x86_64" --headless --editor --path . --import
+
+      - name: Export debug APK
+        run: |
+          mkdir -p build
+          "$HOME/godot/Godot_v4.4.1-stable_linux.x86_64" --headless --path . --export-debug "Android" build/Challenge.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: challenge-android-apk
+          path: build/Challenge.apk
+          if-no-files-found: error
+          retention-days: 14
