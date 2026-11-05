@@ -803,7 +803,10 @@ func _start_game() -> void:
     _start_level(current_level)
 
 func _start_level(level: int) -> void:
-    current_level = clampi(level, 1, unlocked_level)
+    current_level = clampi(level, 1, 10)
+    if current_level > mini(unlocked_level, 10):
+        _show_world_map()
+        return
     if questions.is_empty():
         _clear_content()
         _add_heading("تعذّر بدء اللعبة", "لم نتمكن من تحميل الأسئلة. أعد تشغيل التطبيق.")
@@ -969,14 +972,17 @@ func _show_results() -> void:
     _add_stat_card("أفضل نتيجة شخصية", "🏆  %d نقطة" % best_score)
     var percent := int(round(float(correct_answers) / float(question_order.size()) * 100.0))
     var level_message := ""
-    if percent >= 60 and current_level == unlocked_level and unlocked_level < 10:
+    if percent >= 60 and current_level == unlocked_level and unlocked_level <= 10:
         unlocked_level += 1
-        level_message = "🎉 فتحت المستوى %d!" % unlocked_level
+        if unlocked_level == 11:
+            level_message = "🏆 اكتملت الرحلة! أنت أسطورة العباقرة!"
+        else:
+            level_message = "🎉 فتحت المرحلة %d والخريطة التالية!" % unlocked_level
         _save_player_data()
     elif percent < 60:
-        level_message = "تحتاج 60%% على الأقل لفتح المستوى التالي. حاول مجدداً!"
+        level_message = "تحتاج 60%% على الأقل لفتح المرحلة التالية. حاول مجدداً!"
     else:
-        level_message = "أنت متقدم في المستويات! واصل التحدّي."
+        level_message = "أنت متقدم في الرحلة! واصل التحدّي."
     var result_text := Label.new()
     result_text.text = "نسبة الإجابات الصحيحة: %d%%\n%s" % [percent, level_message]
     result_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
