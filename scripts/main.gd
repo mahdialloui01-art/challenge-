@@ -504,35 +504,55 @@ func _display_question() -> void:
     content.add_child(home_button)
 
 func _select_answer(selected: String) -> void:
-    if answered:
+    # Ignore duplicate taps and stale callbacks after a screen change.
+    if answered or question_timer == null or not is_instance_valid(question_timer):
         return
+    if question_order.is_empty() or question_index < 0 or question_index >= question_order.size():
+        return
+    var question_id := question_order[question_index]
+    if question_id < 0 or question_id >= questions.size():
+        return
+    if not questions[question_id] is Dictionary:
+        return
+
     answered = true
     question_timer.stop()
-    var item: Dictionary = questions[question_order[question_index]]
-    var options: Array = item.get("answers", [])
+    var item: Dictionary = questions[question_id]
+    var raw_options = item.get("answers", [])
+    var options: Array = raw_options if raw_options is Array else []
     var correct_index := int(item.get("correct", -1))
-    var correct_answer := str(options[correct_index]) if correct_index >= 0 and correct_index < options.size() else ""
-    if selected == correct_answer:
+    var correct_answer := ""
+    if correct_index >= 0 and correct_index < options.size():
+        correct_answer = str(options[correct_index])
+
+    var is_correct := not correct_answer.is_empty() and selected == correct_answer
+    if is_correct:
         correct_answers += 1
         var points := 10 + current_level * 2
         score += points
-        feedback_label.text = "إجابة صحيحة! أحسنت +%d ⭐" % points
-        if explanations_enabled:
-            feedback_label.text += "\n" + str(item.get("explanation", ""))
-        feedback_label.add_theme_color_override("font_color", Color(0.45, 1.0, 0.68))
+        if is_instance_valid(feedback_label):
+            feedback_label.text = "إجابة صحيحة! أحسنت +%d ⭐" % points
+            if explanations_enabled:
+                feedback_label.text += "\n" + str(item.get("explanation", ""))
+            feedback_label.add_theme_color_override("font_color", Color(0.45, 1.0, 0.68))
     else:
-        feedback_label.text = "إجابة غير صحيحة. الجواب: " + correct_answer
-        if explanations_enabled:
-            feedback_label.text += "\n" + str(item.get("explanation", ""))
-        feedback_label.add_theme_color_override("font_color", Color(1.0, 0.68, 0.55))
-    if selected.is_empty():
+        if is_instance_valid(feedback_label):
+            feedback_label.text = "إجابة غير صحيحة. الجواب: " + (correct_answer if not correct_answer.is_empty() else "غير متوفر")
+            if explanations_enabled:
+                feedback_label.text += "\n" + str(item.get("explanation", ""))
+            feedback_label.add_theme_color_override("font_color", Color(1.0, 0.68, 0.55))
+    if selected.is_empty() and is_instance_valid(feedback_label):
         feedback_label.text = "انتهى الوقت! " + feedback_label.text
-    if vibration_enabled:
+
+    # Haptics are optional; keep answer handling safe on devices without Android vibration support.
+    if vibration_enabled and OS.has_feature("android"):
         Input.vibrate_handheld(65)
-    score_label.text = "⭐ %d نقطة" % score
-    next_button.disabled = false
-    if question_index == question_order.size() - 1:
-        next_button.text = "عرض النتيجة"
+    if is_instance_valid(score_label):
+        score_label.text = "⭐ %d نقطة" % score
+    if is_instance_valid(next_button):
+        next_button.disabled = false
+        if question_index == question_order.size() - 1:
+            next_button.text = "عرض النتيجة"
 
 func _on_question_timeout() -> void:
     if not answered:
