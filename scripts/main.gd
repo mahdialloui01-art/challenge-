@@ -592,38 +592,84 @@ func _show_help() -> void:
 
 func _show_world_map() -> void:
     _clear_content()
-    _add_heading("رحلة العباقرة", "خمسة عوالم عائمة… افتح طريقك نحو القمة")
+    _add_heading("رحلة العباقرة", "خمسة عوالم… وكل عالم خريطة بمراحلها الخاصة")
     var names := ["وادي المعرفة", "غابة الألغاز", "مدينة العلوم", "قلعة العباقرة", "قمة الأساطير"]
-    var subtitles := ["بوابة البداية", "أسرار الطبيعة", "مختبر التحدّي", "مواجهة الحراس", "الاختبار الأسطوري"]
+    var subtitles := ["بوابة الاكتشاف", "أسرار الطبيعة", "مختبر التحدّي", "حصن الحراس", "الاختبار الأسطوري"]
     var icons := ["✦", "♣", "⚗", "♜", "♛"]
+    var tints := [Color(0.16, 0.86, 0.66), Color(0.35, 0.82, 0.43), Color(0.25, 0.68, 1.0), Color(0.70, 0.48, 1.0), Color(1.0, 0.70, 0.28)]
+
+    var journey := _make_button("🗺  تقدّم الرحلة   %d / 10 مرحلة" % mini(unlocked_level - 1, 10))
+    journey.custom_minimum_size.y = 58
+    journey.disabled = true
+    content.add_child(journey)
+
     for world in range(5):
         var first_level := world * 2 + 1
+        var completed := clampi(unlocked_level - first_level, 0, 2)
         var locked := first_level > unlocked_level
-        var status := "🔒 مقفل" if locked else ("★ العالم الحالي" if first_level <= unlocked_level and unlocked_level < first_level + 2 else "✓ متاح")
+        var tint: Color = tints[world]
+        var status := "✓ اكتملت الخريطة" if completed == 2 else ("🔒 لم تُفتح بعد" if locked else "✦ الخريطة الحالية")
         var card := PanelContainer.new()
         var style := StyleBoxFlat.new()
-        style.bg_color = Color(0.035, 0.075, 0.16, 0.92) if not locked else Color(0.025, 0.04, 0.085, 0.9)
-        style.border_color = Color(0.22, 0.72, 1.0, 0.9) if not locked else Color(0.22, 0.30, 0.45, 0.65)
+        style.bg_color = Color(0.035, 0.075, 0.16, 0.97) if not locked else Color(0.025, 0.04, 0.085, 0.94)
+        style.border_color = tint if not locked else Color(0.20, 0.29, 0.43, 0.72)
         style.set_border_width_all(2)
-        style.set_corner_radius_all(16)
-        style.content_margin_left = 14
-        style.content_margin_right = 14
-        style.content_margin_top = 8
-        style.content_margin_bottom = 8
+        style.set_corner_radius_all(20)
+        style.content_margin_left = 12
+        style.content_margin_right = 12
+        style.content_margin_top = 10
+        style.content_margin_bottom = 10
         card.add_theme_stylebox_override("panel", style)
+
+        var box := VBoxContainer.new()
+        box.add_theme_constant_override("separation", 6)
+        card.add_child(box)
         var button := Button.new()
         button.text = "%s   %s\n%s     %s" % [icons[world], names[world], subtitles[world], status]
-        button.custom_minimum_size = Vector2(0, 66)
+        button.custom_minimum_size = Vector2(0, 72)
         button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         button.alignment = HORIZONTAL_ALIGNMENT_RIGHT
-        button.add_theme_font_size_override("font_size", 18)
-        button.add_theme_color_override("font_color", Color(0.92, 0.97, 1.0) if not locked else Color(0.55, 0.62, 0.75))
+        button.add_theme_font_size_override("font_size", 19)
+        button.add_theme_color_override("font_color", Color(0.94, 0.97, 1.0) if not locked else Color(0.55, 0.62, 0.75))
         button.flat = true
         button.disabled = locked
         if not locked:
             button.pressed.connect(_show_world_levels.bind(world))
-        card.add_child(button)
+        box.add_child(button)
+
+        var row := HBoxContainer.new()
+        var count := Label.new()
+        count.text = "%d / 2 مراحل" % completed
+        count.add_theme_font_size_override("font_size", 14)
+        count.add_theme_color_override("font_color", tint if not locked else Color(0.48, 0.55, 0.68))
+        row.add_child(count)
+        var spacer := Control.new()
+        spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        row.add_child(spacer)
+        var stars := Label.new()
+        stars.text = ("★ " if completed >= 1 else "☆ ") + ("★" if completed >= 2 else "☆")
+        stars.add_theme_font_size_override("font_size", 17)
+        stars.add_theme_color_override("font_color", Color(1.0, 0.78, 0.32))
+        row.add_child(stars)
+        box.add_child(row)
+
+        var progress := ProgressBar.new()
+        progress.min_value = 0
+        progress.max_value = 2
+        progress.value = completed
+        progress.show_percentage = false
+        progress.custom_minimum_size.y = 9
+        var progress_bg := StyleBoxFlat.new()
+        progress_bg.bg_color = Color(0.10, 0.16, 0.27)
+        progress_bg.set_corner_radius_all(8)
+        progress.add_theme_stylebox_override("background", progress_bg)
+        var progress_fill := StyleBoxFlat.new()
+        progress_fill.bg_color = tint
+        progress_fill.set_corner_radius_all(8)
+        progress.add_theme_stylebox_override("fill", progress_fill)
+        box.add_child(progress)
         content.add_child(card)
+
     var back := _make_button("⌂   العودة للرئيسية")
     back.pressed.connect(_show_main_menu)
     content.add_child(back)
@@ -631,20 +677,107 @@ func _show_world_map() -> void:
 func _show_world_levels(world: int) -> void:
     _clear_content()
     var first_level := world * 2 + 1
-    var last_level := first_level + 1
     var names := ["وادي المعرفة", "غابة الألغاز", "مدينة العلوم", "قلعة العباقرة", "قمة الأساطير"]
-    _add_heading(names[world], "أكمل المرحلتين لفتح العالم التالي")
-    for level in range(first_level, last_level + 1):
-        var locked := level > unlocked_level
-        var is_boss := level == last_level
-        var seconds := maxi(8, 22 - (level - 1))
-        var caption := "🔒 المستوى %d — مغلق" % level if locked else "%s المستوى %d\n%d ثانية لكل سؤال" % ["👑 زعيم العالم" if is_boss else "⭐", level, seconds]
-        var button := _make_button(caption)
-        button.custom_minimum_size.y = 78
-        button.disabled = locked
+    var icons := ["✦", "♣", "⚗", "♜", "♛"]
+    var tints := [Color(0.16, 0.86, 0.66), Color(0.35, 0.82, 0.43), Color(0.25, 0.68, 1.0), Color(0.70, 0.48, 1.0), Color(1.0, 0.70, 0.28)]
+    var tint: Color = tints[world]
+    var completed_stages := clampi(unlocked_level - first_level, 0, 2)
+    _add_heading("%s  %s" % [icons[world], names[world]], "خريطة المراحل • أكمل كل نقطة لفتح الطريق")
+
+    var banner := PanelContainer.new()
+    var banner_style := StyleBoxFlat.new()
+    banner_style.bg_color = Color(0.055, 0.11, 0.22, 0.97)
+    banner_style.border_color = tint
+    banner_style.set_border_width_all(2)
+    banner_style.set_corner_radius_all(18)
+    banner_style.content_margin_left = 14
+    banner_style.content_margin_right = 14
+    banner_style.content_margin_top = 10
+    banner_style.content_margin_bottom = 10
+    banner.add_theme_stylebox_override("panel", banner_style)
+    var banner_box := VBoxContainer.new()
+    banner_box.add_theme_constant_override("separation", 6)
+    banner.add_child(banner_box)
+    var banner_title := Label.new()
+    banner_title.text = "تقدّمك في هذه الخريطة"
+    banner_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    banner_title.add_theme_font_size_override("font_size", 18)
+    banner_title.add_theme_color_override("font_color", Color(0.91, 0.95, 1.0))
+    banner_box.add_child(banner_title)
+    var progress := ProgressBar.new()
+    progress.min_value = 0
+    progress.max_value = 2
+    progress.value = completed_stages
+    progress.show_percentage = false
+    progress.custom_minimum_size.y = 12
+    var pbg := StyleBoxFlat.new()
+    pbg.bg_color = Color(0.10, 0.16, 0.27)
+    pbg.set_corner_radius_all(8)
+    progress.add_theme_stylebox_override("background", pbg)
+    var pfg := StyleBoxFlat.new()
+    pfg.bg_color = tint
+    pfg.set_corner_radius_all(8)
+    progress.add_theme_stylebox_override("fill", pfg)
+    banner_box.add_child(progress)
+    var count := Label.new()
+    count.text = "%d من 2 مراحل مكتملة" % completed_stages
+    count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    count.add_theme_font_size_override("font_size", 14)
+    count.add_theme_color_override("font_color", tint)
+    banner_box.add_child(count)
+    content.add_child(banner)
+
+    var stage_titles := ["بوابة البداية", "حارس العالم"]
+    var stage_descriptions := ["اجتز أول تحدٍّ وافتح الطريق", "التحدّي النهائي لفتح العالم التالي"]
+    for index in range(2):
+        var level := first_level + index
+        var locked := level > mini(unlocked_level, 10)
+        var completed := level < unlocked_level
+        var stage_state := "✓ مكتملة" if completed else ("🔒 مغلقة" if locked else "● المرحلة الحالية")
+        var stage_color: Color = Color(0.34, 0.92, 0.68) if completed else (Color(0.43, 0.72, 1.0) if not locked else Color(0.43, 0.49, 0.62))
+        var stage_card := PanelContainer.new()
+        var stage_style := StyleBoxFlat.new()
+        stage_style.bg_color = Color(0.045, 0.09, 0.18, 0.98) if not locked else Color(0.025, 0.045, 0.085, 0.95)
+        stage_style.border_color = stage_color
+        stage_style.set_border_width_all(2)
+        stage_style.set_corner_radius_all(18)
+        stage_style.content_margin_left = 10
+        stage_style.content_margin_right = 10
+        stage_style.content_margin_top = 8
+        stage_style.content_margin_bottom = 8
+        stage_card.add_theme_stylebox_override("panel", stage_style)
+        var stage_button := Button.new()
+        var symbol := "👑" if index == 1 else ("★" if completed else ("🔒" if locked else "◆"))
+        var stage_name := "الزعيم الأخير" if index == 1 else stage_titles[index]
+        stage_button.text = "%s   %s  •  %s\n%s  |  %d ثانية لكل سؤال" % [symbol, stage_name, stage_state, stage_descriptions[index], maxi(8, 22 - (level - 1))]
+        stage_button.custom_minimum_size = Vector2(0, 80)
+        stage_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        stage_button.alignment = HORIZONTAL_ALIGNMENT_RIGHT
+        stage_button.add_theme_font_size_override("font_size", 17)
+        stage_button.add_theme_color_override("font_color", Color(0.94, 0.97, 1.0) if not locked else Color(0.50, 0.57, 0.69))
+        stage_button.flat = true
+        stage_button.disabled = locked
         if not locked:
-            button.pressed.connect(_start_level.bind(level))
-        content.add_child(button)
+            stage_button.pressed.connect(_start_level.bind(level))
+        stage_card.add_child(stage_button)
+        content.add_child(stage_card)
+        if index == 0:
+            var path := Label.new()
+            path.text = "◆\n│\n◆"
+            path.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+            path.add_theme_font_size_override("font_size", 18)
+            path.add_theme_color_override("font_color", tint)
+            content.add_child(path)
+
+    if completed_stages == 2:
+        var finished := Label.new()
+        finished.text = "🏆 اكتملت هذه الخريطة! البوابة التالية مفتوحة."
+        finished.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        finished.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        finished.add_theme_font_size_override("font_size", 17)
+        finished.add_theme_color_override("font_color", Color(1.0, 0.82, 0.35))
+        content.add_child(finished)
+
     var back := _make_button("←   العودة إلى خريطة العوالم")
     back.pressed.connect(_show_world_map)
     content.add_child(back)
