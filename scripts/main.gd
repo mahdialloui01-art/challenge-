@@ -368,7 +368,7 @@ func _load_player_data() -> void:
         music_enabled = bool(config.get_value("settings", "music", true))
     if not DIFFICULTIES.has(difficulty):
         difficulty = "medium"
-    unlocked_level = clampi(unlocked_level, 1, 10)
+    unlocked_level = clampi(unlocked_level, 1, 11)
 
 func _save_player_data() -> void:
     var config := ConfigFile.new()
