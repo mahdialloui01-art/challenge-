@@ -27,8 +27,12 @@ jobs:
 
       - name: Install Android SDK packages
         run: |
-          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          set -euxo pipefail
           yes | sdkmanager --licenses
+          sdkmanager --install "cmdline-tools;latest" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "JAVA_HOME=$JAVA_HOME"
+          sdkmanager --list_installed
 
       - name: Download Godot 4.4.1 and export templates
         run: |
@@ -39,8 +43,11 @@ jobs:
           wget -q "https://github.com/godotengine/godot/releases/download/$GODOT_VERSION-stable/Godot_v$GODOT_VERSION-stable_export_templates.tpz" -O "$HOME/godot/templates.tpz"
           mkdir -p "$HOME/godot/templates"
           unzip -q "$HOME/godot/templates.tpz" -d "$HOME/godot/templates"
-          cp "$HOME/godot/templates/templates/"* "$HOME/.local/share/godot/export_templates/$GODOT_VERSION.stable/"
+          test -d "$HOME/godot/templates/templates"
+          cp -v "$HOME/godot/templates/templates/"* "$HOME/.local/share/godot/export_templates/$GODOT_VERSION.stable/"
           chmod +x "$HOME/godot/Godot_v$GODOT_VERSION-stable_linux.x86_64"
+          "$HOME/godot/Godot_v$GODOT_VERSION-stable_linux.x86_64" --version
+          ls -lah "$HOME/.local/share/godot/export_templates/$GODOT_VERSION.stable/"
 
       - name: Configure Godot Android SDK paths
         run: |
@@ -53,12 +60,18 @@ jobs:
           EOF
 
       - name: Import project
-        run: "$HOME/godot/Godot_v4.4.1-stable_linux.x86_64" --headless --editor --path . --import
+        run: |
+          set -euxo pipefail
+          "$HOME/godot/Godot_v4.4.1-stable_linux.x86_64" --headless --editor --path . --import
+          "$HOME/godot/Godot_v4.4.1-stable_linux.x86_64" --headless --editor --path . --quit
 
       - name: Export debug APK
         run: |
+          set -euxo pipefail
           mkdir -p build
           "$HOME/godot/Godot_v4.4.1-stable_linux.x86_64" --headless --path . --export-debug "Android" build/Challenge.apk
+          test -s build/Challenge.apk
+          ls -lh build/Challenge.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
