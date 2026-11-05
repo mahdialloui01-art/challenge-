@@ -25,18 +25,21 @@ jobs:
       - name: Set up Android SDK
         run: |
           set -euxo pipefail
-          echo "ANDROID_HOME=${ANDROID_HOME:-/usr/local/lib/android/sdk}" >> "$GITHUB_ENV"
-          echo "${ANDROID_HOME:-/usr/local/lib/android/sdk}/cmdline-tools/16.0/bin" >> "$GITHUB_PATH"
-          echo "${ANDROID_HOME:-/usr/local/lib/android/sdk}/platform-tools" >> "$GITHUB_PATH"
+          SDK_ROOT="/usr/local/lib/android/sdk"
+          test -d "$SDK_ROOT/cmdline-tools"
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager -print
 
       - name: Install Android SDK packages
         run: |
           set -euxo pipefail
-          yes | sdkmanager --licenses
-          sdkmanager --install "cmdline-tools;latest" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1)"
+          test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses
+          "$SDKMANAGER" --install "cmdline-tools;latest" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
           echo "ANDROID_HOME=$ANDROID_HOME"
           echo "JAVA_HOME=$JAVA_HOME"
-          sdkmanager --list_installed
+          "$SDKMANAGER" --list_installed
 
       - name: Download Godot 4.4.1 and export templates
         run: |
