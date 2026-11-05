@@ -72,6 +72,16 @@ jobs:
           "$HOME/godot/Godot_v4.4.1-stable_linux.x86_64" --headless --editor --path . --import
           "$HOME/godot/Godot_v4.4.1-stable_linux.x86_64" --headless --editor --path . --quit
 
+      - name: Run game startup smoke test
+        run: |
+          set -euxo pipefail
+          GODOT="$HOME/godot/Godot_v4.4.1-stable_linux.x86_64"
+          timeout 30 "$GODOT" --headless --path . --quit-after 5 2>&1 | tee startup-smoke.log
+          if grep -E "SCRIPT ERROR:|Parse Error:|Failed to load script" startup-smoke.log; then
+            echo "Godot startup smoke test detected a script error."
+            exit 1
+          fi
+
       - name: Create Android debug keystore
         run: |
           set -euxo pipefail
