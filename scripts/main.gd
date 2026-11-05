@@ -10,7 +10,7 @@ var score := 0
 var answered := false
 var showing_results := false
 var difficulty := "medium"
-var vibration_enabled := true
+var vibration_enabled := false
 var explanations_enabled := true
 var best_score := 0
 var games_played := 0
@@ -481,7 +481,7 @@ func _display_question() -> void:
     for i in range(options.size()):
         var answer_text := str(options[i])
         var answer_button := _make_button(answer_text)
-        answer_button.pressed.connect(func(): _select_answer(answer_text))
+        answer_button.pressed.connect(_select_answer.bind(answer_text))
         content.add_child(answer_button)
 
     feedback_label = Label.new()
@@ -544,9 +544,7 @@ func _select_answer(selected: String) -> void:
     if selected.is_empty() and is_instance_valid(feedback_label):
         feedback_label.text = "انتهى الوقت! " + feedback_label.text
 
-    # Haptics are optional; keep answer handling safe on devices without Android vibration support.
-    if vibration_enabled and OS.has_feature("android"):
-        Input.vibrate_handheld(65)
+    # Vibration is disabled in this build while Android answer handling is being stabilized.
     if is_instance_valid(score_label):
         score_label.text = "⭐ %d نقطة" % score
     if is_instance_valid(next_button):
