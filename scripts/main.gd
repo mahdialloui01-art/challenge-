@@ -520,7 +520,7 @@ func _show_main_menu() -> void:
 
     var mode: Dictionary = DIFFICULTIES[difficulty]
     var mode_label := Label.new()
-    mode_label.text = "المستوى المفتوح: %d / 10" % unlocked_level
+    mode_label.text = "المراحل المفتوحة: %d / 10" % mini(unlocked_level, 10)
     mode_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     mode_label.add_theme_font_size_override("font_size", 16)
     mode_label.add_theme_color_override("font_color", Color(0.55, 0.88, 0.78))
@@ -580,7 +580,7 @@ func _show_help() -> void:
     _clear_content()
     _add_heading("طريقة اللعب", "أثبت ذكاءك في مجموعة من الأسئلة المتنوعة")
     var rules := Label.new()
-    rules.text = "١. ابدأ بالمستوى الأول، وافتح المستوى التالي بتحقيق 60٪ على الأقل.\n\n٢. لديك وقت محدود للإجابة، ويقلّ الوقت كلما تقدّمت.\n\n٣. تزداد نقاط الإجابة الصحيحة في المستويات الأعلى.\n\n٤. أكمل 5 أسئلة في كل مستوى.\n\n٥. الموسيقى الحماسية تعمل دون إنترنت ويمكن إيقافها من الإعدادات.\n\nيتم حفظ تقدمك وأفضل نتيجة على جهازك."
+    rules.text = "١. رحلتك تتكوّن من 5 خرائط، وكل خريطة فيها مرحلتان متصلتان بمسار.\n\n٢. أكمل المرحلة بنسبة 60٪ على الأقل لفتح المرحلة التالية.\n\n٣. عند إكمال المرحلتين تُفتح الخريطة التالية تلقائياً.\n\n٤. لديك وقت محدود للإجابة، ويقلّ الوقت كلما تقدّمت.\n\n٥. أكمل 5 أسئلة في كل مرحلة.\n\nالموسيقى تعمل دون إنترنت، ويتم حفظ تقدمك على جهازك."
     rules.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     rules.add_theme_font_size_override("font_size", 19)
     rules.add_theme_color_override("font_color", Color(0.88, 0.92, 1.0))
@@ -994,7 +994,7 @@ func _show_results() -> void:
     replay.pressed.connect(func(): _start_level(current_level))
     content.add_child(replay)
     var levels := _make_button("🏅   قائمة المستويات")
-    levels.pressed.connect(_show_levels)
+    levels.pressed.connect(_show_world_map)
     content.add_child(levels)
     var home := _make_button("⌂   القائمة الرئيسية")
     home.pressed.connect(_show_main_menu)
