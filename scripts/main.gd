@@ -305,7 +305,7 @@ func _show_main_menu() -> void:
 
     var play := _make_button("▶   ابدأ التحدّي")
     play.custom_minimum_size.y = 78
-    play.pressed.connect(_show_levels)
+    play.pressed.connect(_show_world_map)
     content.add_child(play)
 
     var settings_button := _make_button("⚙   الإعدادات")
@@ -390,6 +390,47 @@ func _show_help() -> void:
     content.add_child(rules)
     var back := _make_button("→   العودة للرئيسية")
     back.pressed.connect(_show_main_menu)
+    content.add_child(back)
+
+func _show_world_map() -> void:
+    _clear_content()
+    _add_heading("خريطة العوالم", "اختر عالمك… وكل عالم يخفي تحدّياً أقوى")
+    var names := ["وادي المعرفة", "غابة الألغاز", "مدينة العلوم", "قلعة العباقرة", "قمة الأساطير"]
+    var icons := ["🌄", "🌳", "🔬", "🏰", "👑"]
+    for world in range(5):
+        var first_level := world * 2 + 1
+        var last_level := first_level + 1
+        var locked := first_level > unlocked_level
+        var caption := "%s  %s\nالمستويان %d و %d%s" % [icons[world], names[world], first_level, last_level, "  🔒 مغلق" if locked else "  👑 تحدّي الزعيم"]
+        var button := _make_button(caption)
+        button.custom_minimum_size.y = 88
+        button.disabled = locked
+        if not locked:
+            button.pressed.connect(_show_world_levels.bind(world))
+        content.add_child(button)
+    var back := _make_button("→   العودة للرئيسية")
+    back.pressed.connect(_show_main_menu)
+    content.add_child(back)
+
+func _show_world_levels(world: int) -> void:
+    _clear_content()
+    var first_level := world * 2 + 1
+    var last_level := first_level + 1
+    var names := ["وادي المعرفة", "غابة الألغاز", "مدينة العلوم", "قلعة العباقرة", "قمة الأساطير"]
+    _add_heading(names[world], "أكمل المرحلتين لفتح العالم التالي")
+    for level in range(first_level, last_level + 1):
+        var locked := level > unlocked_level
+        var is_boss := level == last_level
+        var seconds := maxi(8, 22 - (level - 1))
+        var caption := "🔒 المستوى %d — مغلق" % level if locked else "%s المستوى %d\n%d ثانية لكل سؤال" % ["👑 زعيم العالم" if is_boss else "⭐", level, seconds]
+        var button := _make_button(caption)
+        button.custom_minimum_size.y = 78
+        button.disabled = locked
+        if not locked:
+            button.pressed.connect(_start_level.bind(level))
+        content.add_child(button)
+    var back := _make_button("←   العودة إلى خريطة العوالم")
+    back.pressed.connect(_show_world_map)
     content.add_child(back)
 
 func _show_levels() -> void:
