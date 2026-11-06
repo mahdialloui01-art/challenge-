@@ -61,10 +61,16 @@ func get_route_country_name(index: int) -> String:
     return "اكتملت الرحلة"
 
 func _append_remaining_countries() -> void:
+    # Keep the designed Algeria-first route, then append every remaining country
+    # in a stable alphabetical ISO-code order (never dictionary iteration order).
+    var remaining: Array[String] = []
     for code_variant in features_by_code.keys():
         var code := str(code_variant)
         if not country_route.has(code):
-            country_route.append(code)
+            remaining.append(code)
+    remaining.sort()
+    for code in remaining:
+        country_route.append(code)
 
 func _build_globe() -> void:
     globe_mesh = MeshInstance3D.new()
@@ -379,20 +385,41 @@ func _create_country_lock_labels() -> void:
         var lock_label := Label3D.new()
         lock_label.name = "CountryLock_" + code
         lock_label.text = "🔒"
-        lock_label.font_size = 34
-        lock_label.pixel_size = 0.0038
+        lock_label.font_size = 58
+        lock_label.pixel_size = 0.0054
         lock_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
         lock_label.no_depth_test = true
         lock_label.shaded = false
-        lock_label.modulate = Color(1.0, 0.78, 0.30, 1.0)
-        lock_label.outline_size = 8
-        lock_label.outline_modulate = Color(0.025, 0.020, 0.012, 1.0)
-        lock_label.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.032)
+        # Neutral metallic gray: unmistakable locked state, not a gold decoration.
+        lock_label.modulate = Color(0.76, 0.79, 0.83, 1.0)
+        lock_label.outline_size = 10
+        lock_label.outline_modulate = Color(0.035, 0.040, 0.050, 1.0)
+        lock_label.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.042)
         lock_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         lock_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-        lock_label.set_meta("route_index", country_route.find(code))
+        var route_index := country_route.find(code)
+        lock_label.set_meta("route_index", route_index)
         add_child(lock_label)
         country_lock_labels.append(lock_label)
+
+        # A compact sequence number sits just below the large lock so players
+        # can read the exact unlock order at a glance.
+        var order_label := Label3D.new()
+        order_label.name = "CountryLockOrder_%s" % code
+        order_label.text = "%02d" % (route_index + 1)
+        order_label.font_size = 19
+        order_label.pixel_size = 0.0032
+        order_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+        order_label.no_depth_test = true
+        order_label.shaded = false
+        order_label.modulate = Color(0.82, 0.85, 0.89, 1.0)
+        order_label.outline_size = 7
+        order_label.outline_modulate = Color(0.025, 0.030, 0.040, 1.0)
+        order_label.position = lock_label.position + Vector3(0.0, -0.17, 0.0)
+        order_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        order_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+        order_label.set_meta("route_index", route_index)
+        add_child(order_label)
 
 func _create_city_labels() -> void:
     # Accurate geographic anchors for the first playable region; labels appear only at close zoom.
