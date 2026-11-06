@@ -30,7 +30,7 @@ var zoom_distance := 7.6
 var target_zoom_distance := 7.6
 var globe_mesh: MeshInstance3D
 var detail_patch: MeshInstance3D
-var detail_material: StandardMaterial3D
+var detail_material: ShaderMaterial
 var cloud_layer: MeshInstance3D
 var country_labels: Array[Label3D] = []
 var city_labels: Array[Label3D] = []
@@ -159,7 +159,7 @@ func _build_north_africa_detail_patch() -> void:
             var vertex := _geo_to_sphere(longitude, latitude, GLOBE_RADIUS * 1.004)
             vertices.append(vertex)
             normals.append(vertex.normalized())
-            # All longitude samples converge at each pole; use one UV there to prevent radial texture streaks.\n            var pole_u := 0.5 if y == 0 or y == latitude_segments else u\n            uvs.append(Vector2(pole_u, v))
+            uvs.append(Vector2(u, v))
     for y in range(LAT_SEGMENTS):
         for x in range(LON_SEGMENTS):
             var a := y * (LON_SEGMENTS + 1) + x
@@ -494,7 +494,7 @@ func _create_earth_mesh(longitude_segments: int, latitude_segments: int, radius:
             var vertex := _geo_to_sphere(longitude, latitude, radius)
             vertices.append(vertex)
             normals.append(vertex.normalized())
-            uvs.append(Vector2(u, v))
+            # Collapse pole UVs to one meridian sample to prevent polar starburst artifacts.\n            var pole_u := 0.5 if y == 0 or y == latitude_segments else u\n            uvs.append(Vector2(pole_u, v))
     for y in range(latitude_segments):
         for x in range(longitude_segments):
             var a := y * (longitude_segments + 1) + x
