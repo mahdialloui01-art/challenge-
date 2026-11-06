@@ -80,7 +80,7 @@ void fragment() {
     vec3 source = texture(earth_texture, UV).rgb;
     // Preserve the satellite land detail while giving oceans a natural deep-blue
     // colour with lighter coastal water; white clouds and polar ice stay untouched.
-    float blue_score = source.b - max(source.r, source.g) * 0.82;
+    float blue_score = source.b - max(source.r, source.g);
     float ocean_mask = smoothstep(0.025, 0.105, blue_score);
     float depth_tone = clamp((source.b - source.r) * 1.8 + 0.22, 0.0, 1.0);
     vec3 deep_sea = vec3(0.012, 0.075, 0.145);
