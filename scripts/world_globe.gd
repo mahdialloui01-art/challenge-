@@ -387,10 +387,10 @@ func _create_country_lock_labels() -> void:
         var lock_root := Node3D.new()
         lock_root.name = "CountryLock_" + code
         lock_root.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.038)
-        lock_root.scale = Vector3.ONE * 0.48
+        lock_root.scale = Vector3.ONE * 0.20
         lock_root.set_meta("route_index", route_index)
         lock_root.set_meta("country_code", code)
-        lock_root.set_meta("base_scale", 0.48)
+        lock_root.set_meta("base_scale", 0.20)
 
         # Brushed titanium outer shell.
         var titanium := StandardMaterial3D.new()
@@ -512,8 +512,8 @@ func _create_country_lock_labels() -> void:
         var order_label := Label3D.new()
         order_label.name = "SequenceNumber"
         order_label.text = "%02d" % (route_index + 1)
-        order_label.font_size = 28
-        order_label.pixel_size = 0.0038
+        order_label.font_size = 36
+        order_label.pixel_size = 0.0046
         order_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
         order_label.no_depth_test = true
         order_label.shaded = false
@@ -521,6 +521,8 @@ func _create_country_lock_labels() -> void:
         order_label.outline_size = 7
         order_label.outline_modulate = Color(0.004, 0.018, 0.03, 1.0)
         order_label.position = Vector3(0.0, -0.172, 0.073)
+        # Counter-scale the number so it remains readable while the lock shrinks.
+        order_label.scale = Vector3.ONE * 2.4
         order_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         order_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
         lock_root.add_child(order_label)
@@ -613,7 +615,7 @@ func _update_country_label_visibility() -> void:
             continue
         var route_index := int(lock_label.get_meta("route_index", -1))
         var normal := lock_label.position.normalized()
-        var marker_visible := route_index > unlocked_index and normal.dot(camera_local.normalized()) > 0.12
+        var marker_visible := normal.dot(camera_local.normalized()) > 0.12
         lock_label.visible = marker_visible
         if marker_visible:
             var camera_basis_local: Basis = global_transform.basis.inverse() * camera.global_transform.basis
@@ -627,7 +629,7 @@ func _update_country_label_visibility() -> void:
             order_label.visible = false
             continue
         var normal := marker_root.position.normalized()
-        order_label.visible = route_index > unlocked_index and normal.dot(camera_local.normalized()) > 0.12
+        order_label.visible = normal.dot(camera_local.normalized()) > 0.12
 
 func _create_earth_mesh(longitude_segments: int, latitude_segments: int, radius: float = GLOBE_RADIUS) -> ArrayMesh:
     var vertices := PackedVector3Array()
