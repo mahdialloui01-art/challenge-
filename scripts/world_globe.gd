@@ -554,7 +554,11 @@ func _update_country_label_visibility() -> void:
         if not is_instance_valid(order_label):
             continue
         var route_index := int(order_label.get_meta("route_index", -1))
-        var normal := order_label.position.normalized()
+        var marker_root := order_label.get_parent() as Node3D
+        if marker_root == null:
+            order_label.visible = false
+            continue
+        var normal := marker_root.position.normalized()
         order_label.visible = route_index > unlocked_index and normal.dot(camera_local.normalized()) > 0.12
 
 func _create_earth_mesh(longitude_segments: int, latitude_segments: int, radius: float = GLOBE_RADIUS) -> ArrayMesh:
