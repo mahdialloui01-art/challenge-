@@ -601,7 +601,7 @@ func _show_settings() -> void:
     _set_menu_music_active(true)
     _clear_content()
     _add_heading("الإعدادات", "اضبط تجربتك كما تحب")
-    var music_button := _make_button("الموسيقى الحماسية: %s" % ("مفعّلة" if music_enabled else "متوقفة"))
+    var music_button := _make_button("موسيقى القائمة الرئيسية: %s" % ("مفعّلة" if music_enabled else "متوقفة"))
     music_button.pressed.connect(func():
         music_enabled = not music_enabled
         if music_player != null:
@@ -692,6 +692,7 @@ func _set_globe_mode(enabled: bool) -> void:
         globe_hud.visible = enabled
 
 func _show_world_map() -> void:
+    _set_menu_music_active(false)
     _clear_content()
     _set_globe_mode(true)
     if world_globe == null:
