@@ -1,0 +1,40 @@
+name: Build Developer Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - developer-edition
+    paths:
+      - "scripts/**"
+      - "scenes/**"
+      - "data/**"
+      - "assets/**"
+      - "project.godot"
+      - "export_presets.cfg"
+      - ".github/workflows/build-developer.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.4.1
+    steps:
+      - name: Checkout developer edition
+        uses: actions/checkout@v4
+
+      - name: Import project resources
+        run: godot --headless --editor --path . --quit
+
+      - name: Export developer APK
+        run: |
+          mkdir -p build
+          godot --headless --path . --export-release "Developer Android" build/Challenge_Developer.apk
+
+      - name: Upload developer APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: challenge-developer-android-apk
+          path: build/Challenge_Developer.apk
+          if-no-files-found: error
+          retention-days: 14
