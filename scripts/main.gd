@@ -1286,14 +1286,18 @@ func _show_results() -> void:
     _add_stat_card("أفضل نتيجة شخصية", "🏆  %d نقطة" % best_score)
     var percent := int(round(float(correct_answers) / float(question_order.size()) * 100.0))
     var journey_message := ""
-    if percent >= 60 and current_country_index == unlocked_country_index:
-        unlocked_country_index = mini(unlocked_country_index + 1, 176)
-        journey_message = "🎉 ممتاز! فتحت الدولة التالية في رحلتك."
+    if percent >= 60 and current_level == unlocked_level and unlocked_level <= 10:
+        unlocked_level = mini(unlocked_level + 1, 11)
+        journey_message = "🔓 ممتاز! فتحت المرحلة التالية والخريطة التالية عند اكتمال خريطة العالم."
         _save_player_data()
     elif percent < 60:
-        journey_message = "تحتاج إلى 60٪ على الأقل لفتح الدولة التالية. حاول مجدداً!"
+        journey_message = "تحتاج إلى 60٪ على الأقل لفتح المرحلة التالية. حاول مجدداً!"
     else:
-        journey_message = "لقد فتحت هذه الدولة سابقاً. يمكنك مواصلة الرحلة."
+        journey_message = "لقد فتحت هذه المرحلة سابقاً. يمكنك مواصلة الرحلة."
+
+    if percent >= 60 and current_country_index == unlocked_country_index:
+        unlocked_country_index = mini(unlocked_country_index + 1, 176)
+        _save_player_data()
     if percent >= 60 and current_country_index >= 176:
         journey_message = "🏆 أكملت رحلة دول العالم! أنت أسطورة العباقرة."
     var result_text := Label.new()
