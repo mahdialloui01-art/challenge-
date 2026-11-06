@@ -1232,7 +1232,19 @@ func _show_results() -> void:
     var replay := _make_button("↻   أعد تحدّي %s" % current_country_name)
     replay.pressed.connect(func(): _start_country(current_country_index, current_country_code, current_country_name))
     content.add_child(replay)
-    var next := _make_button("🌍   متابعة الرحلة على الكرة الأرضية")
+    # After a successful country challenge, board the next unlocked flight
+    # directly instead of making the player search for the destination again.
+    if unlocked_country_index > current_country_index and world_globe != null and unlocked_country_index < world_globe.country_route.size():
+        var next_code := str(world_globe.country_route[unlocked_country_index])
+        var next_name := world_globe.get_route_country_name(unlocked_country_index)
+        var flight_button := _make_button("✈️  الإقلاع إلى " + next_name)
+        flight_button.custom_minimum_size.y = 78
+        flight_button.pressed.connect(func():
+            _start_country(unlocked_country_index, next_code, next_name)
+        )
+        content.add_child(flight_button)
+
+    var next := _make_button("🌍   عرض مسار الرحلة على الكرة الأرضية")
     next.pressed.connect(_show_world_map)
     content.add_child(next)
     var home := _make_button("⌂   القائمة الرئيسية")
