@@ -76,7 +76,7 @@ func _build_globe() -> void:
     if ResourceLoader.exists("res://assets/earth_surface.jpg"):
         ocean.albedo_texture = load("res://assets/earth_surface.jpg")
     else:
-        ocean.albedo_color = Color("#174b68")
+        ocean.albedo_color = Color("#8a8069")
     globe_mesh.material_override = ocean
     add_child(globe_mesh)
     _build_north_africa_detail_patch()
@@ -85,12 +85,12 @@ func _build_globe() -> void:
     var atmosphere := MeshInstance3D.new()
     atmosphere.mesh = _create_earth_mesh(96, 48, GLOBE_RADIUS * 1.022)
     var halo_mat := StandardMaterial3D.new()
-    halo_mat.albedo_color = Color(0.20, 0.56, 1.0, 0.13)
+    halo_mat.albedo_color = Color(0.92, 0.78, 0.52, 0.035)
     halo_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
     halo_mat.cull_mode = BaseMaterial3D.CULL_FRONT
     halo_mat.emission_enabled = true
-    halo_mat.emission = Color(0.05, 0.22, 0.75)
-    halo_mat.emission_energy_multiplier = 0.45
+    halo_mat.emission = Color(0.12, 0.085, 0.035)
+    halo_mat.emission_energy_multiplier = 0.08
     atmosphere.material_override = halo_mat
     add_child(atmosphere)
 
@@ -101,7 +101,7 @@ func _build_globe() -> void:
 
     var light := OmniLight3D.new()
     light.position = Vector3(-4.0, 4.0, 6.0)
-    light.light_color = Color("#9bcfff")
+    light.light_color = Color("#f5e8cf")
     light.light_energy = 2.2
     light.omni_range = 16.0
     add_child(light)
@@ -245,7 +245,7 @@ func _build_country_borders() -> void:
     border_instance.name = "AccurateGeographicCountryBorders"
     border_instance.mesh = border_mesh
     var border_material := StandardMaterial3D.new()
-    border_material.albedo_color = Color(0.52, 0.79, 0.89, 0.82)
+    border_material.albedo_color = Color(0.86, 0.82, 0.72, 0.62)
     border_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
     border_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
     border_material.cull_mode = BaseMaterial3D.CULL_DISABLED
@@ -290,9 +290,9 @@ func _create_country_labels() -> void:
         label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
         label.no_depth_test = true
         label.shaded = false
-        label.modulate = Color(0.94, 0.97, 1.0, 0.96)
+        label.modulate = Color(0.96, 0.91, 0.78, 0.96)
         label.outline_size = 9
-        label.outline_modulate = Color(0.015, 0.045, 0.10, 0.96)
+        label.outline_modulate = Color(0.025, 0.024, 0.019, 0.96)
         label.position = _geo_to_sphere(center_lon, center_lat, GLOBE_RADIUS * 1.035)
         label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -350,9 +350,9 @@ func _create_city_labels() -> void:
         label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
         label.no_depth_test = true
         label.shaded = false
-        label.modulate = Color(1.0, 0.91, 0.67, 0.98)
+        label.modulate = Color(0.98, 0.86, 0.62, 0.98)
         label.outline_size = 8
-        label.outline_modulate = Color(0.015, 0.035, 0.07, 0.98)
+        label.outline_modulate = Color(0.025, 0.022, 0.016, 0.98)
         label.position = _geo_to_sphere(float(city.lon), float(city.lat), GLOBE_RADIUS * 1.018)
         label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
