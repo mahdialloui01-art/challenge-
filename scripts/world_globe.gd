@@ -90,19 +90,6 @@ func _build_globe() -> void:
     light.omni_range = 16.0
     add_child(light)
 
-    var rim := MeshInstance3D.new()
-    var ring := TorusMesh.new()
-    ring.inner_radius = 3.16
-    ring.outer_radius = 3.19
-    rim.mesh = ring
-    rim.rotation_degrees.x = 90.0
-    var ring_mat := StandardMaterial3D.new()
-    ring_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-    ring_mat.albedo_color = Color("#38aaff")
-    ring_mat.emission_enabled = true
-    ring_mat.emission = Color("#147dff")
-    rim.material_override = ring_mat
-    add_child(rim)
 
 func _load_country_geometry() -> void:
     if not FileAccess.file_exists(DATA_PATH):
@@ -113,12 +100,6 @@ func _load_country_geometry() -> void:
         push_error("Invalid country boundary data")
         return
     var features: Array = parsed.get("features", [])
-    var line_material := StandardMaterial3D.new()
-    line_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-    line_material.albedo_color = Color("#8ddcff")
-    line_material.emission_enabled = true
-    line_material.emission = Color("#267dbd")
-    line_material.emission_energy_multiplier = 0.65
     for feature in features:
         if not feature is Dictionary:
             continue
