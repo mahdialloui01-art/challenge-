@@ -478,18 +478,18 @@ func _create_country_lock_labels() -> void:
         var number_frame := MeshInstance3D.new()
         number_frame.name = "SequenceNumberFrame"
         var frame_mesh := BoxMesh.new()
-        frame_mesh.size = Vector3(0.155, 0.082, 0.010)
+        frame_mesh.size = Vector3(0.1395, 0.0738, 0.009)
         number_frame.mesh = frame_mesh
-        number_frame.position = Vector3(0.0, -0.132, 0.052)
+        number_frame.position = Vector3(0.0, -0.1188, 0.052)
         number_frame.material_override = titanium
         lock_root.add_child(number_frame)
 
         var number_plate := MeshInstance3D.new()
         number_plate.name = "SequenceNumberPlate"
         var plate_mesh := BoxMesh.new()
-        plate_mesh.size = Vector3(0.139, 0.065, 0.008)
+        plate_mesh.size = Vector3(0.1251, 0.0585, 0.0072)
         number_plate.mesh = plate_mesh
-        number_plate.position = Vector3(0.0, -0.132, 0.060)
+        number_plate.position = Vector3(0.0, -0.1188, 0.060)
         var plate_material := StandardMaterial3D.new()
         plate_material.albedo_color = Color(0.008, 0.025, 0.042, 1.0)
         plate_material.metallic = 0.72
@@ -503,9 +503,9 @@ func _create_country_lock_labels() -> void:
         var number_accent := MeshInstance3D.new()
         number_accent.name = "SequenceNumberAccent"
         var accent_mesh := BoxMesh.new()
-        accent_mesh.size = Vector3(0.100, 0.003, 0.003)
+        accent_mesh.size = Vector3(0.090, 0.0027, 0.0027)
         number_accent.mesh = accent_mesh
-        number_accent.position = Vector3(0.0, -0.163, 0.066)
+        number_accent.position = Vector3(0.0, -0.1467, 0.066)
         number_accent.material_override = cyan
         lock_root.add_child(number_accent)
 
@@ -520,7 +520,7 @@ func _create_country_lock_labels() -> void:
         order_label.modulate = Color(0.92, 0.99, 1.0, 1.0)
         order_label.outline_size = 3
         order_label.outline_modulate = Color(0.004, 0.018, 0.03, 1.0)
-        order_label.position = Vector3(0.0, -0.132, 0.068)
+        order_label.position = Vector3(0.0, -0.1188, 0.068)
         # Keep the sequence number proportional to its compact metal plaque.
         order_label.scale = Vector3.ONE
         order_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
