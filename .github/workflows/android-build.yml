@@ -66,6 +66,42 @@ jobs:
           export/android/java_sdk_path = "$JAVA_HOME"
           EOF
 
+      - name: Build satellite Earth texture with precise country borders
+        run: |
+          set -euxo pipefail
+          mkdir -p assets
+          python3 -m pip install --user pillow
+          curl -fL --retry 3 --retry-delay 2 \
+            "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography/january/world.topo.200401.3x5400x2700.jpg" \
+            -o /tmp/earth_base.jpg
+          python3 - <<'PY'
+          from PIL import Image, ImageDraw
+          import json
+          image = Image.open("/tmp/earth_base.jpg").convert("RGB")
+          width, height = image.size
+          with open("data/countries_world.json", encoding="utf-8") as f:
+              world = json.load(f)
+          draw = ImageDraw.Draw(image)
+          def xy(point):
+              lon, lat = float(point[0]), float(point[1])
+              return ((lon + 180.0) / 360.0 * (width - 1),
+                      (90.0 - lat) / 180.0 * (height - 1))
+          for feature in world.get("features", []):
+              for polygon in feature.get("g", []):
+                  for ring in polygon:
+                      if len(ring) < 2:
+                          continue
+                      for a, b in zip(ring, ring[1:]):
+                          p1, p2 = xy(a), xy(b)
+                          if abs(p2[0] - p1[0]) > width * 0.5:
+                              continue
+                          draw.line((p1, p2), fill=(20, 45, 58), width=3)
+                          draw.line((p1, p2), fill=(180, 218, 225), width=1)
+          image.save("assets/earth_surface.jpg", "JPEG", quality=94, optimize=True)
+          print(f"Created satellite globe texture: {width}x{height}")
+          PY
+          test -s assets/earth_surface.jpg
+
       - name: Import project
         run: |
           set -euxo pipefail
