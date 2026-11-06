@@ -154,17 +154,24 @@ jobs:
           def fetch(tile):
               x, y = tile
               url = f"{base}/{y}/{x}.jpg"
-              try:
-                  req = Request(url, headers={"User-Agent": "ChallengeGeniusOfflineMap/1.0"})
-                  with urlopen(req, timeout=35) as response:
-                      data = response.read()
-                  image = Image.open(BytesIO(data)).convert("RGB")
-                  if image.size != (512, 512):
-                      raise ValueError(f"Unexpected tile size {image.size}")
-                  return (x, y, image)
-              except Exception as exc:
-                  print(f"Tile {x}/{y} unavailable: {exc}")
-                  return (x, y, None)
+              last_error = None
+              for attempt in range(1, 5):
+                  try:
+                      req = Request(url, headers={"User-Agent": "ChallengeGeniusOfflineMap/1.0"})
+                      with urlopen(req, timeout=60) as response:
+                          data = response.read()
+                      image = Image.open(BytesIO(data)).convert("RGB")
+                      if image.size != (512, 512):
+                          raise ValueError(f"Unexpected tile size {image.size}")
+                      return (x, y, image)
+                  except Exception as exc:
+                      last_error = exc
+                      print(f"Tile {x}/{y} attempt {attempt}/4 failed: {exc}")
+                      if attempt < 4:
+                          import time
+                          time.sleep(attempt * 2)
+              print(f"Tile {x}/{y} unavailable after retries: {last_error}")
+              return (x, y, None)
 
           tile_ids = [(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
           mosaic = Image.new("RGB", (len(range(x0, x1 + 1))*512, len(range(y0, y1 + 1))*512), (12, 28, 45))
