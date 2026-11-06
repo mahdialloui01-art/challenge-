@@ -254,52 +254,79 @@ func _build_country_borders() -> void:
     add_child(border_instance)
 
 func _create_country_labels() -> void:
-    # Geographic label anchors are derived from each country's offline GeoJSON bounds.
+    # One compact label per country, anchored at the geographic centroid of its
+    # largest land polygon instead of the midpoint of its bounding rectangle.
     for code in country_route:
         if not features_by_code.has(code):
             continue
         var feature: Dictionary = features_by_code[code]
         var geometry: Array = feature.get("g", [])
-        var min_lon := 180.0
-        var max_lon := -180.0
-        var min_lat := 90.0
-        var max_lat := -90.0
-        var sample_count := 0
-        for polygon in geometry:
-            if polygon.is_empty():
-                continue
-            for ring in polygon:
-                for point in ring:
-                    if point.size() < 2:
-                        continue
-                    var lon := float(point[0])
-                    var lat := float(point[1])
-                    min_lon = minf(min_lon, lon)
-                    max_lon = maxf(max_lon, lon)
-                    min_lat = minf(min_lat, lat)
-                    max_lat = maxf(max_lat, lat)
-                    sample_count += 1
-        if sample_count == 0:
+        var anchor := _get_country_label_anchor(geometry)
+        if anchor.size() < 2:
             continue
-        var center_lon := wrapf((min_lon + max_lon) * 0.5, -180.0, 180.0)
-        var center_lat := (min_lat + max_lat) * 0.5
         var label := Label3D.new()
         label.name = "CountryLabel_" + code
         label.text = get_country_name(code)
-        label.font_size = 34 if label.text.length() <= 7 else 27
-        label.pixel_size = 0.0038
+        var name_length := label.text.length()
+        label.font_size = 18 if name_length <= 7 else (15 if name_length <= 11 else 12)
+        label.pixel_size = 0.00245
         label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
         label.no_depth_test = true
         label.shaded = false
-        label.modulate = Color(0.96, 0.91, 0.78, 0.96)
-        label.outline_size = 9
-        label.outline_modulate = Color(0.025, 0.024, 0.019, 0.96)
-        label.position = _geo_to_sphere(center_lon, center_lat, GLOBE_RADIUS * 1.035)
+        label.modulate = Color(0.96, 0.92, 0.82, 0.94)
+        label.outline_size = 5
+        label.outline_modulate = Color(0.025, 0.024, 0.019, 0.94)
+        label.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.012)
         label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
         add_child(label)
         country_labels.append(label)
     _create_city_labels()
+
+
+func _get_country_label_anchor(geometry: Array) -> Array:
+    var best_area := 0.0
+    var best_anchor: Array = []
+    for polygon in geometry:
+        if polygon.is_empty():
+            continue
+        var ring: Array = polygon[0]
+        if ring.size() < 4:
+            continue
+        var twice_area := 0.0
+        var centroid_x := 0.0
+        var centroid_y := 0.0
+        var average_x := 0.0
+        var average_y := 0.0
+        var count := ring.size() - 1 if ring.size() > 1 else ring.size()
+        for i in range(count):
+            var current: Array = ring[i]
+            var next: Array = ring[(i + 1) % count]
+            var x1 := float(current[0])
+            var y1 := float(current[1])
+            var x2 := float(next[0])
+            var y2 := float(next[1])
+            var cross := x1 * y2 - x2 * y1
+            twice_area += cross
+            centroid_x += (x1 + x2) * cross
+            centroid_y += (y1 + y2) * cross
+            average_x += x1
+            average_y += y1
+        var area := absf(twice_area) * 0.5
+        if area <= best_area or count == 0:
+            continue
+        var candidate_lon := average_x / float(count)
+        var candidate_lat := average_y / float(count)
+        if absf(twice_area) > 0.000001:
+            candidate_lon = centroid_x / (3.0 * twice_area)
+            candidate_lat = centroid_y / (3.0 * twice_area)
+        # Concave or crescent-shaped countries can have an exterior centroid.
+        if not _point_in_ring(candidate_lon, candidate_lat, ring):
+            candidate_lon = average_x / float(count)
+            candidate_lat = average_y / float(count)
+        best_area = area
+        best_anchor = [candidate_lon, candidate_lat]
+    return best_anchor
 
 func _create_city_labels() -> void:
     # Accurate geographic anchors for the first playable region; labels appear only at close zoom.
