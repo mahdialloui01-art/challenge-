@@ -210,6 +210,8 @@ func _input(event: InputEvent) -> void:
         _move_drag(event.position, event.relative)
 
 func _begin_drag(position: Vector2) -> void:
+    if position.y < 210.0 or position.y > 1060.0:
+        return
     drag_active = true
     drag_start = position
     last_pointer = position
