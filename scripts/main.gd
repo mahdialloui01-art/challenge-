@@ -641,8 +641,8 @@ func _show_world_map() -> void:
     globe_hud.offset_bottom = -22
     globe_hud.mouse_filter = Control.MOUSE_FILTER_STOP
     var hud_style := StyleBoxFlat.new()
-    hud_style.bg_color = Color(0.015, 0.045, 0.10, 0.88)
-    hud_style.border_color = Color(0.25, 0.62, 0.86, 0.78)
+    hud_style.bg_color = Color(0.025, 0.023, 0.018, 0.90)
+    hud_style.border_color = Color(0.58, 0.44, 0.22, 0.78)
     hud_style.set_border_width_all(1)
     hud_style.set_corner_radius_all(22)
     hud_style.content_margin_left = 18
@@ -670,7 +670,7 @@ func _show_world_map() -> void:
     hint.text = "اسحب للتدوير • قرّب بإصبعين لرؤية تفاصيل شمال إفريقيا • المس الدولة"
     hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     hint.add_theme_font_size_override("font_size", 14)
-    hint.add_theme_color_override("font_color", Color("#c5d9f2"))
+    hint.add_theme_color_override("font_color", Color("#e0d4b9"))
     hud_box.add_child(hint)
     var actions := HBoxContainer.new()
     actions.add_theme_constant_override("separation", 10)
