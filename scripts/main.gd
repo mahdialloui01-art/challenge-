@@ -633,7 +633,7 @@ func _show_world_map() -> void:
     world_globe.set_progress(unlocked_country_index)
     world_globe.visible = true
     _add_heading("رحلة العباقرة حول العالم", "اسحب الكرة لتدوير الأرض • اضغط على الدولة المفتوحة لبدء التحدي")
-    var next_country := world_globe.get_route_country_name(unlocked_country_index)
+    var next_country: String = str(world_globe.get_route_country_name(unlocked_country_index))
     _add_stat_card("الدولة المفتوحة في رحلتك", next_country)
     var progress_label := Label.new()
     progress_label.text = "تقدّم الرحلة: %d / 177 دولة" % (unlocked_country_index + 1)
