@@ -537,7 +537,7 @@ func _show_main_menu() -> void:
 
     var mode: Dictionary = DIFFICULTIES[difficulty]
     var mode_label := Label.new()
-    mode_label.text = "المراحل المفتوحة: %d / 10" % mini(unlocked_level, 10)
+    mode_label.text = "الدول المفتوحة: %d / 177" % (unlocked_country_index + 1)
     mode_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     mode_label.add_theme_font_size_override("font_size", 16)
     mode_label.add_theme_color_override("font_color", Color(0.55, 0.88, 0.78))
