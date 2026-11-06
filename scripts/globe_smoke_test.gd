@@ -23,9 +23,16 @@ func _initialize() -> void:
         push_error("Earth globe is not using the custom geographic UV mesh")
         quit(1)
         return
-    var earth_material := earth.material_override as StandardMaterial3D
-    if earth_material == null or earth_material.albedo_texture == null:
-        push_error("Satellite texture was not assigned to the Earth material")
+    # The Earth uses a ShaderMaterial so the satellite image can retain
+    # its land detail while the shader recolours only ocean pixels.
+    var earth_material := earth.material_override as ShaderMaterial
+    if earth_material == null:
+        push_error("Earth globe is missing its satellite ShaderMaterial")
+        quit(1)
+        return
+    var satellite_texture := earth_material.get_shader_parameter("earth_texture") as Texture2D
+    if satellite_texture == null:
+        push_error("Satellite texture was not assigned to the Earth shader")
         quit(1)
         return
     var clouds := globe.get_node_or_null("AnimatedCloudShell") as MeshInstance3D
