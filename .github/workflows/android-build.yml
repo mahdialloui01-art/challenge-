@@ -76,28 +76,47 @@ jobs:
             "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography/january/world.topo.200401.3x5400x2700.jpg" \
             -o /tmp/earth_base.jpg
           /tmp/globe-venv/bin/python - <<'PY'
-          from PIL import Image, ImageDraw
+          from PIL import Image, ImageDraw, ImageOps
           import json
           image = Image.open("/tmp/earth_base.jpg").convert("RGB")
           width, height = image.size
           with open("data/countries_world.json", encoding="utf-8") as f:
               world = json.load(f)
-          draw = ImageDraw.Draw(image)
+          land_mask = Image.new("L", (width, height), 0)
+          mask_draw = ImageDraw.Draw(land_mask)
           def xy(point):
               lon, lat = float(point[0]), float(point[1])
               return ((lon + 180.0) / 360.0 * (width - 1),
                       (90.0 - lat) / 180.0 * (height - 1))
+          valid_rings = []
           for feature in world.get("features", []):
               for polygon in feature.get("g", []):
+                  if not polygon:
+                      continue
+                  outer = polygon[0]
+                  crosses_seam = any(abs(float(b[0]) - float(a[0])) > 180.0
+                                     for a, b in zip(outer, outer[1:]))
+                  if len(outer) >= 3 and not crosses_seam:
+                      mask_draw.polygon([xy(p) for p in outer], fill=255)
+                  for hole in polygon[1:]:
+                      if len(hole) >= 3:
+                          mask_draw.polygon([xy(p) for p in hole], fill=0)
                   for ring in polygon:
-                      if len(ring) < 2:
-                          continue
-                      for a, b in zip(ring, ring[1:]):
-                          p1, p2 = xy(a), xy(b)
-                          if abs(p2[0] - p1[0]) > width * 0.5:
-                              continue
-                          draw.line((p1, p2), fill=(20, 45, 58), width=3)
-                          draw.line((p1, p2), fill=(180, 218, 225), width=1)
+                      if len(ring) >= 2:
+                          valid_rings.append(ring)
+          # Give the dark ocean pixels a deep, natural blue while preserving
+          # the NASA surface shading and keeping land colors untouched.
+          ocean_luma = image.convert("L").point(lambda p: min(255, int(p * 3.2) + 8))
+          ocean_blue = ImageOps.colorize(ocean_luma, black="#041a36", white="#197eaa")
+          image = Image.composite(image, ocean_blue, land_mask)
+          draw = ImageDraw.Draw(image)
+          for ring in valid_rings:
+              for a, b in zip(ring, ring[1:]):
+                  p1, p2 = xy(a), xy(b)
+                  if abs(p2[0] - p1[0]) > width * 0.5:
+                      continue
+                  draw.line((p1, p2), fill=(16, 42, 59), width=3)
+                  draw.line((p1, p2), fill=(190, 225, 232), width=1)
           image.save("assets/earth_surface.jpg", "JPEG", quality=94, optimize=True)
           print(f"Created satellite globe texture: {width}x{height}")
           PY
