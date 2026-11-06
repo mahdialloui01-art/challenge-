@@ -28,6 +28,8 @@ var rotation_velocity := Vector2.ZERO
 var globe_mesh: MeshInstance3D
 
 func _ready() -> void:
+    set_process_input(true)
+    set_process(true)
     _build_globe()
 
 func set_progress(index: int) -> void:
