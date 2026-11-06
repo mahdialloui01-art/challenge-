@@ -135,6 +135,8 @@ jobs:
           from PIL import Image
           from io import BytesIO
           import math, os
+          # Allow the intentionally large regional tile mosaic.
+          Image.MAX_IMAGE_PIXELS = None
           os.makedirs("assets", exist_ok=True)
 
           # Geographic coverage: northern Algeria, Tunisia and nearby coast.
