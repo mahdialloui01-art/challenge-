@@ -92,12 +92,19 @@ func _initialize() -> void:
             push_error("A 3D lock assembly is missing for a route destination")
             quit(1)
             return
-        var body := lock.get_node_or_null("MetalBody") as MeshInstance3D
-        var shackle := lock.get_node_or_null("Shackle") as MeshInstance3D
-        var keyway := lock.get_node_or_null("IlluminatedKeyway") as MeshInstance3D
-        var panel := lock.get_node_or_null("ElectronicPanel") as MeshInstance3D
-        var status_led := lock.get_node_or_null("StatusLED") as MeshInstance3D
-        var circuit := lock.get_node_or_null("CircuitAccent") as MeshInstance3D
+        # Lock hardware is intentionally grouped under LockHardware so its
+        # 10% scale does not shrink or interfere with the separate number plaque.
+        var hardware := lock.get_node_or_null("LockHardware") as Node3D
+        if hardware == null:
+            push_error("Electronic lock hardware group is missing")
+            quit(1)
+            return
+        var body := hardware.get_node_or_null("MetalBody") as MeshInstance3D
+        var shackle := hardware.get_node_or_null("Shackle") as MeshInstance3D
+        var keyway := hardware.get_node_or_null("IlluminatedKeyway") as MeshInstance3D
+        var panel := hardware.get_node_or_null("ElectronicPanel") as MeshInstance3D
+        var status_led := hardware.get_node_or_null("StatusLED") as MeshInstance3D
+        var circuit := hardware.get_node_or_null("CircuitAccent") as MeshInstance3D
         var order := lock.get_node_or_null("SequenceNumber") as Label3D
         var number_frame := lock.get_node_or_null("SequenceNumberFrame") as MeshInstance3D
         var number_plate := lock.get_node_or_null("SequenceNumberPlate") as MeshInstance3D
