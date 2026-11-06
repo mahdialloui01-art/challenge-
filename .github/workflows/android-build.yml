@@ -181,6 +181,7 @@ jobs:
           top = round((90.0 - lat_max) * px_per_degree_y - y0 * 512)
           bottom = round((90.0 - lat_min) * px_per_degree_y - y0 * 512)
           detail = mosaic.crop((left, top, right, bottom))
+          detail.thumbnail((6144, 6144), Image.Resampling.LANCZOS)
           detail.save("assets/north_africa_detail.jpg", "JPEG", quality=91, optimize=True)
           print(f"Created offline regional imagery {detail.size}; {success}/{len(tile_ids)} tiles")
           PY
