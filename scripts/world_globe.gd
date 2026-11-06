@@ -4,7 +4,7 @@ signal country_tapped(country_index: int, country_code: String, country_name: St
 
 const DATA_PATH := "res://data/countries_world.json"
 const GLOBE_RADIUS := 3.0
-const COUNTRY_ROUTE := [
+var country_route: Array[String] = [
     "DZA", "TUN", "LBY", "EGY", "MAR", "MRT", "NER", "MLI", "TCD", "SDN",
     "SEN", "GHA", "NGA", "ETH", "KEN", "ZAF", "ESP", "FRA", "ITA", "TUR",
     "SAU", "JOR", "ARE", "IND", "CHN", "JPN", "BRA", "USA", "CAN", "AUS"
@@ -40,6 +40,17 @@ func get_country_name(code: String) -> String:
         return str(features_by_code[code].get("n", code))
     return code
 
+func get_route_country_name(index: int) -> String:
+    if index >= 0 and index < country_route.size():
+        return get_country_name(country_route[index])
+    return "اكتملت الرحلة"
+
+func _append_remaining_countries() -> void:
+    for code_variant in features_by_code.keys():
+        var code := str(code_variant)
+        if not country_route.has(code):
+            country_route.append(code)
+
 func _build_globe() -> void:
     var sphere := SphereMesh.new()
     sphere.radius = GLOBE_RADIUS
@@ -74,6 +85,7 @@ func _build_globe() -> void:
     add_child(atmosphere)
 
     _load_country_geometry()
+    _append_remaining_countries()
 
     var light := OmniLight3D.new()
     light.position = Vector3(-4.0, 4.0, 6.0)
@@ -136,7 +148,7 @@ func _load_country_geometry() -> void:
     _add_country_labels()
 
 func _add_country_labels() -> void:
-    for code in COUNTRY_ROUTE:
+    for code in country_route:
         if not features_by_code.has(code):
             continue
         var feature: Dictionary = features_by_code[code]
@@ -247,7 +259,7 @@ func _pick_country(screen_position: Vector2) -> void:
     var code := _find_country(longitude, latitude)
     if code.is_empty():
         return
-    var index := COUNTRY_ROUTE.find(code)
+    var index := country_route.find(code)
     var feature: Dictionary = features_by_code.get(code, {})
     var name := get_country_name(code)
     country_tapped.emit(index, code, name, index >= 0 and index <= unlocked_index)
