@@ -54,35 +54,29 @@ func _append_remaining_countries() -> void:
             country_route.append(code)
 
 func _build_globe() -> void:
-    var sphere := SphereMesh.new()
-    sphere.radius = GLOBE_RADIUS
-    sphere.height = GLOBE_RADIUS * 2.0
-    sphere.radial_segments = 96
-    sphere.rings = 64
     globe_mesh = MeshInstance3D.new()
-    globe_mesh.mesh = sphere
+    globe_mesh.mesh = _create_earth_mesh(192, 96)
     var ocean := StandardMaterial3D.new()
-    ocean.albedo_color = Color("#092e58")
-    ocean.metallic = 0.18
-    ocean.roughness = 0.34
-    ocean.emission_enabled = true
-    ocean.emission = Color("#06244b")
-    ocean.emission_energy_multiplier = 0.35
+    ocean.albedo_color = Color.WHITE
+    ocean.metallic = 0.0
+    ocean.roughness = 0.92
+    ocean.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+    if ResourceLoader.exists("res://assets/earth_surface.jpg"):
+        ocean.albedo_texture = load("res://assets/earth_surface.jpg")
+    else:
+        ocean.albedo_color = Color("#174b68")
     globe_mesh.material_override = ocean
     add_child(globe_mesh)
 
     var atmosphere := MeshInstance3D.new()
-    var halo := SphereMesh.new()
-    halo.radius = GLOBE_RADIUS * 1.035
-    halo.height = GLOBE_RADIUS * 2.07
-    halo.radial_segments = 64
-    halo.rings = 32
-    atmosphere.mesh = halo
+    atmosphere.mesh = _create_earth_mesh(96, 48, GLOBE_RADIUS * 1.022)
     var halo_mat := StandardMaterial3D.new()
-    halo_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-    halo_mat.albedo_color = Color(0.15, 0.62, 1.0, 0.10)
+    halo_mat.albedo_color = Color(0.20, 0.56, 1.0, 0.13)
     halo_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-    halo_mat.no_depth_test = true
+    halo_mat.cull_mode = BaseMaterial3D.CULL_FRONT
+    halo_mat.emission_enabled = true
+    halo_mat.emission = Color(0.05, 0.22, 0.75)
+    halo_mat.emission_energy_multiplier = 0.45
     atmosphere.material_override = halo_mat
     add_child(atmosphere)
 
@@ -132,95 +126,39 @@ func _load_country_geometry() -> void:
         if code.is_empty():
             continue
         features_by_code[code] = feature
-        _add_country_land(feature, features_by_code.size())
-        var country_lines := MeshInstance3D.new()
-        var immediate := ImmediateMesh.new()
-        var polygons: Array = feature.get("g", [])
-        for polygon in polygons:
-            for ring in polygon:
-                if not ring is Array or ring.size() < 4:
-                    continue
-                immediate.surface_begin(Mesh.PRIMITIVE_LINE_STRIP, line_material)
-                for coord in ring:
-                    immediate.surface_add_vertex(_geo_to_sphere(float(coord[0]), float(coord[1]), GLOBE_RADIUS + 0.012))
-                immediate.surface_end()
-        country_lines.mesh = immediate
-        country_lines.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-        add_child(country_lines)
+        # The satellite texture carries the country outlines. GeoJSON is kept for accurate selection.
 
-    _add_country_labels()
-
-func _add_country_land(feature: Dictionary, country_number: int) -> void:
-    var land_mesh := ImmediateMesh.new()
-    var land_material := StandardMaterial3D.new()
-    land_material.albedo_color = Color("#397d68") if country_number % 3 == 0 else (Color("#47896e") if country_number % 3 == 1 else Color("#36745f"))
-    land_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-    land_material.roughness = 0.92
-    land_material.cull_mode = BaseMaterial3D.CULL_DISABLED
-    land_material.metallic = 0.0
-    for polygon in feature.get("g", []):
-        if polygon.is_empty():
-            continue
-        var outer_ring: Array = polygon[0]
-        var points := PackedVector2Array()
-        var previous_lon := 0.0
-        for coord in outer_ring:
-            var longitude := float(coord[0])
-            if not points.is_empty():
-                while longitude - previous_lon > 180.0:
-                    longitude -= 360.0
-                while longitude - previous_lon < -180.0:
-                    longitude += 360.0
-            points.append(Vector2(longitude, float(coord[1])))
-            previous_lon = longitude
-        if points.size() < 3:
-            continue
-        var triangles := Geometry2D.triangulate_polygon(points)
-        if triangles.size() < 3:
-            continue
-        land_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES, land_material)
-        for vertex_index in triangles:
-            var point: Vector2 = points[vertex_index]
-            land_mesh.surface_add_vertex(_geo_to_sphere(wrapf(point.x, -180.0, 180.0), point.y, GLOBE_RADIUS + 0.004))
-        land_mesh.surface_end()
-    if land_mesh.get_surface_count() > 0:
-        var land_instance := MeshInstance3D.new()
-        land_instance.mesh = land_mesh
-        land_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-        add_child(land_instance)
-
-func _add_country_labels() -> void:
-    for code in country_route:
-        if not features_by_code.has(code):
-            continue
-        var feature: Dictionary = features_by_code[code]
-        var bounds := _feature_bounds(feature)
-        var label := Label3D.new()
-        label.text = get_country_name(code)
-        label.font_size = 32
-        label.pixel_size = 0.0045
-        label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-        label.modulate = Color("#f3fbff")
-        label.outline_size = 6
-        label.outline_modulate = Color("#08213c")
-        label.position = _geo_to_sphere(bounds.x, bounds.y, GLOBE_RADIUS + 0.045)
-        label.no_depth_test = false
-        add_child(label)
-
-func _feature_bounds(feature: Dictionary) -> Vector2:
-    var min_lon := 180.0
-    var max_lon := -180.0
-    var min_lat := 90.0
-    var max_lat := -90.0
-    for polygon in feature.get("g", []):
-        if polygon.is_empty():
-            continue
-        for point in polygon[0]:
-            min_lon = minf(min_lon, float(point[0]))
-            max_lon = maxf(max_lon, float(point[0]))
-            min_lat = minf(min_lat, float(point[1]))
-            max_lat = maxf(max_lat, float(point[1]))
-    return Vector2((min_lon + max_lon) * 0.5, (min_lat + max_lat) * 0.5)
+func _create_earth_mesh(longitude_segments: int, latitude_segments: int, radius: float = GLOBE_RADIUS) -> ArrayMesh:
+    var vertices := PackedVector3Array()
+    var normals := PackedVector3Array()
+    var uvs := PackedVector2Array()
+    var indices := PackedInt32Array()
+    for y in range(latitude_segments + 1):
+        var v := float(y) / float(latitude_segments)
+        var latitude := 90.0 - v * 180.0
+        for x in range(longitude_segments + 1):
+            var u := float(x) / float(longitude_segments)
+            var longitude := u * 360.0 - 180.0
+            var vertex := _geo_to_sphere(longitude, latitude, radius)
+            vertices.append(vertex)
+            normals.append(vertex.normalized())
+            uvs.append(Vector2(u, v))
+    for y in range(latitude_segments):
+        for x in range(longitude_segments):
+            var a := y * (longitude_segments + 1) + x
+            var b := a + longitude_segments + 1
+            var c := a + 1
+            var d := b + 1
+            indices.append_array(PackedInt32Array([a, b, c, c, b, d]))
+    var arrays := []
+    arrays.resize(Mesh.ARRAY_MAX)
+    arrays[Mesh.ARRAY_VERTEX] = vertices
+    arrays[Mesh.ARRAY_NORMAL] = normals
+    arrays[Mesh.ARRAY_TEX_UV] = uvs
+    arrays[Mesh.ARRAY_INDEX] = indices
+    var mesh := ArrayMesh.new()
+    mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+    return mesh
 
 func _geo_to_sphere(longitude: float, latitude: float, radius: float) -> Vector3:
     var lon := deg_to_rad(longitude)
