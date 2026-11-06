@@ -31,7 +31,7 @@ func _ready() -> void:
     _build_globe()
 
 func set_progress(index: int) -> void:
-    unlocked_index = clampi(index, 0, COUNTRY_ROUTE.size() - 1)
+    unlocked_index = clampi(index, 0, country_route.size() - 1)
 
 func get_country_name(code: String) -> String:
     if ARABIC_NAMES.has(code):
