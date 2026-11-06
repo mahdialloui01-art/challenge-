@@ -825,8 +825,8 @@ func _start_level(level: int) -> void:
             question_pool.append(i)
     if question_pool.is_empty():
         for i in range(questions.size()):
-            var candidate: Dictionary = questions[i]
-            if str(candidate.get("country", "")).is_empty():
+            var general_candidate: Dictionary = questions[i]
+            if str(general_candidate.get("country", "")).is_empty():
                 question_pool.append(i)
     if question_pool.is_empty():
         for i in range(questions.size()):
