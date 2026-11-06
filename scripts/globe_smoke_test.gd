@@ -41,9 +41,14 @@ func _initialize() -> void:
         push_error("Close-zoom city label layer is incomplete")
         quit(1)
         return
+    if globe.get_node_or_null("AccurateGeographicCountryBorders") == null:
+        push_error("Accurate country border overlay was not created")
+        quit(1)
+        return
     print("WORLD_GLOBE_SATELLITE_TEXTURE_OK")
     print("WORLD_GLOBE_CLOUD_LAYER_OK")
     print("WORLD_GLOBE_REGIONAL_DETAIL_OK")
     print("WORLD_GLOBE_CITY_LABELS_OK")
+    print("WORLD_GLOBE_BORDER_OVERLAY_OK")
     print("WORLD_GLOBE_SMOKE_OK")
     quit()
