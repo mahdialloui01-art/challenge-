@@ -34,3 +34,8 @@
 ## World journey prototype
 
 The game now includes offline Natural Earth country boundaries, a rotatable 3D globe, sequential country unlocking, and an initial multidisciplinary Algeria question bank. Country boundaries and quiz content are packaged locally for offline play.
+
+
+## Realistic offline Earth globe
+
+The Android build creates an offline 5400 × 2700 NASA Blue Marble topography texture and bakes the Natural Earth country boundaries into the equirectangular map at their geographic longitude/latitude positions. The globe uses a custom UV sphere that matches the same geographic coordinate system used by country selection. NASA Blue Marble source: https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-topography/ (NASA imagery); country boundaries: Natural Earth 1:110m Admin-0, public-domain data.
