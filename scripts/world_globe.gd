@@ -102,8 +102,8 @@ func _build_globe() -> void:
 
     var light := OmniLight3D.new()
     light.position = Vector3(-4.0, 4.0, 6.0)
-    light.light_color = Color("#f5e8cf")
-    light.light_energy = 2.2
+    light.light_color = Color(0.98, 0.99, 1.0)
+    light.light_energy = 1.65
     light.omni_range = 16.0
     add_child(light)
 
