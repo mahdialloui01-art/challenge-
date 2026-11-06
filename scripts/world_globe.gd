@@ -25,6 +25,7 @@ var drag_start := Vector2.ZERO
 var last_pointer := Vector2.ZERO
 var pointer_moved := false
 var rotation_velocity := Vector2.ZERO
+var zoom_distance := 7.6
 var globe_mesh: MeshInstance3D
 var country_labels: Array[Label3D] = []
 
@@ -232,9 +233,23 @@ func _input(event: InputEvent) -> void:
             _end_drag(event.position)
     elif event is InputEventMouseMotion and drag_active and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
         _move_drag(event.position, event.relative)
+    elif event is InputEventMagnifyGesture:
+        _apply_zoom(event.factor)
+    elif event is InputEventMouseButton and event.pressed:
+        if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+            _apply_zoom(1.12)
+        elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+            _apply_zoom(0.89)
+
+func _apply_zoom(factor: float) -> void:
+    var camera := get_viewport().get_camera_3d()
+    if camera == null:
+        return
+    zoom_distance = clampf(zoom_distance / factor, 4.2, 12.5)
+    camera.position.z = zoom_distance
 
 func _begin_drag(position: Vector2) -> void:
-    if position.y < 210.0 or position.y > 1220.0:
+    if position.y > 1060.0:
         return
     drag_active = true
     drag_start = position
@@ -257,7 +272,7 @@ func _end_drag(position: Vector2) -> void:
     if not drag_active:
         return
     drag_active = false
-    if not pointer_moved and position.distance_to(drag_start) < 14.0 and position.y >= 210.0 and position.y <= 1220.0:
+    if not pointer_moved and position.distance_to(drag_start) < 14.0 and position.y <= 1060.0:
         _pick_country(position)
 
 func _pick_country(screen_position: Vector2) -> void:
