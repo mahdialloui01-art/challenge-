@@ -120,16 +120,20 @@ func _draw() -> void:
     # Full-map lock: later worlds stay visibly sealed until the previous world is completed.
     var world_first_level := world_index * 2 + 1
     if world_first_level > unlocked_level:
-        draw_rect(Rect2(48, 45, 624, 670), Color(0.012, 0.020, 0.034, 0.82), true)
-        var lock_center := Vector2(360, 292)
-        draw_arc(lock_center + Vector2(0, -13), 43, PI, TAU, 48, Color("#f3d99a"), 11.0, true)
-        draw_rect(Rect2(lock_center + Vector2(-55, -12), Vector2(110, 88)), Color("#d5b46c"), true)
-        draw_rect(Rect2(lock_center + Vector2(-44, -1), Vector2(88, 66)), Color("#f0d69a"), true)
-        draw_circle(lock_center + Vector2(0, 25), 9, Color("#4b3924"))
-        draw_rect(Rect2(lock_center + Vector2(-4, 29), Vector2(8, 19)), Color("#4b3924"), true)
-        draw_string(ThemeDB.fallback_font, Vector2(80, 430), "هذه الخريطة مقفلة", HORIZONTAL_ALIGNMENT_CENTER, 560, 30, Color("#fff0c8"))
-        draw_string(ThemeDB.fallback_font, Vector2(80, 475), "أكمل الخريطة السابقة لفتح هذه المغامرة", HORIZONTAL_ALIGNMENT_CENTER, 560, 19, Color("#e3d5b8"))
-        draw_string(ThemeDB.fallback_font, Vector2(80, 520), "المرحلة المطلوبة: %d" % (world_first_level - 1), HORIZONTAL_ALIGNMENT_CENTER, 560, 17, Color("#f5ca73"))
+        # Full-screen sealed-map treatment: darken the complete terrain and place
+        # a large high-contrast gold lock on a dedicated panel.
+        draw_rect(Rect2(48, 45, 624, 670), Color(0.004, 0.009, 0.018, 0.90), true)
+        draw_rect(Rect2(105, 165, 510, 430), Color(0.025, 0.045, 0.065, 0.96), true)
+        draw_rect(Rect2(105, 165, 510, 430), Color("#c6a45e"), false, 4.0, true)
+        var lock_center := Vector2(360, 300)
+        draw_arc(lock_center + Vector2(0, -20), 62, PI, TAU, 64, Color("#ffe5a3"), 15.0, true)
+        draw_rect(Rect2(lock_center + Vector2(-76, -20), Vector2(152, 118)), Color("#a77a36"), true)
+        draw_rect(Rect2(lock_center + Vector2(-65, -10), Vector2(130, 98)), Color("#f1d18a"), true)
+        draw_circle(lock_center + Vector2(0, 30), 13, Color("#49351f"))
+        draw_rect(Rect2(lock_center + Vector2(-5, 40), Vector2(10, 29)), Color("#49351f"), true)
+        draw_string(ThemeDB.fallback_font, Vector2(115, 485), "هذه الخريطة مقفلة", HORIZONTAL_ALIGNMENT_CENTER, 490, 34, Color("#fff0c8"))
+        draw_string(ThemeDB.fallback_font, Vector2(115, 530), "أكمل الخريطة السابقة لفتح هذه المغامرة", HORIZONTAL_ALIGNMENT_CENTER, 490, 20, Color("#e3d5b8"))
+        draw_string(ThemeDB.fallback_font, Vector2(115, 565), "المرحلة المطلوبة: %d" % (world_first_level - 1), HORIZONTAL_ALIGNMENT_CENTER, 490, 18, Color("#f5ca73"))
     draw_set_transform(Vector2.ZERO)
 
 func _draw_tree(p: Vector2, tint: Color) -> void:
