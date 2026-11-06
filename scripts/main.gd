@@ -679,102 +679,89 @@ func _show_world_levels(world: int) -> void:
     var first_level := world * 2 + 1
     var names := ["وادي المعرفة", "غابة الألغاز", "مدينة العلوم", "قلعة العباقرة", "قمة الأساطير"]
     var icons := ["✦", "♣", "⚗", "♜", "♛"]
-    var tints := [Color(0.16, 0.86, 0.66), Color(0.35, 0.82, 0.43), Color(0.25, 0.68, 1.0), Color(0.70, 0.48, 1.0), Color(1.0, 0.70, 0.28)]
-    var tint: Color = tints[world]
     var completed_stages := clampi(unlocked_level - first_level, 0, 2)
-    _add_heading("%s  %s" % [icons[world], names[world]], "خريطة المراحل • أكمل كل نقطة لفتح الطريق")
+    _add_heading("%s  %s" % [icons[world], names[world]], "استكشف الخريطة… واتبع الطريق حتى قلعة الحارس")
 
     var banner := PanelContainer.new()
     var banner_style := StyleBoxFlat.new()
     banner_style.bg_color = Color(0.055, 0.11, 0.22, 0.97)
-    banner_style.border_color = tint
+    banner_style.border_color = Color(0.38, 0.72, 0.88)
     banner_style.set_border_width_all(2)
-    banner_style.set_corner_radius_all(18)
-    banner_style.content_margin_left = 14
-    banner_style.content_margin_right = 14
-    banner_style.content_margin_top = 10
-    banner_style.content_margin_bottom = 10
+    banner_style.set_corner_radius_all(16)
+    banner_style.content_margin_left = 12
+    banner_style.content_margin_right = 12
+    banner_style.content_margin_top = 8
+    banner_style.content_margin_bottom = 8
     banner.add_theme_stylebox_override("panel", banner_style)
     var banner_box := VBoxContainer.new()
-    banner_box.add_theme_constant_override("separation", 6)
+    banner_box.add_theme_constant_override("separation", 5)
     banner.add_child(banner_box)
-    var banner_title := Label.new()
-    banner_title.text = "تقدّمك في هذه الخريطة"
-    banner_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    banner_title.add_theme_font_size_override("font_size", 18)
-    banner_title.add_theme_color_override("font_color", Color(0.91, 0.95, 1.0))
-    banner_box.add_child(banner_title)
+    var progress_title := Label.new()
+    progress_title.text = "تقدّمك في العالم  •  %d / 2 مراحل" % completed_stages
+    progress_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    progress_title.add_theme_font_size_override("font_size", 17)
+    progress_title.add_theme_color_override("font_color", Color(0.92, 0.96, 1.0))
+    banner_box.add_child(progress_title)
     var progress := ProgressBar.new()
     progress.min_value = 0
     progress.max_value = 2
     progress.value = completed_stages
     progress.show_percentage = false
-    progress.custom_minimum_size.y = 12
-    var pbg := StyleBoxFlat.new()
-    pbg.bg_color = Color(0.10, 0.16, 0.27)
-    pbg.set_corner_radius_all(8)
-    progress.add_theme_stylebox_override("background", pbg)
-    var pfg := StyleBoxFlat.new()
-    pfg.bg_color = tint
-    pfg.set_corner_radius_all(8)
-    progress.add_theme_stylebox_override("fill", pfg)
+    progress.custom_minimum_size.y = 10
     banner_box.add_child(progress)
-    var count := Label.new()
-    count.text = "%d من 2 مراحل مكتملة" % completed_stages
-    count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    count.add_theme_font_size_override("font_size", 14)
-    count.add_theme_color_override("font_color", tint)
-    banner_box.add_child(count)
     content.add_child(banner)
 
-    var stage_titles := ["بوابة البداية", "حارس العالم"]
-    var stage_descriptions := ["اجتز أول تحدٍّ وافتح الطريق", "التحدّي النهائي لفتح العالم التالي"]
-    for index in range(2):
-        var level := first_level + index
-        var locked := level > mini(unlocked_level, 10)
-        var completed := level < unlocked_level
-        var stage_state := "✓ مكتملة" if completed else ("🔒 مغلقة" if locked else "● المرحلة الحالية")
-        var stage_color: Color = Color(0.34, 0.92, 0.68) if completed else (Color(0.43, 0.72, 1.0) if not locked else Color(0.43, 0.49, 0.62))
-        var stage_card := PanelContainer.new()
-        var stage_style := StyleBoxFlat.new()
-        stage_style.bg_color = Color(0.045, 0.09, 0.18, 0.98) if not locked else Color(0.025, 0.045, 0.085, 0.95)
-        stage_style.border_color = stage_color
-        stage_style.set_border_width_all(2)
-        stage_style.set_corner_radius_all(18)
-        stage_style.content_margin_left = 10
-        stage_style.content_margin_right = 10
-        stage_style.content_margin_top = 8
-        stage_style.content_margin_bottom = 8
-        stage_card.add_theme_stylebox_override("panel", stage_style)
-        var stage_button := Button.new()
-        var symbol := "👑" if index == 1 else ("★" if completed else ("🔒" if locked else "◆"))
-        var stage_name: String = "الزعيم الأخير" if index == 1 else stage_titles[index]
-        stage_button.text = "%s   %s  •  %s\n%s  |  %d ثانية لكل سؤال" % [symbol, stage_name, stage_state, stage_descriptions[index], maxi(8, 22 - (level - 1))]
-        stage_button.custom_minimum_size = Vector2(0, 80)
-        stage_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-        stage_button.alignment = HORIZONTAL_ALIGNMENT_RIGHT
-        stage_button.add_theme_font_size_override("font_size", 17)
-        stage_button.add_theme_color_override("font_color", Color(0.94, 0.97, 1.0) if not locked else Color(0.50, 0.57, 0.69))
-        stage_button.flat = true
-        stage_button.disabled = locked
-        if not locked:
-            stage_button.pressed.connect(_start_level.bind(level))
-        stage_card.add_child(stage_button)
-        content.add_child(stage_card)
-        if index == 0:
-            var path := Label.new()
-            path.text = "◆\n│\n◆"
-            path.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-            path.add_theme_font_size_override("font_size", 18)
-            path.add_theme_color_override("font_color", tint)
-            content.add_child(path)
+    var map_frame := PanelContainer.new()
+    var frame_style := StyleBoxFlat.new()
+    frame_style.bg_color = Color("#10243a")
+    frame_style.border_color = Color("#80c7d0")
+    frame_style.set_border_width_all(2)
+    frame_style.set_corner_radius_all(18)
+    frame_style.content_margin_left = 5
+    frame_style.content_margin_right = 5
+    frame_style.content_margin_top = 5
+    frame_style.content_margin_bottom = 5
+    map_frame.add_theme_stylebox_override("panel", frame_style)
+    map_frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    var map_art = WorldMapArt.new()
+    map_art.configure(world, unlocked_level)
+    map_art.custom_minimum_size = Vector2(0, 650)
+    map_art.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    map_art.stage_selected.connect(_start_level)
+    map_frame.add_child(map_art)
+    content.add_child(map_frame)
+
+    var legend := HBoxContainer.new()
+    legend.add_theme_constant_override("separation", 8)
+    var stage_one := Label.new()
+    stage_one.text = "①  بوابة البداية"
+    stage_one.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    stage_one.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    stage_one.add_theme_font_size_override("font_size", 15)
+    stage_one.add_theme_color_override("font_color", Color("#f5d58a"))
+    legend.add_child(stage_one)
+    var stage_two := Label.new()
+    stage_two.text = "②  حارس العالم"
+    stage_two.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    stage_two.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    stage_two.add_theme_font_size_override("font_size", 15)
+    stage_two.add_theme_color_override("font_color", Color("#f5d58a"))
+    legend.add_child(stage_two)
+    content.add_child(legend)
+
+    var hint := Label.new()
+    hint.text = "اضغط على علامة المرحلة في الخريطة للعب • الطريق يفتح بالتدريج"
+    hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    hint.add_theme_font_size_override("font_size", 14)
+    hint.add_theme_color_override("font_color", Color(0.68, 0.82, 0.94))
+    content.add_child(hint)
 
     if completed_stages == 2:
         var finished := Label.new()
         finished.text = "🏆 اكتملت هذه الخريطة! البوابة التالية مفتوحة."
         finished.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-        finished.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-        finished.add_theme_font_size_override("font_size", 17)
+        finished.add_theme_font_size_override("font_size", 16)
         finished.add_theme_color_override("font_color", Color(1.0, 0.82, 0.35))
         content.add_child(finished)
 
