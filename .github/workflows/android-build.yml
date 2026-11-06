@@ -79,6 +79,8 @@ jobs:
           from PIL import Image, ImageDraw, ImageOps
           import json
           image = Image.open("/tmp/earth_base.jpg").convert("RGB")
+          # Keep a high-detail global texture while staying below common mobile GPU texture limits.
+          image.thumbnail((10800, 5400), Image.Resampling.LANCZOS)
           width, height = image.size
           with open("data/countries_world.json", encoding="utf-8") as f:
               world = json.load(f)
