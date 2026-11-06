@@ -106,7 +106,7 @@ func _initialize() -> void:
             push_error("Electronic lock is missing its shell, shackle, glass panel, sensor, or LED details")
             quit(1)
             return
-        if lock.scale.x > 0.50 or lock.scale.y > 0.50 or lock.scale.z > 0.50:
+        if lock.scale.x > 0.21 or lock.scale.y > 0.21 or lock.scale.z > 0.21:
             push_error("Electronic lock is too large and may cover the country map")
             quit(1)
             return
@@ -124,7 +124,7 @@ func _initialize() -> void:
             push_error("Futuristic sequence number badge is missing its frame, plate, or cyan accent")
             quit(1)
             return
-        if order == null or order.text != "%02d" % (route_index + 1):
+        if order == null or order.text != "%02d" % (route_index + 1) or order.scale.x < 2.39:
             push_error("Country lock sequence number is incorrect")
             quit(1)
             return
