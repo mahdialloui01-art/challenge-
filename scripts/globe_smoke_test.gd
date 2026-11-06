@@ -87,7 +87,8 @@ func _initialize() -> void:
         return
     print("WORLD_GLOBE_SATELLITE_TEXTURE_OK")
     print("WORLD_GLOBE_CLOUD_LAYER_OK")
-    print("WORLD_GLOBE_REGIONAL_DETAIL_BLEND_OK")\n    print("WORLD_GLOBE_POLAR_UV_OK")
+    print("WORLD_GLOBE_REGIONAL_DETAIL_BLEND_OK")
+    print("WORLD_GLOBE_POLAR_UV_OK")
     print("WORLD_GLOBE_CITY_LABELS_OK")
     print("WORLD_GLOBE_BORDER_OVERLAY_OK")
     print("WORLD_GLOBE_SMOKE_OK")
