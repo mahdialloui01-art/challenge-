@@ -95,6 +95,7 @@ func _build_globe() -> void:
 
     _load_country_geometry()
     _append_remaining_countries()
+    _build_country_borders()
     _create_country_labels()
 
     var light := OmniLight3D.new()
@@ -208,6 +209,47 @@ func _load_country_geometry() -> void:
         features_by_code[code] = feature
         # The satellite texture carries the country outlines. GeoJSON is kept for accurate selection.
 
+
+func _build_country_borders() -> void:
+    # Draw georeferenced borders above both the base globe and the satellite detail overlay.
+    var vertices := PackedVector3Array()
+    var indices := PackedInt32Array()
+    for feature_variant in features_by_code.values():
+        var feature: Dictionary = feature_variant
+        for polygon in feature.get("g", []):
+            for ring in polygon:
+                if ring.size() < 2:
+                    continue
+                for point_index in range(ring.size() - 1):
+                    var a = ring[point_index]
+                    var b = ring[point_index + 1]
+                    var lon_a := float(a[0])
+                    var lon_b := float(b[0])
+                    if absf(lon_b - lon_a) > 180.0:
+                        continue
+                    var base_index := vertices.size()
+                    vertices.append(_geo_to_sphere(lon_a, float(a[1]), GLOBE_RADIUS * 1.006))
+                    vertices.append(_geo_to_sphere(lon_b, float(b[1]), GLOBE_RADIUS * 1.006))
+                    indices.append(base_index)
+                    indices.append(base_index + 1)
+    if vertices.is_empty():
+        return
+    var arrays := []
+    arrays.resize(Mesh.ARRAY_MAX)
+    arrays[Mesh.ARRAY_VERTEX] = vertices
+    arrays[Mesh.ARRAY_INDEX] = indices
+    var border_mesh := ArrayMesh.new()
+    border_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_LINES, arrays)
+    var border_instance := MeshInstance3D.new()
+    border_instance.name = "AccurateGeographicCountryBorders"
+    border_instance.mesh = border_mesh
+    var border_material := StandardMaterial3D.new()
+    border_material.albedo_color = Color(0.52, 0.79, 0.89, 0.82)
+    border_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    border_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+    border_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+    border_instance.material_override = border_material
+    add_child(border_instance)
 
 func _create_country_labels() -> void:
     # Geographic label anchors are derived from each country's offline GeoJSON bounds.
