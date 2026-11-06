@@ -140,14 +140,14 @@ jobs:
           # Geographic coverage: northern Algeria, Tunisia and nearby coast.
           lon_min, lon_max = -9.0, 16.0
           lat_min, lat_max = 18.0, 38.0
-          zoom = 7
+          zoom = 8
           tiles_x = 2 ** zoom * 2
           tiles_y = 2 ** zoom
           x0 = int(math.floor((lon_min + 180.0) / 360.0 * tiles_x))
           x1 = int(math.floor((lon_max + 180.0) / 360.0 * tiles_x))
           y0 = int(math.floor((90.0 - lat_max) / 180.0 * tiles_y))
           y1 = int(math.floor((90.0 - lat_min) / 180.0 * tiles_y))
-          base = "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/250m/8"
+          base = f"https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/250m/{zoom}"
 
           def fetch(tile):
               x, y = tile
