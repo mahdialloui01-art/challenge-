@@ -78,17 +78,19 @@ render_mode cull_disabled;
 uniform sampler2D earth_texture : source_color, filter_linear_mipmap;
 void fragment() {
     vec3 source = texture(earth_texture, UV).rgb;
-    // Preserve the satellite land detail while giving oceans a natural deep-blue
-    // colour with lighter coastal water; white clouds and polar ice stay untouched.
-    float blue_score = source.b - max(source.r, source.g);
-    float ocean_mask = smoothstep(0.025, 0.105, blue_score);
-    float depth_tone = clamp((source.b - source.r) * 1.8 + 0.22, 0.0, 1.0);
-    vec3 deep_sea = vec3(0.012, 0.075, 0.145);
-    vec3 open_water = vec3(0.025, 0.205, 0.305);
-    vec3 sea_colour = mix(deep_sea, open_water, depth_tone);
-    vec3 natural_land = source * vec3(1.02, 1.00, 0.94);
+    // Keep the original satellite land texture and replace only strongly blue ocean pixels.
+    float max_land = max(source.r, source.g);
+    float blue_excess = source.b - max_land;
+    float ocean_mask = smoothstep(0.008, 0.060, blue_excess);
+    float water_depth = clamp((source.b - source.r) * 2.4 + 0.45, 0.0, 1.0);
+    vec3 deep_ocean = vec3(0.012, 0.055, 0.125);
+    vec3 open_ocean = vec3(0.025, 0.145, 0.255);
+    vec3 shallow_water = vec3(0.055, 0.30, 0. thirty);
+    vec3 sea_colour = mix(deep_ocean, open_ocean, water_depth);
+    sea_colour = mix(sea_colour, shallow_water, smoothstep(0.55, 0.92, water_depth) * 0.28);
+    vec3 natural_land = source * vec3(1.04, 1.02, 0.98);
     ALBEDO = mix(natural_land, sea_colour, ocean_mask);
-    ROUGHNESS = 0.94;
+    ROUGHNESS = 0.96;
 }
 """
         var earth_material := ShaderMaterial.new()
@@ -103,8 +105,7 @@ void fragment() {
         ocean = fallback_ocean
     globe_mesh.material_override = ocean
     add_child(globe_mesh)
-    _build_north_africa_detail_patch()
-    _build_cloud_layer()
+    # Keep one seamless global surface; regional overlays caused visible rectangular seams.
 
     var atmosphere := MeshInstance3D.new()
     atmosphere.mesh = _create_earth_mesh(96, 48, GLOBE_RADIUS * 1.022)
