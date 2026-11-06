@@ -20,6 +20,7 @@ const ARABIC_NAMES := {
 
 var features_by_code: Dictionary = {}
 var unlocked_index := 0
+var interaction_enabled := true
 var drag_active := false
 var drag_start := Vector2.ZERO
 var last_pointer := Vector2.ZERO
@@ -433,6 +434,8 @@ func _process(delta: float) -> void:
         rotate_y(delta * 0.0018)
 
 func _input(event: InputEvent) -> void:
+    if not interaction_enabled:
+        return
     if event is InputEventScreenTouch:
         if event.pressed:
             _begin_drag(event.position)
