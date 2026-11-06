@@ -38,6 +38,7 @@ const MUSIC_RATE := 22050.0
 const MUSIC_LOOP_SECONDS := 8.0
 
 var content: VBoxContainer
+var interface_root: Control
 var footer_label: Label
 var progress_label: Label
 var score_label: Label
@@ -405,6 +406,7 @@ func _build_interface() -> void:
     root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     root.layout_direction = Control.LAYOUT_DIRECTION_RTL
     layer.add_child(root)
+    interface_root = root
 
     var tint := ColorRect.new()
     tint.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -678,12 +680,96 @@ func _show_country_locked(index: int, code: String, name: String) -> void:
     back.pressed.connect(_show_world_map)
     content.add_child(back)
 
+
 func _start_country(index: int, code: String = "DZA", name: String = "الجزائر") -> void:
     current_country_index = index
     current_country_code = code
     current_country_name = name
     _set_globe_mode(false)
-    _start_level(1)
+    _play_country_arrival()
+
+func _play_country_arrival() -> void:
+    _clear_content()
+    # Cinematic flight transition: the aircraft crosses the screen before landing.
+    var flight_layer := Control.new()
+    flight_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    flight_layer.mouse_filter = Control.MOUSE_FILTER_STOP
+    interface_root.add_child(flight_layer)
+
+    var sky := ColorRect.new()
+    sky.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    sky.color = Color(0.008, 0.018, 0.052, 0.98)
+    flight_layer.add_child(sky)
+
+    var glow := ColorRect.new()
+    glow.position = Vector2(0, 430)
+    glow.size = Vector2(720, 3)
+    glow.color = Color(0.18, 0.62, 1.0, 0.48)
+    flight_layer.add_child(glow)
+
+    var destination := Label.new()
+    destination.text = "الوجهة القادمة\n" + current_country_name
+    destination.position = Vector2(30, 145)
+    destination.size = Vector2(660, 150)
+    destination.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    destination.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    destination.add_theme_font_size_override("font_size", 34)
+    destination.add_theme_color_override("font_color", Color(0.88, 0.94, 1.0))
+    flight_layer.add_child(destination)
+
+    var flight_status := Label.new()
+    flight_status.text = "✈  جارٍ التحليق نحو " + current_country_name
+    flight_status.position = Vector2(25, 920)
+    flight_status.size = Vector2(670, 55)
+    flight_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    flight_status.add_theme_font_size_override("font_size", 20)
+    flight_status.add_theme_color_override("font_color", Color(0.48, 0.82, 1.0))
+    flight_layer.add_child(flight_status)
+
+    var aircraft := Label.new()
+    aircraft.text = "✈"
+    aircraft.position = Vector2(-150, 570)
+    aircraft.size = Vector2(150, 110)
+    aircraft.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    aircraft.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    aircraft.add_theme_font_size_override("font_size", 76)
+    aircraft.add_theme_color_override("font_color", Color(0.95, 0.98, 1.0))
+    flight_layer.add_child(aircraft)
+
+    var tween := create_tween()
+    tween.set_parallel(true)
+    tween.tween_property(aircraft, "position", Vector2(720, 330), 2.1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+    tween.tween_property(aircraft, "rotation", -0.16, 0.8)
+    tween.tween_property(glow, "modulate:a", 0.9, 1.0)
+    tween.chain().tween_interval(0.25)
+    tween.tween_callback(func():
+        if is_instance_valid(flight_layer):
+            flight_layer.queue_free()
+        _show_country_briefing()
+    )
+
+func _show_country_briefing() -> void:
+    _clear_content()
+    var flags := {"DZA":"🇩🇿", "TUN":"🇹🇳", "LBY":"🇱🇾", "EGY":"🇪🇬", "MAR":"🇲🇦"}
+    var flag := str(flags.get(current_country_code, "🌍"))
+    _add_heading(flag + "  أهلاً بك في " + current_country_name, "وصلت إلى وجهتك! استعد لاكتشاف أسرارها واختبار ذكائك")
+    _add_stat_card("محطة الرحلة", "%d" % (current_country_index + 1))
+    _add_stat_card("محتوى التحدّي", "تاريخ • جغرافيا • علوم • ثقافة")
+    var welcome := Label.new()
+    welcome.text = "تم الهبوط بنجاح ✦\nأمامك مجموعة أسئلة مستوحاة من هذه الدولة. اجمع النقاط وأثبت أنك تستحق فتح الوجهة التالية."
+    welcome.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    welcome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    welcome.custom_minimum_size.y = 120
+    welcome.add_theme_font_size_override("font_size", 19)
+    welcome.add_theme_color_override("font_color", Color(0.82, 0.91, 1.0))
+    content.add_child(welcome)
+    var launch := _make_button("🚀  ابدأ تحدّي " + current_country_name)
+    launch.custom_minimum_size.y = 82
+    launch.pressed.connect(func(): _start_level(1))
+    content.add_child(launch)
+    var back := _make_button("🌍  العودة إلى الكرة الأرضية")
+    back.pressed.connect(_show_world_map)
+    content.add_child(back)
 
 func _show_world_levels(world: int) -> void:
     _clear_content()
