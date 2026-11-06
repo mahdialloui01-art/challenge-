@@ -95,9 +95,16 @@ func _initialize() -> void:
         var body := lock.get_node_or_null("MetalBody") as MeshInstance3D
         var shackle := lock.get_node_or_null("Shackle") as MeshInstance3D
         var keyway := lock.get_node_or_null("IlluminatedKeyway") as MeshInstance3D
+        var panel := lock.get_node_or_null("ElectronicPanel") as MeshInstance3D
+        var status_led := lock.get_node_or_null("StatusLED") as MeshInstance3D
+        var circuit := lock.get_node_or_null("CircuitAccent") as MeshInstance3D
         var order := lock.get_node_or_null("SequenceNumber") as Label3D
-        if body == null or shackle == null or keyway == null:
-            push_error("Modern 3D lock is missing body, shackle, or illuminated keyway")
+        if body == null or shackle == null or keyway == null or panel == null or status_led == null or circuit == null:
+            push_error("Electronic lock is missing its shell, shackle, glass panel, sensor, or LED details")
+            quit(1)
+            return
+        if lock.scale.x > 0.80 or lock.scale.y > 0.80 or lock.scale.z > 0.80:
+            push_error("Electronic lock is too large and may cover the country map")
             quit(1)
             return
         var body_material := body.material_override as StandardMaterial3D
