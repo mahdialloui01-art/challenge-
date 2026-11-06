@@ -28,10 +28,12 @@ var rotation_velocity := Vector2.ZERO
 var zoom_distance := 7.6
 var globe_mesh: MeshInstance3D
 var detail_patch: MeshInstance3D
+var detail_material: StandardMaterial3D
+var cloud_layer: MeshInstance3D
 var country_labels: Array[Label3D] = []
-const DETAIL_LON_MIN := -3.0
-const DETAIL_LON_MAX := 12.0
-const DETAIL_LAT_MIN := 30.0
+const DETAIL_LON_MIN := -9.0
+const DETAIL_LON_MAX := 16.0
+const DETAIL_LAT_MIN := 18.0
 const DETAIL_LAT_MAX := 38.0
 
 func _ready() -> void:
@@ -76,6 +78,7 @@ func _build_globe() -> void:
     globe_mesh.material_override = ocean
     add_child(globe_mesh)
     _build_north_africa_detail_patch()
+    _build_cloud_layer()
 
     var atmosphere := MeshInstance3D.new()
     atmosphere.mesh = _create_earth_mesh(96, 48, GLOBE_RADIUS * 1.022)
@@ -144,14 +147,47 @@ func _build_north_africa_detail_patch() -> void:
     detail_patch = MeshInstance3D.new()
     detail_patch.name = "OfflineNorthAfricaSatelliteDetail"
     detail_patch.mesh = patch_mesh
-    var detail_material := StandardMaterial3D.new()
+    detail_material = StandardMaterial3D.new()
     detail_material.albedo_texture = image_texture
+    detail_material.albedo_color = Color(1, 1, 1, 0)
+    detail_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
     detail_material.roughness = 1.0
     detail_material.cull_mode = BaseMaterial3D.CULL_DISABLED
     detail_material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
     detail_patch.material_override = detail_material
     detail_patch.visible = false
     add_child(detail_patch)
+
+func _build_cloud_layer() -> void:
+    cloud_layer = MeshInstance3D.new()
+    cloud_layer.name = "AnimatedCloudShell"
+    cloud_layer.mesh = _create_earth_mesh(160, 80, GLOBE_RADIUS * 1.008)
+    var cloud_shader := Shader.new()
+    cloud_shader.code = """shader_type spatial;
+render_mode blend_mix, depth_prepass_alpha, cull_disabled, unshaded;
+float hash21(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+}
+float noise2(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hash21(i), hash21(i + vec2(1.0, 0.0)), f.x),
+               mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), f.x), f.y);
+}
+void fragment() {
+    vec2 p = UV * vec2(22.0, 11.0);
+    p.x += TIME * 0.018;
+    float n = noise2(p) * 0.58 + noise2(p * 2.1) * 0.29 + noise2(p * 4.2) * 0.13;
+    float cloud = smoothstep(0.55, 0.72, n);
+    ALBEDO = vec3(0.86, 0.92, 1.0);
+    ALPHA = cloud * 0.30;
+}
+"""
+    var cloud_material := ShaderMaterial.new()
+    cloud_material.shader = cloud_shader
+    cloud_layer.material_override = cloud_material
+    add_child(cloud_layer)
 
 func _load_country_geometry() -> void:
     if not FileAccess.file_exists(DATA_PATH):
@@ -269,14 +305,16 @@ func _geo_to_sphere(longitude: float, latitude: float, radius: float) -> Vector3
 
 func _process(delta: float) -> void:
     _update_country_label_visibility()
-    if detail_patch != null:
-        detail_patch.visible = zoom_distance <= 6.35
+    if detail_patch != null and detail_material != null:
+        var detail_alpha := clampf(inverse_lerp(9.6, 7.7, zoom_distance), 0.0, 1.0)
+        detail_patch.visible = detail_alpha > 0.01
+        detail_material.albedo_color = Color(1, 1, 1, detail_alpha)
     if not drag_active and rotation_velocity.length() > 0.001:
         rotate_y(rotation_velocity.x * delta)
         rotate_x(rotation_velocity.y * delta)
-        rotation_velocity = rotation_velocity.lerp(Vector2.ZERO, minf(1.0, delta * 2.8))
+        rotation_velocity = rotation_velocity.lerp(Vector2.ZERO, minf(1.0, delta * 5.2))
     if not drag_active:
-        rotate_y(delta * 0.018)
+        rotate_y(delta * 0.0035)
 
 func _input(event: InputEvent) -> void:
     if event is InputEventScreenTouch:
@@ -305,7 +343,8 @@ func _apply_zoom(factor: float) -> void:
     var camera := get_viewport().get_camera_3d()
     if camera == null:
         return
-    zoom_distance = clampf(zoom_distance / factor, 4.2, 12.5)
+    var gentle_factor := lerpf(1.0, factor, 0.58)
+    zoom_distance = clampf(zoom_distance / gentle_factor, 3.28, 14.0)
     camera.position.z = zoom_distance
 
 func _begin_drag(position: Vector2) -> void:
@@ -322,10 +361,10 @@ func _move_drag(position: Vector2, relative: Vector2) -> void:
         return
     if position.distance_to(drag_start) > 8.0:
         pointer_moved = true
-    rotate_y(relative.x * 0.008)
-    rotate_x(relative.y * 0.008)
+    rotate_y(relative.x * 0.0022)
+    rotate_x(relative.y * 0.0022)
     rotation.x = clampf(rotation.x, -1.25, 1.25)
-    rotation_velocity = Vector2(relative.x * 0.42, relative.y * 0.42)
+    rotation_velocity = Vector2(relative.x * 0.006, relative.y * 0.006).limit_length(0.75)
     last_pointer = position
 
 func _end_drag(position: Vector2) -> void:
