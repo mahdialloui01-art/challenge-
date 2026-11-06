@@ -85,7 +85,7 @@ void fragment() {
     float water_depth = clamp((source.b - source.r) * 2.4 + 0.45, 0.0, 1.0);
     vec3 deep_ocean = vec3(0.012, 0.055, 0.125);
     vec3 open_ocean = vec3(0.025, 0.145, 0.255);
-    vec3 shallow_water = vec3(0.055, 0.30, 0. thirty);
+    vec3 shallow_water = vec3(0.055, 0.30, 0.38);
     vec3 sea_colour = mix(deep_ocean, open_ocean, water_depth);
     sea_colour = mix(sea_colour, shallow_water, smoothstep(0.55, 0.92, water_depth) * 0.28);
     vec3 natural_land = source * vec3(1.04, 1.02, 0.98);
@@ -131,6 +131,7 @@ void fragment() {
     light.light_energy = 1.65
     light.omni_range = 16.0
     add_child(light)
+    _build_cloud_layer()
 
 
 func _build_north_africa_detail_patch() -> void:
