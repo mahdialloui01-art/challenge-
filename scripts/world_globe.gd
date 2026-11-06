@@ -132,6 +132,7 @@ void fragment() {
     light.omni_range = 16.0
     add_child(light)
     _build_cloud_layer()
+    _build_north_africa_detail_patch()
 
 
 func _build_north_africa_detail_patch() -> void:
