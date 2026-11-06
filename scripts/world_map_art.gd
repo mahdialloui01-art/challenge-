@@ -117,6 +117,19 @@ func _draw() -> void:
         if locked:
             draw_arc(point, 13, PI, TAU, 24, Color("#e5edf6"), 3.0, true)
             draw_rect(Rect2(point + Vector2(-11, -1), Vector2(22, 16)), Color("#e5edf6"), true)
+    # Full-map lock: later worlds stay visibly sealed until the previous world is completed.
+    var world_first_level := world_index * 2 + 1
+    if world_first_level > unlocked_level:
+        draw_rect(Rect2(48, 45, 624, 670), Color(0.012, 0.020, 0.034, 0.82), true)
+        var lock_center := Vector2(360, 292)
+        draw_arc(lock_center + Vector2(0, -13), 43, PI, TAU, 48, Color("#f3d99a"), 11.0, true)
+        draw_rect(Rect2(lock_center + Vector2(-55, -12), Vector2(110, 88)), Color("#d5b46c"), true)
+        draw_rect(Rect2(lock_center + Vector2(-44, -1), Vector2(88, 66)), Color("#f0d69a"), true)
+        draw_circle(lock_center + Vector2(0, 25), 9, Color("#4b3924"))
+        draw_rect(Rect2(lock_center + Vector2(-4, 29), Vector2(8, 19)), Color("#4b3924"), true)
+        draw_string(ThemeDB.fallback_font, Vector2(80, 430), "هذه الخريطة مقفلة", HORIZONTAL_ALIGNMENT_CENTER, 560, 30, Color("#fff0c8"))
+        draw_string(ThemeDB.fallback_font, Vector2(80, 475), "أكمل الخريطة السابقة لفتح هذه المغامرة", HORIZONTAL_ALIGNMENT_CENTER, 560, 19, Color("#e3d5b8"))
+        draw_string(ThemeDB.fallback_font, Vector2(80, 520), "المرحلة المطلوبة: %d" % (world_first_level - 1), HORIZONTAL_ALIGNMENT_CENTER, 560, 17, Color("#f5ca73"))
     draw_set_transform(Vector2.ZERO)
 
 func _draw_tree(p: Vector2, tint: Color) -> void:
@@ -148,6 +161,9 @@ func _gui_input(event: InputEvent) -> void:
         _try_select(event.position)
 
 func _try_select(pos: Vector2) -> void:
+    if world_index * 2 + 1 > unlocked_level:
+        accept_event()
+        return
     var sx: float = size.x / 720.0
     var sy: float = size.y / 760.0
     var p := Vector2(pos.x / sx, pos.y / sy)
