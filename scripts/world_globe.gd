@@ -648,45 +648,41 @@ func _update_country_label_visibility() -> void:
         var tier := int(label.get_meta("zoom_tier", 2))
         var tier_visible := zoom_distance <= 5.45 or (tier == 1 and zoom_distance <= 6.15)
         label.visible = tier_visible and normal.dot(camera_local.normalized()) > 0.18
+
+    # Deterministic screen-space packing: route order has priority, and nearby
+    # locks are suppressed instead of piling up into a scattered-looking cluster.
+    var accepted_lock_positions: Array[Vector2] = []
+    var viewport_size := get_viewport().get_visible_rect().size
+    var min_lock_gap := 58.0 if zoom_distance > 6.0 else (43.0 if zoom_distance > 4.8 else 31.0)
+    var camera_basis_local: Basis = global_transform.basis.inverse() * camera.global_transform.basis
     for lock_label in country_lock_labels:
         if not is_instance_valid(lock_label):
             continue
-        var route_index := int(lock_label.get_meta("route_index", -1))
         var normal := lock_label.position.normalized()
         var marker_visible := normal.dot(camera_local.normalized()) > 0.12
-        lock_label.visible = marker_visible
         if marker_visible:
-            var camera_basis_local: Basis = global_transform.basis.inverse() * camera.global_transform.basis
-            lock_label.basis = camera_basis_local
-    # Screen-space decluttering: keep lock markers, but never let sequence
-    # numbers overlap. Route order gives early destinations visual priority.
-    var accepted_number_positions: Array[Vector2] = []
-    var viewport_size := get_viewport().get_visible_rect().size
-    var min_number_gap := 46.0 if zoom_distance > 6.0 else (34.0 if zoom_distance > 4.8 else 25.0)
+            var world_position := lock_label.global_position
+            marker_visible = not camera.is_position_behind(world_position)
+            if marker_visible:
+                var screen_position := camera.unproject_position(world_position)
+                marker_visible = screen_position.x >= 8.0 and screen_position.y >= 8.0 and screen_position.x <= viewport_size.x - 8.0 and screen_position.y <= viewport_size.y - 8.0
+                if marker_visible:
+                    for accepted_position in accepted_lock_positions:
+                        if screen_position.distance_to(accepted_position) < min_lock_gap:
+                            marker_visible = false
+                            break
+                if marker_visible:
+                    accepted_lock_positions.append(screen_position)
+                    lock_label.basis = camera_basis_local
+        lock_label.visible = marker_visible
+
+    # The number belongs to its lock plaque: show it only when that complete
+    # marker survived the spacing pass, so no detached floating numbers remain.
     for order_label in country_order_labels:
         if not is_instance_valid(order_label):
             continue
         var marker_root := order_label.get_parent() as Node3D
-        if marker_root == null:
-            order_label.visible = false
-            continue
-        var world_position := marker_root.global_position
-        if camera.is_position_behind(world_position):
-            order_label.visible = false
-            continue
-        var screen_position := camera.unproject_position(world_position)
-        var on_screen := screen_position.x >= 8.0 and screen_position.y >= 8.0 and screen_position.x <= viewport_size.x - 8.0 and screen_position.y <= viewport_size.y - 8.0
-        var normal := marker_root.position.normalized()
-        var front_facing := normal.dot(camera_local.normalized()) > 0.12
-        var spaced := true
-        if on_screen and front_facing:
-            for accepted_position in accepted_number_positions:
-                if screen_position.distance_to(accepted_position) < min_number_gap:
-                    spaced = false
-                    break
-        order_label.visible = on_screen and front_facing and spaced
-        if order_label.visible:
-            accepted_number_positions.append(screen_position)
+        order_label.visible = marker_root != null and marker_root.visible
 
 func _create_earth_mesh(longitude_segments: int, latitude_segments: int, radius: float = GLOBE_RADIUS) -> ArrayMesh:
     var vertices := PackedVector3Array()
