@@ -42,7 +42,7 @@ jobs:
       - name: Export developer APK
         run: |
           mkdir -p build
-          godot --headless --path . --export-release "Developer Android" build/Challenge_Developer.apk
+          godot --headless --path . --export-debug "Developer Android" build/Challenge_Developer.apk
           test -s build/Challenge_Developer.apk
 
       - name: Upload developer APK
