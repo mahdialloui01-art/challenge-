@@ -403,7 +403,7 @@ func _process(delta: float) -> void:
     if not drag_active and rotation_velocity.length() > 0.001:
         rotate_y(rotation_velocity.x * delta)
         rotate_x(rotation_velocity.y * delta)
-        rotation_velocity = rotation_velocity.lerp(Vector2.ZERO, minf(1.0, delta * 5.2))
+        rotation_velocity = rotation_velocity.lerp(Vector2.ZERO, minf(1.0, delta * 8.0))
     if not drag_active:
         rotate_y(delta * 0.0035)
 
@@ -434,7 +434,7 @@ func _apply_zoom(factor: float) -> void:
     var camera := get_viewport().get_camera_3d()
     if camera == null:
         return
-    var gentle_factor := lerpf(1.0, factor, 0.58)
+    var gentle_factor := lerpf(1.0, factor, 0.28)
     zoom_distance = clampf(zoom_distance / gentle_factor, 3.28, 14.0)
     camera.position.z = zoom_distance
 
@@ -452,10 +452,10 @@ func _move_drag(position: Vector2, relative: Vector2) -> void:
         return
     if position.distance_to(drag_start) > 8.0:
         pointer_moved = true
-    rotate_y(relative.x * 0.0022)
-    rotate_x(relative.y * 0.0022)
+    rotate_y(relative.x * 0.00085)
+    rotate_x(relative.y * 0.00085)
     rotation.x = clampf(rotation.x, -1.25, 1.25)
-    rotation_velocity = Vector2(relative.x * 0.006, relative.y * 0.006).limit_length(0.75)
+    rotation_velocity = Vector2(relative.x * 0.00115, relative.y * 0.00115).limit_length(0.22)
     last_pointer = position
 
 func _end_drag(position: Vector2) -> void:
