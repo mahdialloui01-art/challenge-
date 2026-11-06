@@ -14,5 +14,20 @@ func _initialize() -> void:
         push_error("World globe second country is not Tunisia")
         quit(1)
         return
+    if not ResourceLoader.exists("res://assets/earth_surface.jpg"):
+        push_error("NASA satellite Earth texture was not packaged")
+        quit(1)
+        return
+    var earth := globe.get_child(0) as MeshInstance3D
+    if earth == null or not (earth.mesh is ArrayMesh):
+        push_error("Earth globe is not using the custom geographic UV mesh")
+        quit(1)
+        return
+    var earth_material := earth.material_override as StandardMaterial3D
+    if earth_material == null or earth_material.albedo_texture == null:
+        push_error("Satellite texture was not assigned to the Earth material")
+        quit(1)
+        return
+    print("WORLD_GLOBE_SATELLITE_TEXTURE_OK")
     print("WORLD_GLOBE_SMOKE_OK")
     quit()
