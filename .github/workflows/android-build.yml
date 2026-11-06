@@ -1,4 +1,5 @@
 name: Build Android APK
+# CI rebuild for compact, non-overlapping globe sequence labels
 
 on:
   push:
