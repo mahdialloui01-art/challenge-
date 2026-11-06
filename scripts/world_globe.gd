@@ -35,6 +35,7 @@ var cloud_layer: MeshInstance3D
 var country_labels: Array[Label3D] = []
 var city_labels: Array[Label3D] = []
 var country_lock_labels: Array[Label3D] = []
+var country_order_labels: Array[Label3D] = []
 const DETAIL_LON_MIN := -9.0
 const DETAIL_LON_MAX := 16.0
 const DETAIL_LAT_MIN := 18.0
@@ -420,6 +421,7 @@ func _create_country_lock_labels() -> void:
         order_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
         order_label.set_meta("route_index", route_index)
         add_child(order_label)
+        country_order_labels.append(order_label)
 
 func _create_city_labels() -> void:
     # Accurate geographic anchors for the first playable region; labels appear only at close zoom.
@@ -505,7 +507,14 @@ func _update_country_label_visibility() -> void:
             continue
         var route_index := int(lock_label.get_meta("route_index", -1))
         var normal := lock_label.position.normalized()
-        lock_label.visible = route_index > unlocked_index and normal.dot(camera_local.normalized()) > 0.12
+        var marker_visible := route_index > unlocked_index and normal.dot(camera_local.normalized()) > 0.12
+        lock_label.visible = marker_visible
+    for order_label in country_order_labels:
+        if not is_instance_valid(order_label):
+            continue
+        var route_index := int(order_label.get_meta("route_index", -1))
+        var normal := order_label.position.normalized()
+        order_label.visible = route_index > unlocked_index and normal.dot(camera_local.normalized()) > 0.12
 
 func _create_earth_mesh(longitude_segments: int, latitude_segments: int, radius: float = GLOBE_RADIUS) -> ArrayMesh:
     var vertices := PackedVector3Array()
