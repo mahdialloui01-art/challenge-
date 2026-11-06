@@ -87,14 +87,27 @@ func _initialize() -> void:
         return
     for route_index in range(globe.country_route.size()):
         var code: String = globe.country_route[route_index]
-        var lock: Label3D = globe.get_node_or_null("CountryLock_" + code)
-        var order: Label3D = globe.get_node_or_null("CountryLockOrder_" + code)
-        if lock == null or lock.font_size < 50:
-            push_error("Locked destination does not have a large visible lock")
+        var lock: Node3D = globe.get_node_or_null("CountryLock_" + code)
+        if lock == null:
+            push_error("A 3D lock assembly is missing for a route destination")
             quit(1)
             return
-        if lock.modulate.r > 0.90 or lock.modulate.g > 0.92 or lock.modulate.b < 0.65:
-            push_error("Lock marker is not the requested neutral gray")
+        var body := lock.get_node_or_null("MetalBody") as MeshInstance3D
+        var shackle := lock.get_node_or_null("Shackle") as MeshInstance3D
+        var keyway := lock.get_node_or_null("IlluminatedKeyway") as MeshInstance3D
+        var order := lock.get_node_or_null("SequenceNumber") as Label3D
+        if body == null or shackle == null or keyway == null:
+            push_error("Modern 3D lock is missing body, shackle, or illuminated keyway")
+            quit(1)
+            return
+        var body_material := body.material_override as StandardMaterial3D
+        if body_material == null or body_material.metallic < 0.75:
+            push_error("Lock body is missing its metallic finish")
+            quit(1)
+            return
+        var gray := body_material.albedo_color
+        if absf(gray.r - gray.g) > 0.12 or absf(gray.g - gray.b) > 0.12:
+            push_error("Lock body is not a neutral metallic gray")
             quit(1)
             return
         if order == null or order.text != "%02d" % (route_index + 1):
