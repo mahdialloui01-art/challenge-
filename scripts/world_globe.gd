@@ -353,9 +353,8 @@ func _get_country_label_anchor(geometry: Array) -> Array:
     return best_anchor
 
 func _create_country_lock_labels() -> void:
-    # A prominent lock is anchored to the next locked destination on the globe.
-    # Labels for every route country are prepared once; only the next locked one
-    # is shown at a time to avoid cluttering the planet.
+    # Every locked destination gets its own visible lock marker.
+    # Markers are hidden only when they are on the far side of the globe.
     for code in country_route:
         if not features_by_code.has(code):
             continue
@@ -462,7 +461,7 @@ func _update_country_label_visibility() -> void:
             continue
         var route_index := int(lock_label.get_meta("route_index", -1))
         var normal := lock_label.position.normalized()
-        lock_label.visible = route_index == unlocked_index + 1 and normal.dot(camera_local.normalized()) > 0.12
+        lock_label.visible = route_index > unlocked_index and normal.dot(camera_local.normalized()) > 0.12
 
 func _create_earth_mesh(longitude_segments: int, latitude_segments: int, radius: float = GLOBE_RADIUS) -> ArrayMesh:
     var vertices := PackedVector3Array()
