@@ -234,7 +234,7 @@ func _input(event: InputEvent) -> void:
         _move_drag(event.position, event.relative)
 
 func _begin_drag(position: Vector2) -> void:
-    if position.y < 210.0 or position.y > 1060.0:
+    if position.y < 210.0 or position.y > 1220.0:
         return
     drag_active = true
     drag_start = position
@@ -257,7 +257,7 @@ func _end_drag(position: Vector2) -> void:
     if not drag_active:
         return
     drag_active = false
-    if not pointer_moved and position.distance_to(drag_start) < 14.0 and position.y >= 540.0 and position.y <= 1080.0:
+    if not pointer_moved and position.distance_to(drag_start) < 14.0 and position.y >= 210.0 and position.y <= 1220.0:
         _pick_country(position)
 
 func _pick_country(screen_position: Vector2) -> void:
