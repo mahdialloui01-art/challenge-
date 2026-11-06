@@ -1,6 +1,7 @@
 extends Node3D
 
 const WorldMapArt = preload("res://scripts/world_map_art.gd")
+const WorldGlobe = preload("res://scripts/world_globe.gd")
 
 const QUESTIONS_PATH := "res://data/questions.json"
 const SAVE_PATH := "user://player_data.cfg"
@@ -18,6 +19,13 @@ var best_score := 0
 var games_played := 0
 var unlocked_level := 1
 var current_level := 1
+var unlocked_country_index := 0
+var current_country_index := 0
+var current_country_code := "DZA"
+var current_country_name := "الجزائر"
+var question_pool: Array[int] = []
+var world_globe: Node3D
+var world_camera: Camera3D
 var correct_answers := 0
 var question_timer: Timer
 var time_label: Label
@@ -115,12 +123,12 @@ func _music_sample(sample_index: int) -> float:
 
 func _build_3d_world() -> void:
     # A layered floating-island world map built from real 3D meshes.
-    var camera := Camera3D.new()
-    camera.position = Vector3(0, 0, 12)
-    camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-    camera.size = 15.5
-    camera.current = true
-    add_child(camera)
+    world_camera = Camera3D.new()
+    world_camera.position = Vector3(0, 0, 12)
+    world_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+    world_camera.size = 15.5
+    world_camera.current = true
+    add_child(world_camera)
 
     var environment := WorldEnvironment.new()
     var env := Environment.new()
@@ -167,6 +175,7 @@ func _build_3d_world() -> void:
         star_mat.emission_enabled = true
         star_mat.emission = Color(0.18, 0.42, 1.0)
         star.material_override = star_mat
+        star.add_to_group("fantasy_map")
         var angle := float(i) * 2.399
         var radius := 5.0 + float((i * 7) % 9) * 0.48
         star.position = Vector3(cos(angle) * radius, sin(angle * 1.37) * 6.0, -5.0 - float(i % 5))
@@ -199,6 +208,7 @@ func _build_3d_world() -> void:
             pebble_mat.emission_enabled = true
             pebble_mat.emission = Color(0.08, 0.42, 1.0) * 1.8
             pebble.material_override = pebble_mat
+            pebble.add_to_group("fantasy_map")
             add_child(pebble)
 
 func _map_material(color: Color, glow: float = 0.0) -> StandardMaterial3D:
@@ -212,6 +222,7 @@ func _map_material(color: Color, glow: float = 0.0) -> StandardMaterial3D:
 
 func _add_map_island(position: Vector3, tint: Color, world_index: int) -> void:
     var island := Node3D.new()
+    island.add_to_group("fantasy_map")
     island.position = position
     add_child(island)
 
@@ -367,10 +378,12 @@ func _load_player_data() -> void:
         vibration_enabled = bool(config.get_value("settings", "vibration", true))
         explanations_enabled = bool(config.get_value("settings", "explanations", true))
         unlocked_level = int(config.get_value("progress", "unlocked_level", 1))
+        unlocked_country_index = int(config.get_value("country_progress", "unlocked_index", 0))
         music_enabled = bool(config.get_value("settings", "music", true))
     if not DIFFICULTIES.has(difficulty):
         difficulty = "medium"
     unlocked_level = clampi(unlocked_level, 1, 11)
+    unlocked_country_index = clampi(unlocked_country_index, 0, 176)
 
 func _save_player_data() -> void:
     var config := ConfigFile.new()
@@ -381,6 +394,7 @@ func _save_player_data() -> void:
     config.set_value("settings", "explanations", explanations_enabled)
     config.set_value("settings", "music", music_enabled)
     config.set_value("progress", "unlocked_level", unlocked_level)
+    config.set_value("country_progress", "unlocked_index", unlocked_country_index)
     config.save(SAVE_PATH)
 
 func _build_interface() -> void:
@@ -498,6 +512,7 @@ func _add_stat_card(caption: String, value: String) -> void:
     content.add_child(card)
 
 func _show_main_menu() -> void:
+    _set_globe_mode(false)
     _clear_content()
     _add_heading("مرحباً بك أيها العبقري!", "هل أنت مستعد لاختبار معلوماتك؟")
     _add_stat_card("أفضل نتيجة شخصية", "🏆  %d نقطة" % best_score)
@@ -582,7 +597,7 @@ func _show_help() -> void:
     _clear_content()
     _add_heading("طريقة اللعب", "أثبت ذكاءك في مجموعة من الأسئلة المتنوعة")
     var rules := Label.new()
-    rules.text = "١. رحلتك تتكوّن من 5 خرائط، وكل خريطة فيها مرحلتان متصلتان بمسار.\n\n٢. أكمل المرحلة بنسبة 60٪ على الأقل لفتح المرحلة التالية.\n\n٣. عند إكمال المرحلتين تُفتح الخريطة التالية تلقائياً.\n\n٤. لديك وقت محدود للإجابة، ويقلّ الوقت كلما تقدّمت.\n\n٥. أكمل 5 أسئلة في كل مرحلة.\n\nالموسيقى تعمل دون إنترنت، ويتم حفظ تقدمك على جهازك."
+    rules.text = "١. تبدأ رحلتك من الجزائر، وكل دولة تمثل مرحلة مستقلة.\n\n٢. اسحب الكرة الأرضية بإصبعك لتدويرها واكتشاف البلدان.\n\n٣. اضغط على الجزائر لبدء أول تحدٍّ، ثم افتح الدولة التالية بعد النجاح.\n\n٤. تحتاج إلى 60٪ على الأقل لفتح البلد التالي.\n\n٥. الأسئلة متنوعة في التاريخ والجغرافيا والعلوم والثقافة وغيرها.\n\nتعمل اللعبة دون إنترنت وتحفظ تقدمك على الهاتف."
     rules.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     rules.add_theme_font_size_override("font_size", 19)
     rules.add_theme_color_override("font_color", Color(0.88, 0.92, 1.0))
@@ -592,89 +607,88 @@ func _show_help() -> void:
     back.pressed.connect(_show_main_menu)
     content.add_child(back)
 
+func _set_globe_mode(enabled: bool) -> void:
+    if world_camera != null:
+        if enabled:
+            world_camera.projection = Camera3D.PROJECTION_PERSPECTIVE
+            world_camera.position = Vector3(0, 0, 9.2)
+            world_camera.fov = 43.0
+        else:
+            world_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+            world_camera.position = Vector3(0, 0, 12)
+            world_camera.size = 15.5
+    for backdrop in get_tree().get_nodes_in_group("fantasy_map"):
+        if is_instance_valid(backdrop):
+            backdrop.visible = not enabled
+    if world_globe != null:
+        world_globe.visible = enabled
+
 func _show_world_map() -> void:
     _clear_content()
-    _add_heading("رحلة العباقرة", "خمسة عوالم… وكل عالم خريطة بمراحلها الخاصة")
-    var names := ["وادي المعرفة", "غابة الألغاز", "مدينة العلوم", "قلعة العباقرة", "قمة الأساطير"]
-    var subtitles := ["بوابة الاكتشاف", "أسرار الطبيعة", "مختبر التحدّي", "حصن الحراس", "الاختبار الأسطوري"]
-    var icons := ["✦", "♣", "⚗", "♜", "♛"]
-    var tints := [Color(0.16, 0.86, 0.66), Color(0.35, 0.82, 0.43), Color(0.25, 0.68, 1.0), Color(0.70, 0.48, 1.0), Color(1.0, 0.70, 0.28)]
+    _set_globe_mode(true)
+    if world_globe == null:
+        world_globe = WorldGlobe.new()
+        world_globe.country_tapped.connect(_on_country_tapped)
+        add_child(world_globe)
+    world_globe.set_progress(unlocked_country_index)
+    world_globe.visible = true
+    _add_heading("رحلة العباقرة حول العالم", "اسحب الكرة لتدوير الأرض • اضغط على الدولة المفتوحة لبدء التحدي")
+    var next_country := world_globe.get_country_name("DZA")
+    var route_codes: Array = ["DZA", "TUN", "LBY", "EGY", "MAR", "MRT", "NER", "MLI", "TCD", "SDN"]
+    if unlocked_country_index < route_codes.size():
+        next_country = world_globe.get_country_name(str(route_codes[unlocked_country_index]))
+    else:
+        next_country = "الدولة التالية"
+    _add_stat_card("الدولة المفتوحة في رحلتك", next_country)
+    var progress_label := Label.new()
+    progress_label.text = "تقدّم الرحلة: %d / 177 دولة" % (unlocked_country_index + 1)
+    progress_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    progress_label.add_theme_font_size_override("font_size", 18)
+    progress_label.add_theme_color_override("font_color", Color("#78e6cb"))
+    content.add_child(progress_label)
+    var hint := Label.new()
+    hint.text = "الجزائر هي نقطة البداية 🇩🇿\nالدول المقفلة ستُفتح بالتتابع بعد النجاح في التحدي."
+    hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    hint.add_theme_font_size_override("font_size", 16)
+    hint.add_theme_color_override("font_color", Color("#d5e8ff"))
+    content.add_child(hint)
+    var home := _make_button("⌂   القائمة الرئيسية")
+    home.pressed.connect(_show_main_menu)
+    content.add_child(home)
 
-    var journey := _make_button("🗺  تقدّم الرحلة   %d / 10 مرحلة" % mini(unlocked_level - 1, 10))
-    journey.custom_minimum_size.y = 58
-    journey.disabled = true
-    content.add_child(journey)
+func _on_country_tapped(index: int, code: String, name: String, unlocked: bool) -> void:
+    if unlocked and index == unlocked_country_index:
+        _start_country(index, code, name)
+    else:
+        _show_country_locked(index, code, name)
 
-    for world in range(5):
-        var first_level := world * 2 + 1
-        var completed := clampi(unlocked_level - first_level, 0, 2)
-        var locked := first_level > unlocked_level
-        var tint: Color = tints[world]
-        var status := "✓ اكتملت الخريطة" if completed == 2 else ("🔒 لم تُفتح بعد" if locked else "✦ الخريطة الحالية")
-        var card := PanelContainer.new()
-        var style := StyleBoxFlat.new()
-        style.bg_color = Color(0.035, 0.075, 0.16, 0.97) if not locked else Color(0.025, 0.04, 0.085, 0.94)
-        style.border_color = tint if not locked else Color(0.20, 0.29, 0.43, 0.72)
-        style.set_border_width_all(2)
-        style.set_corner_radius_all(20)
-        style.content_margin_left = 12
-        style.content_margin_right = 12
-        style.content_margin_top = 10
-        style.content_margin_bottom = 10
-        card.add_theme_stylebox_override("panel", style)
-
-        var box := VBoxContainer.new()
-        box.add_theme_constant_override("separation", 6)
-        card.add_child(box)
-        var button := Button.new()
-        button.text = "%s   %s\n%s     %s" % [icons[world], names[world], subtitles[world], status]
-        button.custom_minimum_size = Vector2(0, 72)
-        button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-        button.alignment = HORIZONTAL_ALIGNMENT_RIGHT
-        button.add_theme_font_size_override("font_size", 19)
-        button.add_theme_color_override("font_color", Color(0.94, 0.97, 1.0) if not locked else Color(0.55, 0.62, 0.75))
-        button.flat = true
-        button.disabled = locked
-        if not locked:
-            button.pressed.connect(_show_world_levels.bind(world))
-        box.add_child(button)
-
-        var row := HBoxContainer.new()
-        var count := Label.new()
-        count.text = "%d / 2 مراحل" % completed
-        count.add_theme_font_size_override("font_size", 14)
-        count.add_theme_color_override("font_color", tint if not locked else Color(0.48, 0.55, 0.68))
-        row.add_child(count)
-        var spacer := Control.new()
-        spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-        row.add_child(spacer)
-        var stars := Label.new()
-        stars.text = ("★ " if completed >= 1 else "☆ ") + ("★" if completed >= 2 else "☆")
-        stars.add_theme_font_size_override("font_size", 17)
-        stars.add_theme_color_override("font_color", Color(1.0, 0.78, 0.32))
-        row.add_child(stars)
-        box.add_child(row)
-
-        var progress := ProgressBar.new()
-        progress.min_value = 0
-        progress.max_value = 2
-        progress.value = completed
-        progress.show_percentage = false
-        progress.custom_minimum_size.y = 9
-        var progress_bg := StyleBoxFlat.new()
-        progress_bg.bg_color = Color(0.10, 0.16, 0.27)
-        progress_bg.set_corner_radius_all(8)
-        progress.add_theme_stylebox_override("background", progress_bg)
-        var progress_fill := StyleBoxFlat.new()
-        progress_fill.bg_color = tint
-        progress_fill.set_corner_radius_all(8)
-        progress.add_theme_stylebox_override("fill", progress_fill)
-        box.add_child(progress)
-        content.add_child(card)
-
-    var back := _make_button("⌂   العودة للرئيسية")
-    back.pressed.connect(_show_main_menu)
+func _show_country_locked(index: int, code: String, name: String) -> void:
+    _clear_content()
+    _add_heading(name, "مرحلة من رحلة العباقرة حول العالم")
+    if index < 0:
+        _add_stat_card("حالة الدولة", "ستُضاف إلى مسار الرحلة لاحقاً")
+    elif index > unlocked_country_index:
+        _add_stat_card("حالة الدولة", "🔒 مغلقة")
+        var message := Label.new()
+        message.text = "أكمل تحدّي %s أولاً حتى تفتح هذه الدولة." % (world_globe.get_country_name("DZA") if unlocked_country_index == 0 else "الدولة السابقة")
+        message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        message.add_theme_font_size_override("font_size", 18)
+        message.add_theme_color_override("font_color", Color("#ffd27a"))
+        content.add_child(message)
+    else:
+        _add_stat_card("حالة الدولة", "✓ سبق أن فتحتها")
+    var back := _make_button("🌍   العودة إلى الكرة الأرضية")
+    back.pressed.connect(_show_world_map)
     content.add_child(back)
+
+func _start_country(index: int, code: String = "DZA", name: String = "الجزائر") -> void:
+    current_country_index = index
+    current_country_code = code
+    current_country_name = name
+    _set_globe_mode(false)
+    _start_level(1)
 
 func _show_world_levels(world: int) -> void:
     _clear_content()
@@ -809,8 +823,21 @@ func _start_level(level: int) -> void:
     time_limit = maxf(8.0, 22.0 - float(current_level - 1))
     showing_results = false
     question_index = 0
-    question_order.clear()
+    question_pool.clear()
     for i in range(questions.size()):
+        var candidate: Dictionary = questions[i]
+        if str(candidate.get("country", "")) == current_country_code:
+            question_pool.append(i)
+    if question_pool.is_empty():
+        for i in range(questions.size()):
+            var candidate: Dictionary = questions[i]
+            if str(candidate.get("country", "")).is_empty():
+                question_pool.append(i)
+    if question_pool.is_empty():
+        for i in range(questions.size()):
+            question_pool.append(i)
+    question_order.clear()
+    for i in range(question_pool.size()):
         question_order.append(i)
     question_order.shuffle()
     question_order.resize(mini(5, question_order.size()))
@@ -819,7 +846,7 @@ func _start_level(level: int) -> void:
 func _display_question() -> void:
     answered = false
     _clear_content()
-    var item: Dictionary = questions[question_order[question_index]]
+    var item: Dictionary = questions[question_pool[question_order[question_index]]]
 
     category_label = Label.new()
     category_label.text = "✦  %s  ✦" % str(item.get("category", "تحدّي عام"))
@@ -891,7 +918,7 @@ func _select_answer(selected: String) -> void:
         return
     if question_order.is_empty() or question_index < 0 or question_index >= question_order.size():
         return
-    var question_id := question_order[question_index]
+    var question_id := question_pool[question_order[question_index]]
     if question_id < 0 or question_id >= questions.size():
         return
     if not questions[question_id] is Dictionary:
@@ -956,39 +983,35 @@ func _show_results() -> void:
 
     var points_per_question := 10 + current_level * 2
     _clear_content()
-    _add_heading("انتهى التحدّي!", "أحسنت! هذه حصيلتك في هذه الجولة")
-    _add_stat_card("نتيجتك — المستوى %d" % current_level, "⭐  %d / %d نقطة" % [score, question_order.size() * points_per_question])
+    _add_heading("انتهى تحدّي %s!" % current_country_name, "هذه حصيلتك في هذه الدولة")
+    _add_stat_card("نتيجتك", "⭐  %d / %d نقطة" % [score, question_order.size() * points_per_question])
     _add_stat_card("أفضل نتيجة شخصية", "🏆  %d نقطة" % best_score)
     var percent := int(round(float(correct_answers) / float(question_order.size()) * 100.0))
-    var level_message := ""
-    if percent >= 60 and current_level == unlocked_level and unlocked_level <= 10:
-        unlocked_level += 1
-        if unlocked_level == 11:
-            level_message = "🏆 اكتملت الرحلة! أنت أسطورة العباقرة!"
-        elif current_level % 2 == 0:
-            level_message = "🎉 اكتملت الخريطة! فُتحت الخريطة التالية."
-        else:
-            level_message = "🎉 فتحت المرحلة %d داخل الخريطة!" % unlocked_level
+    var journey_message := ""
+    if percent >= 60 and current_country_index == unlocked_country_index:
+        unlocked_country_index = mini(unlocked_country_index + 1, 176)
+        journey_message = "🎉 ممتاز! فتحت الدولة التالية في رحلتك."
         _save_player_data()
-    elif percent < 60 and current_level == unlocked_level:
-        level_message = "تحتاج 60%% على الأقل لفتح المرحلة التالية. حاول مجدداً!"
     elif percent < 60:
-        level_message = "أعد هذه المرحلة وحاول تحسين نتيجتك!"
+        journey_message = "تحتاج إلى 60٪ على الأقل لفتح الدولة التالية. حاول مجدداً!"
     else:
-        level_message = "أنت متقدم في الرحلة! واصل التحدّي."
+        journey_message = "لقد فتحت هذه الدولة سابقاً. يمكنك مواصلة الرحلة."
+    if percent >= 60 and current_country_index >= 176:
+        journey_message = "🏆 أكملت رحلة دول العالم! أنت أسطورة العباقرة."
     var result_text := Label.new()
-    result_text.text = "نسبة الإجابات الصحيحة: %d%%\n%s" % [percent, level_message]
+    result_text.text = "نسبة الإجابات الصحيحة: %d%%\n%s" % [percent, journey_message]
     result_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    result_text.add_theme_font_size_override("font_size", 21)
+    result_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    result_text.add_theme_font_size_override("font_size", 20)
     result_text.add_theme_color_override("font_color", Color(0.55, 0.9, 1.0))
     content.add_child(result_text)
 
-    var replay := _make_button("↻   أعد المستوى")
-    replay.pressed.connect(func(): _start_level(current_level))
+    var replay := _make_button("↻   أعد تحدّي %s" % current_country_name)
+    replay.pressed.connect(func(): _start_country(current_country_index, current_country_code, current_country_name))
     content.add_child(replay)
-    var levels := _make_button("🏅   قائمة المستويات")
-    levels.pressed.connect(_show_world_map)
-    content.add_child(levels)
+    var next := _make_button("🌍   متابعة الرحلة على الكرة الأرضية")
+    next.pressed.connect(_show_world_map)
+    content.add_child(next)
     var home := _make_button("⌂   القائمة الرئيسية")
     home.pressed.connect(_show_main_menu)
     content.add_child(home)
