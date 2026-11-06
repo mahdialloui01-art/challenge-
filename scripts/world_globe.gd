@@ -31,6 +31,7 @@ var detail_patch: MeshInstance3D
 var detail_material: StandardMaterial3D
 var cloud_layer: MeshInstance3D
 var country_labels: Array[Label3D] = []
+var city_labels: Array[Label3D] = []
 const DETAIL_LON_MIN := -9.0
 const DETAIL_LON_MAX := 16.0
 const DETAIL_LAT_MIN := 18.0
@@ -254,6 +255,48 @@ func _create_country_labels() -> void:
         label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
         add_child(label)
         country_labels.append(label)
+    _create_city_labels()
+
+func _create_city_labels() -> void:
+    # Accurate geographic anchors for the first playable region; labels appear only at close zoom.
+    var cities: Array[Dictionary] = [
+        {"name":"الجزائر العاصمة", "lon":3.0588, "lat":36.7538},
+        {"name":"وهران", "lon":-0.6308, "lat":35.6971},
+        {"name":"قسنطينة", "lon":6.6147, "lat":36.3650},
+        {"name":"عنابة", "lon":7.7667, "lat":36.9000},
+        {"name":"سطيف", "lon":5.4100, "lat":36.1900},
+        {"name":"باتنة", "lon":6.1700, "lat":35.5500},
+        {"name":"بجاية", "lon":5.0600, "lat":36.7500},
+        {"name":"تلمسان", "lon":-1.3200, "lat":34.8800},
+        {"name":"بسكرة", "lon":5.7300, "lat":34.8500},
+        {"name":"غرداية", "lon":3.6700, "lat":32.4900},
+        {"name":"ورقلة", "lon":5.3300, "lat":31.9500},
+        {"name":"تمنراست", "lon":5.5200, "lat":22.7900},
+        {"name":"أدرار", "lon":-0.2900, "lat":27.8700},
+        {"name":"بشار", "lon":-2.2200, "lat":31.6200},
+        {"name":"الوادي", "lon":6.8600, "lat":33.3700},
+        {"name":"تونس", "lon":10.1815, "lat":36.8065},
+        {"name":"صفاقس", "lon":10.7603, "lat":34.7406},
+        {"name":"سوسة", "lon":10.6370, "lat":35.8256},
+        {"name":"قابس", "lon":10.0975, "lat":33.8881}
+    ]
+    for city in cities:
+        var label := Label3D.new()
+        label.name = "CityLabel_" + str(city.name)
+        label.text = str(city.name)
+        label.font_size = 25
+        label.pixel_size = 0.0032
+        label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+        label.no_depth_test = true
+        label.shaded = false
+        label.modulate = Color(1.0, 0.91, 0.67, 0.98)
+        label.outline_size = 8
+        label.outline_modulate = Color(0.015, 0.035, 0.07, 0.98)
+        label.position = _geo_to_sphere(float(city.lon), float(city.lat), GLOBE_RADIUS * 1.018)
+        label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+        add_child(label)
+        city_labels.append(label)
 
 func _update_country_label_visibility() -> void:
     var camera := get_viewport().get_camera_3d()
@@ -265,6 +308,12 @@ func _update_country_label_visibility() -> void:
             continue
         var normal := label.position.normalized()
         label.visible = normal.dot(camera_local.normalized()) > 0.12
+    var show_cities := zoom_distance <= 4.9
+    for label in city_labels:
+        if not is_instance_valid(label):
+            continue
+        var normal := label.position.normalized()
+        label.visible = show_cities and normal.dot(camera_local.normalized()) > 0.18
 
 func _create_earth_mesh(longitude_segments: int, latitude_segments: int, radius: float = GLOBE_RADIUS) -> ArrayMesh:
     var vertices := PackedVector3Array()
