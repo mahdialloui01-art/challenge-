@@ -42,7 +42,7 @@ func _initialize() -> void:
             push_error("North pole UVs are not collapsed; polar texture streaks may appear")
             quit(1)
             return
-    var south_pole_start := 95 * 193
+    var south_pole_start := 96 * 193
     for x in range(193):
         if absf(earth_uvs[south_pole_start + x].x - 0.5) > 0.0001:
             push_error("South pole UVs are not collapsed; polar texture streaks may appear")
