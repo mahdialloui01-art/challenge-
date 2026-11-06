@@ -6,6 +6,7 @@ const WorldGlobe = preload("res://scripts/world_globe.gd")
 const QUESTIONS_PATH := "res://data/questions.json"
 const SAVE_PATH := "user://player_data.cfg"
 
+var developer_mode := false
 var questions: Array = []
 var question_order: Array[int] = []
 var question_index := 0
@@ -58,6 +59,7 @@ const DIFFICULTIES := {
 }
 
 func _ready() -> void:
+    developer_mode = OS.has_feature("developer")
     _build_3d_world()
     _setup_music()
     question_timer = Timer.new()
@@ -582,6 +584,11 @@ func _show_main_menu() -> void:
     play.pressed.connect(_show_world_map)
     content.add_child(play)
 
+    if developer_mode:
+        var developer_button := _make_button("🛠   مركز المطوّر")
+        developer_button.pressed.connect(_show_developer_console)
+        content.add_child(developer_button)
+
     var settings_button := _make_button("⚙   الإعدادات")
     settings_button.pressed.connect(_show_settings)
     content.add_child(settings_button)
@@ -601,6 +608,86 @@ func _show_main_menu() -> void:
     mode_label.add_theme_font_size_override("font_size", 16)
     mode_label.add_theme_color_override("font_color", Color(0.55, 0.88, 0.78))
     content.add_child(mode_label)
+
+func _show_developer_console() -> void:
+    if not developer_mode:
+        _show_main_menu()
+        return
+    _clear_content()
+    _add_heading("مركز المطوّر", "وضع خاص بهذه النسخة — أدوات الاختبار لا تظهر في نسخة اللاعبين")
+    _add_stat_card("إجمالي الأسئلة المحمّلة", str(questions.size()))
+    _add_stat_card("تقدّم الدول الحالي", "%d / 177" % (unlocked_country_index + 1))
+    _add_stat_card("أعلى مرحلة مفتوحة", str(unlocked_level))
+
+    var unlock_all := _make_button("🔓 فتح جميع الدول والمراحل في نسخة المطوّر")
+    unlock_all.pressed.connect(func():
+        unlocked_country_index = 176
+        unlocked_level = 10
+        _save_player_data()
+        if world_globe != null:
+            world_globe.set_progress(unlocked_country_index)
+        _show_developer_console()
+    )
+    content.add_child(unlock_all)
+
+    var country_title := Label.new()
+    country_title.text = "الانتقال مباشرة إلى أي دولة"
+    country_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    country_title.add_theme_font_size_override("font_size", 19)
+    content.add_child(country_title)
+    var country_picker := OptionButton.new()
+    country_picker.custom_minimum_size.y = 58
+    country_picker.add_theme_font_size_override("font_size", 17)
+    if world_globe != null:
+        for i in range(world_globe.country_route.size()):
+            country_picker.add_item("%03d — %s" % [i + 1, world_globe.get_route_country_name(i)], i)
+    content.add_child(country_picker)
+    var open_country := _make_button("✈ فتح الدولة المختارة")
+    open_country.pressed.connect(func():
+        if world_globe == null or world_globe.country_route.is_empty():
+            return
+        var index := country_picker.get_selected_id()
+        index = clampi(index, 0, world_globe.country_route.size() - 1)
+        var code := str(world_globe.country_route[index])
+        var name := str(world_globe.get_route_country_name(index))
+        _start_country(index, code, name)
+    )
+    content.add_child(open_country)
+
+    var level_title := Label.new()
+    level_title.text = "اختبار أي مرحلة مباشرة"
+    level_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    level_title.add_theme_font_size_override("font_size", 19)
+    content.add_child(level_title)
+    for level in range(1, 11):
+        var level_button := _make_button("🧪 اختبار المرحلة %d" % level)
+        level_button.pressed.connect(func(): _start_level(level))
+        content.add_child(level_button)
+
+    var questions_title := Label.new()
+    questions_title.text = "بنك الأسئلة — عرض كامل"
+    questions_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    questions_title.add_theme_font_size_override("font_size", 20)
+    content.add_child(questions_title)
+    for i in range(questions.size()):
+        var item: Dictionary = questions[i]
+        var answers: Array = item.get("answers", [])
+        var correct_index := int(item.get("correct", -1))
+        var correct_text := str(answers[correct_index]) if correct_index >= 0 and correct_index < answers.size() else "غير محدد"
+        var details := Label.new()
+        details.text = "%d. [%s] %s\nالإجابة الصحيحة: %s\n%s" % [
+            i + 1, str(item.get("category", "عام")), str(item.get("question", "سؤال بلا نص")),
+            correct_text, str(item.get("explanation", ""))
+        ]
+        details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        details.add_theme_font_size_override("font_size", 15)
+        details.add_theme_color_override("font_color", Color("#e8dfc9"))
+        details.custom_minimum_size.y = 78
+        content.add_child(details)
+
+    var back := _make_button("⌂ العودة إلى القائمة الرئيسية")
+    back.pressed.connect(_show_main_menu)
+    content.add_child(back)
 
 func _show_settings() -> void:
     _set_menu_music_active(true)
@@ -1032,7 +1119,7 @@ func _start_game() -> void:
 
 func _start_level(level: int) -> void:
     current_level = clampi(level, 1, 10)
-    if current_level > mini(unlocked_level, 10):
+    if current_level > mini(unlocked_level, 10) and not developer_mode:
         _show_world_map()
         return
     if questions.is_empty():
