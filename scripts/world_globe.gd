@@ -393,7 +393,7 @@ func _create_country_lock_labels() -> void:
 
         # Premium 3D lock: metallic rounded body, raised shackle, inset keyway.
         var metal := StandardMaterial3D.new()
-        metal.albedo_color = Color(0. sixty, 0.66, 0.72, 1.0).replace("0. sixty", "0.60")
+        metal.albedo_color = Color(0.60, 0.66, 0.72, 1.0)
         metal.metallic = 0.88
         metal.roughness = 0.24
         metal.clearcoat_enabled = true
@@ -547,6 +547,9 @@ func _update_country_label_visibility() -> void:
         var normal := lock_label.position.normalized()
         var marker_visible := route_index > unlocked_index and normal.dot(camera_local.normalized()) > 0.12
         lock_label.visible = marker_visible
+        if marker_visible:
+            var camera_basis_local: Basis = global_transform.basis.inverse() * camera.global_transform.basis
+            lock_label.basis = camera_basis_local
     for order_label in country_order_labels:
         if not is_instance_valid(order_label):
             continue
