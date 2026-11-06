@@ -29,3 +29,8 @@
 - لا يتطلب اتصال إنترنت أثناء اللعب.
 
 > هذه نسخة تأسيسية قابلة للتطوير. لم يتم اعتمادها كإصدار نهائي قبل نجاح اختبار البناء والتشغيل على جهاز Android.
+
+
+## World journey prototype
+
+The game now includes offline Natural Earth country boundaries, a rotatable 3D globe, sequential country unlocking, and an initial multidisciplinary Algeria question bank. Country boundaries and quiz content are packaged locally for offline play.
