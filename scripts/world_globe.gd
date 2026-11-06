@@ -154,6 +154,7 @@ func _add_country_land(feature: Dictionary, country_number: int) -> void:
     var land_mesh := ImmediateMesh.new()
     var land_material := StandardMaterial3D.new()
     land_material.albedo_color = Color("#397d68") if country_number % 3 == 0 else (Color("#47896e") if country_number % 3 == 1 else Color("#36745f"))
+    land_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
     land_material.roughness = 0.92
     land_material.cull_mode = BaseMaterial3D.CULL_DISABLED
     land_material.metallic = 0.0
@@ -274,7 +275,7 @@ func _end_drag(position: Vector2) -> void:
     if not drag_active:
         return
     drag_active = false
-    if not pointer_moved and position.distance_to(drag_start) < 14.0:
+    if not pointer_moved and position.distance_to(drag_start) < 14.0 and position.y >= 540.0 and position.y <= 1080.0:
         _pick_country(position)
 
 func _pick_country(screen_position: Vector2) -> void:
