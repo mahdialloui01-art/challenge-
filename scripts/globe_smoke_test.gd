@@ -99,11 +99,14 @@ func _initialize() -> void:
         var status_led := lock.get_node_or_null("StatusLED") as MeshInstance3D
         var circuit := lock.get_node_or_null("CircuitAccent") as MeshInstance3D
         var order := lock.get_node_or_null("SequenceNumber") as Label3D
+        var number_frame := lock.get_node_or_null("SequenceNumberFrame") as MeshInstance3D
+        var number_plate := lock.get_node_or_null("SequenceNumberPlate") as MeshInstance3D
+        var number_accent := lock.get_node_or_null("SequenceNumberAccent") as MeshInstance3D
         if body == null or shackle == null or keyway == null or panel == null or status_led == null or circuit == null:
             push_error("Electronic lock is missing its shell, shackle, glass panel, sensor, or LED details")
             quit(1)
             return
-        if lock.scale.x > 0.80 or lock.scale.y > 0.80 or lock.scale.z > 0.80:
+        if lock.scale.x > 0.50 or lock.scale.y > 0.50 or lock.scale.z > 0.50:
             push_error("Electronic lock is too large and may cover the country map")
             quit(1)
             return
@@ -115,6 +118,10 @@ func _initialize() -> void:
         var gray := body_material.albedo_color
         if absf(gray.r - gray.g) > 0.12 or absf(gray.g - gray.b) > 0.12:
             push_error("Lock body is not a neutral metallic gray")
+            quit(1)
+            return
+        if number_frame == null or number_plate == null or number_accent == null:
+            push_error("Futuristic sequence number badge is missing its frame, plate, or cyan accent")
             quit(1)
             return
         if order == null or order.text != "%02d" % (route_index + 1):
@@ -135,6 +142,8 @@ func _initialize() -> void:
     print("WORLD_GLOBE_REGIONAL_DETAIL_BLEND_OK")
     print("WORLD_GLOBE_POLAR_UV_OK")
     print("WORLD_GLOBE_CITY_LABELS_OK")
+    print("WORLD_GLOBE_COMPACT_LOCKS_OK")
+    print("WORLD_GLOBE_FUTURISTIC_SEQUENCE_BADGES_OK")
     print("WORLD_GLOBE_BORDER_OVERLAY_OK")
     print("WORLD_GLOBE_SMOKE_OK")
     quit()
