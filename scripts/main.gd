@@ -31,6 +31,7 @@ var question_timer: Timer
 var time_label: Label
 var time_limit := 20.0
 var music_enabled := true
+var menu_music_active := true
 var music_player: AudioStreamPlayer
 var music_playback: AudioStreamGeneratorPlayback
 var music_sample_index := 0
@@ -65,7 +66,7 @@ func _ready() -> void:
     _load_questions()
     _load_player_data()
     if music_player != null:
-        music_player.stream_paused = not music_enabled
+        music_player.stream_paused = not (music_enabled and menu_music_active)
     _build_interface()
     _show_main_menu()
 
@@ -81,7 +82,7 @@ func _setup_music() -> void:
     music_playback = music_player.get_stream_playback() as AudioStreamGeneratorPlayback
 
 func _process(delta: float) -> void:
-    if music_enabled and music_playback != null:
+    if music_enabled and menu_music_active and music_playback != null:
         var frames := music_playback.get_frames_available()
         if frames > 0:
             var buffer := PackedVector2Array()
@@ -99,30 +100,92 @@ func _process(delta: float) -> void:
             gem.rotate_x(delta * 0.35)
 
 func _music_sample(sample_index: int) -> float:
+    # A restrained cinematic menu score: warm sustained chords and soft piano-like notes.
     var t := fposmod(float(sample_index) / MUSIC_RATE, MUSIC_LOOP_SECONDS)
-    var beat_time := fposmod(t, 0.5)
-    var beat := int(floor(t / 0.5))
-    var step := int(floor(t / 0.25)) % 32
-    var local_step := fposmod(t, 0.25)
-    var kick := 0.0
-    if beat % 4 == 0:
-        kick = sin(TAU * (48.0 + 42.0 * exp(-beat_time * 24.0)) * beat_time) * exp(-beat_time * 13.0) * 0.72
-    var snare := 0.0
-    if beat % 4 == 2:
-        var noise := sin(float(sample_index) * 12.9898) * 43758.5453
-        noise = (noise - floor(noise)) * 2.0 - 1.0
-        snare = noise * exp(-beat_time * 22.0) * 0.20
-    var hat_phase := fposmod(t, 0.25)
-    var hat_noise := sin(float(sample_index) * 78.233) * 12345.678
-    hat_noise = (hat_noise - floor(hat_noise)) * 2.0 - 1.0
-    var hats := hat_noise * exp(-hat_phase * 38.0) * 0.055
-    var notes := [659.25, 783.99, 987.77, 783.99, 587.33, 698.46, 880.0, 698.46, 523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880.0, 987.77]
-    var note_frequency: float = notes[step % notes.size()]
-    var melody := sin(TAU * note_frequency * local_step) * exp(-local_step * 5.5) * 0.16
-    var bass_notes := [110.0, 110.0, 146.83, 146.83, 98.0, 98.0, 130.81, 130.81]
-    var bass_frequency: float = bass_notes[(beat / 2) % bass_notes.size()]
-    var bass := sin(TAU * bass_frequency * t) * 0.13
-    return clampf((kick + snare + hats + melody + bass) * 0.72, -0.95, 0.95)
+    var chord := int(floor(t / 2.0)) % 4
+    var local_time := fposmod(t, 2.0)
+    var roots := [110.0, 130.81, 146.83, 98.0]
+    var root: float = roots[chord]
+    var pad := sin(TAU * root * t) * 0.075
+    pad += sin(TAU * root * 1.5 * t + 0.3) * 0.045
+    pad += sin(TAU * root * 2.0 * t + 0.8) * 0.025
+    pad += sin(TAU * root * 2.52 * t + 1.1) * 0.018
+    var note_sets := [
+        [440.0, 523.25, 659.25, 587.33],
+        [392.0, 493.88, 587.33, 523.25],
+        [440.0, 554.37, 659.25, 783.99],
+        [392.0, 493.88, 587.33, 659.25]
+    ]
+    var note_index := int(floor(local_time / 0.5))
+    var note_frequency: float = note_sets[chord][note_index]
+    var note_phase := fposmod(local_time, 0.5)
+    var piano := sin(TAU * note_frequency * note_phase) * exp(-note_phase * 5.0) * 0.10
+    piano += sin(TAU * note_frequency * 2.01 * note_phase) * exp(-note_phase * 8.0) * 0.025
+    var swell := 0.82 + 0.18 * sin(TAU * t / MUSIC_LOOP_SECONDS)
+    return clampf((pad + piano) * swell, -0.4, 0.4)
+
+func _set_menu_music_active(active: bool) -> void:
+    menu_music_active = active
+    if music_player != null:
+        music_player.stream_paused = not (music_enabled and menu_music_active)
+
+func _make_sound_effect(kind: String) -> AudioStreamWAV:
+    var rate := 22050
+    var duration := 0.10
+    if kind == "correct":
+        duration = 0.48
+    elif kind == "wrong":
+        duration = 0.34
+    elif kind == "arrival":
+        duration = 0.82
+    elif kind == "tap":
+        duration = 0.065
+    var count := int(rate * duration)
+    var bytes := PackedByteArray()
+    bytes.resize(count * 2)
+    var seed := 0.0
+    for i in range(count):
+        var t := float(i) / float(rate)
+        var progress := t / duration
+        var wave := 0.0
+        if kind == "correct":
+            var f1 := 659.25 if progress < 0.42 else 783.99
+            var phase := fposmod(t, 0.24 if progress < 0.42 else 0.24)
+            wave = sin(TAU * f1 * phase) * exp(-phase * 7.0) * 0.48
+            wave += sin(TAU * f1 * 2.0 * t) * exp(-t * 4.0) * 0.12
+        elif kind == "wrong":
+            var frequency := lerpf(210.0, 105.0, progress)
+            wave = sin(TAU * frequency * t) * (1.0 - progress) * 0.42
+            wave += sin(TAU * frequency * 0.5 * t) * (1.0 - progress) * 0.12
+        elif kind == "arrival":
+            var frequency := lerpf(95.0, 42.0, progress)
+            var noise := sin(float(i) * 12.9898) * 43758.5453
+            noise = (noise - floor(noise)) * 2.0 - 1.0
+            wave = sin(TAU * frequency * t) * (1.0 - progress) * 0.28
+            wave += noise * pow(1.0 - progress, 2.0) * 0.12
+        else:
+            wave = sin(TAU * 880.0 * t) * (1.0 - progress) * 0.24
+        var fade := minf(1.0, float(count - i) / maxf(1.0, float(rate) * 0.025))
+        var value := int(clampf(wave * fade, -0.95, 0.95) * 32767.0)
+        bytes.encode_s16(i * 2, value)
+    var stream := AudioStreamWAV.new()
+    stream.format = AudioStreamWAV.FORMAT_16_BITS
+    stream.mix_rate = rate
+    stream.stereo = false
+    stream.data = bytes
+    return stream
+
+func _play_sfx(kind: String) -> void:
+    var player := AudioStreamPlayer.new()
+    player.stream = _make_sound_effect(kind)
+    player.volume_db = -5.0 if kind == "correct" else -8.0
+    add_child(player)
+    player.finished.connect(player.queue_free)
+    player.play()
+
+func _play_ui_tap() -> void:
+    if not menu_music_active:
+        _play_sfx("tap")
 
 func _build_3d_world() -> void:
     # Cinematic, restrained space environment. The real textured Earth is the
@@ -490,6 +553,7 @@ func _add_stat_card(caption: String, value: String) -> void:
     content.add_child(card)
 
 func _show_main_menu() -> void:
+    _set_menu_music_active(true)
     _set_globe_mode(false)
     if world_globe == null:
         world_globe = WorldGlobe.new()
@@ -534,13 +598,14 @@ func _show_main_menu() -> void:
     content.add_child(mode_label)
 
 func _show_settings() -> void:
+    _set_menu_music_active(true)
     _clear_content()
     _add_heading("الإعدادات", "اضبط تجربتك كما تحب")
     var music_button := _make_button("الموسيقى الحماسية: %s" % ("مفعّلة" if music_enabled else "متوقفة"))
     music_button.pressed.connect(func():
         music_enabled = not music_enabled
         if music_player != null:
-            music_player.stream_paused = not music_enabled
+            music_player.stream_paused = not (music_enabled and menu_music_active)
         _save_player_data()
         _show_settings()
     )
@@ -716,6 +781,8 @@ func _show_country_locked(index: int, code: String, name: String) -> void:
 
 
 func _start_country(index: int, code: String = "DZA", name: String = "الجزائر") -> void:
+    _set_menu_music_active(false)
+    _play_sfx("arrival")
     current_country_index = index
     current_country_code = code
     current_country_name = name
@@ -1088,6 +1155,7 @@ func _select_answer(selected: String) -> void:
 
     var is_correct := not correct_answer.is_empty() and selected == correct_answer
     if is_correct:
+        _play_sfx("correct")
         correct_answers += 1
         var points := 10 + current_level * 2
         score += points
@@ -1097,6 +1165,7 @@ func _select_answer(selected: String) -> void:
                 feedback_label.text += "\n" + str(item.get("explanation", ""))
             feedback_label.add_theme_color_override("font_color", Color(0.45, 1.0, 0.68))
     else:
+        _play_sfx("wrong")
         if is_instance_valid(feedback_label):
             feedback_label.text = "إجابة غير صحيحة. الجواب: " + (correct_answer if not correct_answer.is_empty() else "غير متوفر")
             if explanations_enabled:
@@ -1127,6 +1196,7 @@ func _next_question() -> void:
     _display_question()
 
 func _show_results() -> void:
+    _set_menu_music_active(true)
     showing_results = true
     games_played += 1
     if score > best_score:
@@ -1170,6 +1240,7 @@ func _show_results() -> void:
 
 func _make_button(caption: String) -> Button:
     var button := Button.new()
+    button.pressed.connect(_play_ui_tap)
     button.text = caption
     button.custom_minimum_size = Vector2(0, 64)
     button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
