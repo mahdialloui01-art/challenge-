@@ -148,8 +148,8 @@ func _build_3d_world() -> void:
     sky.sky_material = sky_material
     env.sky = sky
     env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-    env.ambient_light_color = Color(0.72, 0.67, 0.56)
-    env.ambient_light_energy = 0.48
+    env.ambient_light_color = Color(0.78, 0.80, 0.82)
+    env.ambient_light_energy = 0.40
     env.glow_enabled = true
     env.glow_intensity = 0.18
     environment.environment = env
@@ -157,15 +157,15 @@ func _build_3d_world() -> void:
 
     var key_light := DirectionalLight3D.new()
     key_light.rotation_degrees = Vector3(-38, -28, -18)
-    key_light.light_color = Color(1.0, 0.91, 0.76)
+    key_light.light_color = Color(1.0, 0.99, 0.96)
     key_light.light_energy = 1.35
     key_light.shadow_enabled = true
     add_child(key_light)
 
     var fill_light := OmniLight3D.new()
     fill_light.position = Vector3(-4, 2, 5)
-    fill_light.light_color = Color(0.78, 0.70, 0.56)
-    fill_light.light_energy = 0.32
+    fill_light.light_color = Color(0.78, 0.82, 0.88)
+    fill_light.light_energy = 0.20
     fill_light.omni_range = 18.0
     add_child(fill_light)
 
