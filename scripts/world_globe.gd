@@ -159,7 +159,7 @@ func _build_north_africa_detail_patch() -> void:
             var vertex := _geo_to_sphere(longitude, latitude, GLOBE_RADIUS * 1.004)
             vertices.append(vertex)
             normals.append(vertex.normalized())
-            uvs.append(Vector2(u, v))
+            # All longitude samples converge at each pole; use one UV there to prevent radial texture streaks.\n            var pole_u := 0.5 if y == 0 or y == latitude_segments else u\n            uvs.append(Vector2(pole_u, v))
     for y in range(LAT_SEGMENTS):
         for x in range(LON_SEGMENTS):
             var a := y * (LON_SEGMENTS + 1) + x
@@ -178,13 +178,24 @@ func _build_north_africa_detail_patch() -> void:
     detail_patch = MeshInstance3D.new()
     detail_patch.name = "OfflineNorthAfricaSatelliteDetail"
     detail_patch.mesh = patch_mesh
-    detail_material = StandardMaterial3D.new()
-    detail_material.albedo_texture = image_texture
-    detail_material.albedo_color = Color(1, 1, 1, 0)
-    detail_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-    detail_material.roughness = 1.0
-    detail_material.cull_mode = BaseMaterial3D.CULL_DISABLED
-    detail_material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+    var detail_shader := Shader.new()
+    detail_shader.code = """shader_type spatial;
+render_mode blend_mix, depth_prepass_alpha, cull_disabled, unshaded;
+uniform sampler2D detail_texture : source_color, filter_linear_mipmap;
+uniform float detail_alpha = 0.0;
+void fragment() {
+    vec2 edge_distance = min(UV, vec2(1.0) - UV);
+    float edge = min(edge_distance.x, edge_distance.y);
+    float feather = smoothstep(0.0, 0.075, edge);
+    ALBEDO = texture(detail_texture, UV).rgb;
+    ALPHA = feather * detail_alpha * 0.92;
+    ROUGHNESS = 1.0;
+}
+"""
+    detail_material = ShaderMaterial.new()
+    detail_material.shader = detail_shader
+    detail_material.set_shader_parameter("detail_texture", image_texture)
+    detail_material.set_shader_parameter("detail_alpha", 0.0)
     detail_patch.material_override = detail_material
     detail_patch.visible = false
     add_child(detail_patch)
@@ -212,7 +223,7 @@ void fragment() {
     float n = noise2(p) * 0.58 + noise2(p * 2.1) * 0.29 + noise2(p * 4.2) * 0.13;
     float cloud = smoothstep(0.55, 0.72, n);
     ALBEDO = vec3(0.86, 0.92, 1.0);
-    ALPHA = cloud * 0.30;
+    ALPHA = cloud * 0.16;
 }
 """
     var cloud_material := ShaderMaterial.new()
@@ -451,7 +462,10 @@ func _update_country_label_visibility() -> void:
         if not is_instance_valid(label):
             continue
         var normal := label.position.normalized()
-        label.visible = normal.dot(camera_local.normalized()) > 0.12
+        var code := label.name.trim_prefix("CountryLabel_")
+        var overview_countries := ["DZA", "TUN", "LBY", "EGY", "MAR", "MRT", "NER", "MLI", "TCD", "SDN", "NGA", "ETH", "KEN", "ZAF", "ESP", "FRA", "DEU", "ITA", "GBR", "RUS", "TUR", "SAU", "IND", "CHN", "JPN", "BRA", "USA", "CAN", "AUS"]
+        var zoom_visible := zoom_distance <= 6.4 or overview_countries.has(code)
+        label.visible = zoom_visible and normal.dot(camera_local.normalized()) > 0.12
     for label in city_labels:
         if not is_instance_valid(label):
             continue
@@ -511,9 +525,10 @@ func _process(delta: float) -> void:
         if absf(camera.position.z - zoom_distance) > 0.001:
             camera.position.z = zoom_distance
     if detail_patch != null and detail_material != null:
-        var detail_alpha := clampf(inverse_lerp(9.6, 7.7, zoom_distance), 0.0, 1.0)
+        # Regional imagery fades in only during a deliberate close zoom, never on the overview globe.
+        var detail_alpha := 1.0 - smoothstep(4.8, 6.0, zoom_distance)
         detail_patch.visible = detail_alpha > 0.01
-        detail_material.albedo_color = Color(1, 1, 1, detail_alpha)
+        detail_material.set_shader_parameter("detail_alpha", detail_alpha)
     if not drag_active and rotation_velocity.length() > 0.001:
         rotate_y(rotation_velocity.x * delta)
         rotate_x(rotation_velocity.y * delta)
