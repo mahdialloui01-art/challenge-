@@ -124,7 +124,7 @@ func _initialize() -> void:
             push_error("Futuristic sequence number badge is missing its frame, plate, or cyan accent")
             quit(1)
             return
-        if order == null or order.text != "%02d" % (route_index + 1) or order.scale.x < 2.39:
+        if order == null or order.text != "%02d" % (route_index + 1) or order.scale.x > 1.01 or order.font_size > 24 or order.pixel_size > 0.002:
             push_error("Country lock sequence number is incorrect")
             quit(1)
             return
@@ -143,7 +143,7 @@ func _initialize() -> void:
     print("WORLD_GLOBE_POLAR_UV_OK")
     print("WORLD_GLOBE_CITY_LABELS_OK")
     print("WORLD_GLOBE_COMPACT_LOCKS_OK")
-    print("WORLD_GLOBE_FUTURISTIC_SEQUENCE_BADGES_OK")
+    print("WORLD_GLOBE_DECLUTTERED_SEQUENCE_BADGES_OK")
     print("WORLD_GLOBE_BORDER_OVERLAY_OK")
     print("WORLD_GLOBE_SMOKE_OK")
     quit()
