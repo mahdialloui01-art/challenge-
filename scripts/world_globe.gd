@@ -27,7 +27,12 @@ var pointer_moved := false
 var rotation_velocity := Vector2.ZERO
 var zoom_distance := 7.6
 var globe_mesh: MeshInstance3D
+var detail_patch: MeshInstance3D
 var country_labels: Array[Label3D] = []
+const DETAIL_LON_MIN := -3.0
+const DETAIL_LON_MAX := 12.0
+const DETAIL_LAT_MIN := 30.0
+const DETAIL_LAT_MAX := 38.0
 
 func _ready() -> void:
     set_process_input(true)
@@ -70,6 +75,7 @@ func _build_globe() -> void:
         ocean.albedo_color = Color("#174b68")
     globe_mesh.material_override = ocean
     add_child(globe_mesh)
+    _build_north_africa_detail_patch()
 
     var atmosphere := MeshInstance3D.new()
     atmosphere.mesh = _create_earth_mesh(96, 48, GLOBE_RADIUS * 1.022)
@@ -94,6 +100,58 @@ func _build_globe() -> void:
     light.omni_range = 16.0
     add_child(light)
 
+
+func _build_north_africa_detail_patch() -> void:
+    # NASA GIBS MODIS true-colour regional mosaic, bundled for offline country-level zoom.
+    var texture_path := "res://assets/north_africa_detail.jpg"
+    if not ResourceLoader.exists(texture_path):
+        return
+    var image_texture := load(texture_path) as Texture2D
+    if image_texture == null:
+        return
+
+    var vertices := PackedVector3Array()
+    var normals := PackedVector3Array()
+    var uvs := PackedVector2Array()
+    var indices := PackedInt32Array()
+    const LON_SEGMENTS := 96
+    const LAT_SEGMENTS := 52
+    for y in range(LAT_SEGMENTS + 1):
+        var v := float(y) / float(LAT_SEGMENTS)
+        var latitude := DETAIL_LAT_MAX - v * (DETAIL_LAT_MAX - DETAIL_LAT_MIN)
+        for x in range(LON_SEGMENTS + 1):
+            var u := float(x) / float(LON_SEGMENTS)
+            var longitude := DETAIL_LON_MIN + u * (DETAIL_LON_MAX - DETAIL_LON_MIN)
+            var vertex := _geo_to_sphere(longitude, latitude, GLOBE_RADIUS * 1.004)
+            vertices.append(vertex)
+            normals.append(vertex.normalized())
+            uvs.append(Vector2(u, v))
+    for y in range(LAT_SEGMENTS):
+        for x in range(LON_SEGMENTS):
+            var a := y * (LON_SEGMENTS + 1) + x
+            var b := a + LON_SEGMENTS + 1
+            var c := a + 1
+            var d := b + 1
+            indices.append_array(PackedInt32Array([a, b, c, c, b, d]))
+    var arrays := []
+    arrays.resize(Mesh.ARRAY_MAX)
+    arrays[Mesh.ARRAY_VERTEX] = vertices
+    arrays[Mesh.ARRAY_NORMAL] = normals
+    arrays[Mesh.ARRAY_TEX_UV] = uvs
+    arrays[Mesh.ARRAY_INDEX] = indices
+    var patch_mesh := ArrayMesh.new()
+    patch_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+    detail_patch = MeshInstance3D.new()
+    detail_patch.name = "OfflineNorthAfricaSatelliteDetail"
+    detail_patch.mesh = patch_mesh
+    var detail_material := StandardMaterial3D.new()
+    detail_material.albedo_texture = image_texture
+    detail_material.roughness = 1.0
+    detail_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+    detail_material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+    detail_patch.material_override = detail_material
+    detail_patch.visible = false
+    add_child(detail_patch)
 
 func _load_country_geometry() -> void:
     if not FileAccess.file_exists(DATA_PATH):
@@ -211,6 +269,8 @@ func _geo_to_sphere(longitude: float, latitude: float, radius: float) -> Vector3
 
 func _process(delta: float) -> void:
     _update_country_label_visibility()
+    if detail_patch != null:
+        detail_patch.visible = zoom_distance <= 6.35
     if not drag_active and rotation_velocity.length() > 0.001:
         rotate_y(rotation_velocity.x * delta)
         rotate_x(rotation_velocity.y * delta)
