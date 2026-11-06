@@ -631,6 +631,8 @@ func _set_globe_mode(enabled: bool) -> void:
         interface_margin.visible = not enabled
     if interface_root != null and interface_root.get_child_count() > 0:
         interface_root.get_child(0).visible = not enabled
+    if globe_hud != null and is_instance_valid(globe_hud):
+        globe_hud.visible = enabled
 
 func _show_world_map() -> void:
     _clear_content()
@@ -768,13 +770,14 @@ func _play_country_arrival() -> void:
 
     var aircraft := _make_cinematic_aircraft()
     aircraft.position = Vector3(-8.5, 1.8, 0.0)
+    aircraft.rotation = Vector3(0.0, PI * 0.5, 0.0)
     aircraft.scale = Vector3(0.28, 0.28, 0.28)
     add_child(aircraft)
 
     var tween := create_tween()
     tween.set_parallel(true)
     tween.tween_property(aircraft, "position", Vector3(1.8, -0.8, 0.6), 2.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
-    tween.tween_property(aircraft, "rotation", Vector3(0.12, 0.0, -0.22), 1.2)
+    tween.tween_property(aircraft, "rotation", Vector3(0.12, PI * 0.5, -0.22), 1.2)
     tween.tween_property(aircraft, "scale", Vector3(0.72, 0.72, 0.72), 2.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
     tween.tween_property(world_camera, "position", Vector3(0.7, -0.2, 10.0), 2.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
     tween.tween_property(glow, "modulate:a", 0.9, 1.0)
