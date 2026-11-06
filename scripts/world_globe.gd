@@ -392,6 +392,12 @@ func _create_country_lock_labels() -> void:
         lock_root.set_meta("country_code", code)
         lock_root.set_meta("base_scale", 0.12)
 
+        # Scale only the lock hardware down by 90%; keep the number box unchanged.
+        var lock_hardware := Node3D.new()
+        lock_hardware.name = "LockHardware"
+        lock_hardware.scale = Vector3.ONE * 0.1
+        lock_root.add_child(lock_hardware)
+
         # Brushed titanium outer shell.
         var titanium := StandardMaterial3D.new()
         titanium.albedo_color = Color(0.57, 0.64, 0.72, 1.0)
@@ -407,7 +413,7 @@ func _create_country_lock_labels() -> void:
         shell_mesh.size = Vector3(0.19, 0.16, 0.065)
         shell.mesh = shell_mesh
         shell.material_override = titanium
-        lock_root.add_child(shell)
+        lock_hardware.add_child(shell)
 
         # Dark glass-like electronic face.
         var panel := MeshInstance3D.new()
@@ -424,7 +430,7 @@ func _create_country_lock_labels() -> void:
         panel_material.emission = Color(0.008, 0.065, 0.09)
         panel_material.emission_energy_multiplier = 0.45
         panel.material_override = panel_material
-        lock_root.add_child(panel)
+        lock_hardware.add_child(panel)
 
         # Raised electronic shackle, kept narrow and compact.
         var shackle := MeshInstance3D.new()
@@ -436,7 +442,7 @@ func _create_country_lock_labels() -> void:
         shackle.scale = Vector3(1.0, 1.12, 0.72)
         shackle.position = Vector3(0.0, 0.102, -0.004)
         shackle.material_override = titanium
-        lock_root.add_child(shackle)
+        lock_hardware.add_child(shackle)
 
         # Glowing biometric/key sensor and tiny status light.
         var keyway := MeshInstance3D.new()
@@ -454,7 +460,7 @@ func _create_country_lock_labels() -> void:
         cyan.emission_energy_multiplier = 2.4
         cyan.metallic = 0.35
         keyway.material_override = cyan
-        lock_root.add_child(keyway)
+        lock_hardware.add_child(keyway)
 
         var status_led := MeshInstance3D.new()
         status_led.name = "StatusLED"
@@ -463,7 +469,7 @@ func _create_country_lock_labels() -> void:
         status_led.mesh = led_mesh
         status_led.position = Vector3(0.0, 0.043, 0.049)
         status_led.material_override = cyan
-        lock_root.add_child(status_led)
+        lock_hardware.add_child(status_led)
 
         var circuit := MeshInstance3D.new()
         circuit.name = "CircuitAccent"
@@ -472,7 +478,7 @@ func _create_country_lock_labels() -> void:
         circuit.mesh = circuit_mesh
         circuit.position = Vector3(0.058, -0.025, 0.049)
         circuit.material_override = cyan
-        lock_root.add_child(circuit)
+        lock_hardware.add_child(circuit)
 
         # A compact illuminated number plaque, visually separate from the lock.
         var number_frame := MeshInstance3D.new()
