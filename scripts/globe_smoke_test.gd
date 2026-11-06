@@ -127,11 +127,12 @@ func _initialize() -> void:
             push_error("Lock body is not a neutral metallic gray")
             quit(1)
             return
-        if number_frame == null or number_plate == null or number_accent == null or number_frame.scale.x > 0.101 or number_plate.scale.x > 0.101 or number_accent.scale.x > 0.101:
+        var expected_badge_scale := 0.24 * globe._get_country_marker_scale(globe.features_by_code[code].get("g", []))
+        if number_frame == null or number_plate == null or number_accent == null or absf(number_frame.scale.x - expected_badge_scale) > 0.001 or absf(number_plate.scale.x - expected_badge_scale) > 0.001 or absf(number_accent.scale.x - expected_badge_scale) > 0.001:
             push_error("Futuristic sequence number badge is missing its frame, plate, or cyan accent")
             quit(1)
             return
-        if order == null or order.text != "%02d" % (route_index + 1) or order.scale.x > 0.101 or order.font_size > 24 or order.pixel_size > 0.002:
+        if order == null or order.text != "%02d" % (route_index + 1) or absf(order.scale.x - expected_badge_scale) > 0.001 or order.font_size > 24 or order.pixel_size > 0.002:
             push_error("Country lock sequence number is incorrect")
             quit(1)
             return
