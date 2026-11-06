@@ -494,7 +494,9 @@ func _create_earth_mesh(longitude_segments: int, latitude_segments: int, radius:
             var vertex := _geo_to_sphere(longitude, latitude, radius)
             vertices.append(vertex)
             normals.append(vertex.normalized())
-            # Collapse pole UVs to one meridian sample to prevent polar starburst artifacts.\n            var pole_u := 0.5 if y == 0 or y == latitude_segments else u\n            uvs.append(Vector2(pole_u, v))
+            # Collapse pole UVs to one meridian sample to prevent polar starburst artifacts.
+            var pole_u := 0.5 if y == 0 or y == latitude_segments else u
+            uvs.append(Vector2(pole_u, v))
     for y in range(latitude_segments):
         for x in range(longitude_segments):
             var a := y * (longitude_segments + 1) + x
