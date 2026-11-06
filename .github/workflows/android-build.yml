@@ -122,6 +122,70 @@ jobs:
           PY
           test -s assets/earth_surface.jpg
 
+      - name: Build offline North Africa satellite detail mosaic
+        run: |
+          set -euxo pipefail
+          python3 - <<'PY'
+          from concurrent.futures import ThreadPoolExecutor, as_completed
+          from urllib.request import Request, urlopen
+          from PIL import Image
+          from io import BytesIO
+          import math, os
+          os.makedirs("assets", exist_ok=True)
+
+          # Geographic coverage: northern Algeria, Tunisia and nearby coast.
+          lon_min, lon_max = -3.0, 12.0
+          lat_min, lat_max = 30.0, 38.0
+          zoom = 8
+          tiles_x = 2 ** (zoom - 1) * 2
+          tiles_y = 2 ** (zoom - 1)
+          x0 = int(math.floor((lon_min + 180.0) / 360.0 * tiles_x))
+          x1 = int(math.floor((lon_max + 180.0) / 360.0 * tiles_x))
+          y0 = int(math.floor((90.0 - lat_max) / 180.0 * tiles_y))
+          y1 = int(math.floor((90.0 - lat_min) / 180.0 * tiles_y))
+          base = "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/250m/8"
+
+          def fetch(tile):
+              x, y = tile
+              url = f"{base}/{y}/{x}.jpg"
+              try:
+                  req = Request(url, headers={"User-Agent": "ChallengeGeniusOfflineMap/1.0"})
+                  with urlopen(req, timeout=35) as response:
+                      data = response.read()
+                  image = Image.open(BytesIO(data)).convert("RGB")
+                  if image.size != (512, 512):
+                      raise ValueError(f"Unexpected tile size {image.size}")
+                  return (x, y, image)
+              except Exception as exc:
+                  print(f"Tile {x}/{y} unavailable: {exc}")
+                  return (x, y, None)
+
+          tile_ids = [(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
+          mosaic = Image.new("RGB", (len(range(x0, x1 + 1))*512, len(range(y0, y1 + 1))*512), (12, 28, 45))
+          success = 0
+          with ThreadPoolExecutor(max_workers=8) as pool:
+              futures = [pool.submit(fetch, tile) for tile in tile_ids]
+              for future in as_completed(futures):
+                  x, y, tile_image = future.result()
+                  if tile_image is not None:
+                      mosaic.paste(tile_image, ((x-x0)*512, (y-y0)*512))
+                      success += 1
+
+          if success < int(len(tile_ids) * 0.70):
+              raise SystemExit(f"Only {success}/{len(tile_ids)} NASA detail tiles downloaded")
+
+          px_per_degree_x = tiles_x * 512 / 360.0
+          px_per_degree_y = tiles_y * 512 / 180.0
+          left = round((lon_min + 180.0) * px_per_degree_x - x0 * 512)
+          right = round((lon_max + 180.0) * px_per_degree_x - x0 * 512)
+          top = round((90.0 - lat_max) * px_per_degree_y - y0 * 512)
+          bottom = round((90.0 - lat_min) * px_per_degree_y - y0 * 512)
+          detail = mosaic.crop((left, top, right, bottom))
+          detail.save("assets/north_africa_detail.jpg", "JPEG", quality=91, optimize=True)
+          print(f"Created offline regional imagery {detail.size}; {success}/{len(tile_ids)} tiles")
+          PY
+          test -s assets/north_africa_detail.jpg
+
       - name: Import project
         run: |
           set -euxo pipefail
