@@ -531,8 +531,7 @@ func _create_country_lock_labels() -> void:
         order_label.outline_modulate = Color(0.004, 0.018, 0.03, 1.0)
         order_label.position = Vector3(0.0, -0.1188, 0.0536)
         order_label.scale = Vector3.ONE * 0.1
-        # Keep the sequence number proportional to its compact metal plaque.
-        order_label.scale = Vector3.ONE
+        # Keep the sequence number at the same compact 10% scale as its plaque.
         order_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         order_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
         lock_root.add_child(order_label)
