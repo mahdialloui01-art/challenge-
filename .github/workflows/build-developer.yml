@@ -23,6 +23,19 @@ jobs:
       - name: Checkout developer edition
         uses: actions/checkout@v4
 
+      - name: Prepare Godot Android export environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.local/share/godot" "$HOME/.config/godot"
+          cp -a /root/.local/share/godot/export_templates "$HOME/.local/share/godot/"
+          cp -a /root/.config/godot/editor_settings-4.4.tres "$HOME/.config/godot/"
+          test -f "$HOME/.local/share/godot/export_templates/4.4.1.stable/android_debug.apk"
+          test -f "$HOME/.local/share/godot/export_templates/4.4.1.stable/android_release.apk"
+          java -version
+          test -d /usr/lib/android-sdk
+          echo "Godot Android templates and SDK settings are ready."
+
       - name: Import project resources
         run: godot --headless --editor --path . --quit
 
@@ -30,6 +43,7 @@ jobs:
         run: |
           mkdir -p build
           godot --headless --path . --export-release "Developer Android" build/Challenge_Developer.apk
+          test -s build/Challenge_Developer.apk
 
       - name: Upload developer APK
         uses: actions/upload-artifact@v4
