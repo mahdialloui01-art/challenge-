@@ -125,13 +125,14 @@ func _music_sample(sample_index: int) -> float:
     return clampf((kick + snare + hats + melody + bass) * 0.72, -0.95, 0.95)
 
 func _build_3d_world() -> void:
-    # A layered floating-island world map built from real 3D meshes.
+    # Cinematic, restrained space environment. The real textured Earth is the
+    # hero object; no floating fantasy islands or neon-blue scenery.
     world_camera = Camera3D.new()
-    world_camera.position = Vector3(0, 0, 12)
+    world_camera.position = Vector3(0, 0, 8.4)
     world_camera.near = 0.02
     world_camera.far = 120.0
-    world_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-    world_camera.size = 15.5
+    world_camera.projection = Camera3D.PROJECTION_PERSPECTIVE
+    world_camera.fov = 48.0
     world_camera.current = true
     add_child(world_camera)
 
@@ -140,81 +141,51 @@ func _build_3d_world() -> void:
     env.background_mode = Environment.BG_SKY
     var sky := Sky.new()
     var sky_material := ProceduralSkyMaterial.new()
-    sky_material.sky_top_color = Color(0.012, 0.025, 0.085)
-    sky_material.sky_horizon_color = Color(0.055, 0.12, 0.24)
-    sky_material.ground_bottom_color = Color(0.012, 0.02, 0.06)
-    sky_material.ground_horizon_color = Color(0.025, 0.07, 0.15)
+    sky_material.sky_top_color = Color(0.012, 0.012, 0.010)
+    sky_material.sky_horizon_color = Color(0.055, 0.048, 0.036)
+    sky_material.ground_bottom_color = Color(0.008, 0.008, 0.007)
+    sky_material.ground_horizon_color = Color(0.028, 0.025, 0.020)
     sky.sky_material = sky_material
     env.sky = sky
     env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-    env.ambient_light_color = Color(0.34, 0.48, 0.78)
-    env.ambient_light_energy = 0.8
+    env.ambient_light_color = Color(0.72, 0.67, 0.56)
+    env.ambient_light_energy = 0.48
     env.glow_enabled = true
-    env.glow_intensity = 0.55
+    env.glow_intensity = 0.18
     environment.environment = env
     add_child(environment)
 
     var key_light := DirectionalLight3D.new()
-    key_light.rotation_degrees = Vector3(-42, -25, -18)
-    key_light.light_energy = 1.65
+    key_light.rotation_degrees = Vector3(-38, -28, -18)
+    key_light.light_color = Color(1.0, 0.91, 0.76)
+    key_light.light_energy = 1.35
     key_light.shadow_enabled = true
     add_child(key_light)
 
     var fill_light := OmniLight3D.new()
-    fill_light.position = Vector3(-4, 4, 5)
-    fill_light.light_color = Color(0.22, 0.62, 1.0)
-    fill_light.light_energy = 2.0
+    fill_light.position = Vector3(-4, 2, 5)
+    fill_light.light_color = Color(0.78, 0.70, 0.56)
+    fill_light.light_energy = 0.32
     fill_light.omni_range = 18.0
     add_child(fill_light)
 
-    # Distant stars and a subtle orbital halo.
-    for i in range(64):
+    # Sparse neutral stars, kept subtle so the planet remains the focal point.
+    for i in range(72):
         var star := MeshInstance3D.new()
         var star_mesh := SphereMesh.new()
-        star_mesh.radius = 0.018 if i % 4 else 0.032
+        star_mesh.radius = 0.009 if i % 4 else 0.016
         star_mesh.height = star_mesh.radius * 2.0
         star.mesh = star_mesh
         var star_mat := StandardMaterial3D.new()
         star_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-        star_mat.albedo_color = Color(0.48, 0.72, 1.0, 0.82)
-        star_mat.emission_enabled = true
-        star_mat.emission = Color(0.18, 0.42, 1.0)
+        star_mat.albedo_color = Color(0.78, 0.74, 0.64, 0.58)
         star.material_override = star_mat
-        star.add_to_group("fantasy_map")
-        var angle := float(i) * 2.399
-        var radius := 5.0 + float((i * 7) % 9) * 0.48
-        star.position = Vector3(cos(angle) * radius, sin(angle * 1.37) * 6.0, -5.0 - float(i % 5))
+        star.position = Vector3(
+            cos(float(i) * 2.399) * (6.5 + float(i % 5) * 0.45),
+            sin(float(i) * 1.37) * 6.2,
+            -7.0 - float(i % 6)
+        )
         add_child(star)
-
-    var world_specs := [
-        {"p": Vector3(-3.4, 3.0, 0), "c": Color(0.12, 0.65, 0.46), "name": "وادي المعرفة"},
-        {"p": Vector3(2.9, 1.55, -0.2), "c": Color(0.18, 0.56, 0.32), "name": "غابة الألغاز"},
-        {"p": Vector3(-2.8, -0.1, 0.1), "c": Color(0.15, 0.48, 0.78), "name": "مدينة العلوم"},
-        {"p": Vector3(3.0, -1.8, 0), "c": Color(0.52, 0.34, 0.72), "name": "قلعة العباقرة"},
-        {"p": Vector3(-0.1, -3.55, -0.2), "c": Color(0.82, 0.53, 0.20), "name": "قمة الأساطير"}
-    ]
-    for i in range(world_specs.size()):
-        _add_map_island(world_specs[i]["p"], world_specs[i]["c"], i)
-
-    # Glowing stepping-stone trail connecting the five floating worlds.
-    for i in range(4):
-        var a: Vector3 = world_specs[i]["p"]
-        var b: Vector3 = world_specs[i + 1]["p"]
-        for step in range(1, 5):
-            var t := float(step) / 5.0
-            var pebble := MeshInstance3D.new()
-            var pebble_mesh := SphereMesh.new()
-            pebble_mesh.radius = 0.075
-            pebble_mesh.height = 0.10
-            pebble.mesh = pebble_mesh
-            pebble.position = a.lerp(b, t) + Vector3(0, 0, -0.45)
-            var pebble_mat := StandardMaterial3D.new()
-            pebble_mat.albedo_color = Color(0.22, 0.78, 1.0)
-            pebble_mat.emission_enabled = true
-            pebble_mat.emission = Color(0.08, 0.42, 1.0) * 1.8
-            pebble.material_override = pebble_mat
-            pebble.add_to_group("fantasy_map")
-            add_child(pebble)
 
 func _map_material(color: Color, glow: float = 0.0) -> StandardMaterial3D:
     var material := StandardMaterial3D.new()
@@ -414,7 +385,7 @@ func _build_interface() -> void:
 
     var tint := ColorRect.new()
     tint.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    tint.color = Color(0.018, 0.028, 0.075, 0.48)
+    tint.color = Color(0.018, 0.017, 0.014, 0.28)
     root.add_child(tint)
 
     var margin := MarginContainer.new()
@@ -514,12 +485,22 @@ func _add_stat_card(caption: String, value: String) -> void:
     caption_label.text = caption
     caption_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     caption_label.add_theme_font_size_override("font_size", 15)
-    caption_label.add_theme_color_override("font_color", Color(0.78, 0.85, 1.0))
+    caption_label.add_theme_color_override("font_color", Color(0.84, 0.80, 0.70))
     box.add_child(caption_label)
     content.add_child(card)
 
 func _show_main_menu() -> void:
     _set_globe_mode(false)
+    if world_globe == null:
+        world_globe = WorldGlobe.new()
+        world_globe.country_tapped.connect(_on_country_tapped)
+        add_child(world_globe)
+    world_globe.set_progress(unlocked_country_index)
+    world_globe.interaction_enabled = false
+    world_globe.visible = true
+    world_camera.projection = Camera3D.PROJECTION_PERSPECTIVE
+    world_camera.position = Vector3(0, 0, 8.4)
+    world_camera.fov = 48.0
     _clear_content()
     _add_heading("مرحباً بك أيها العبقري!", "هل أنت مستعد لاختبار معلوماتك؟")
     _add_stat_card("أفضل نتيجة شخصية", "🏆  %d نقطة" % best_score)
@@ -607,7 +588,7 @@ func _show_help() -> void:
     rules.text = "١. تبدأ رحلتك من الجزائر، وكل دولة تمثل مرحلة مستقلة.\n\n٢. اسحب الكرة الأرضية بإصبعك لتدويرها واكتشاف البلدان.\n\n٣. اضغط على الجزائر لبدء أول تحدٍّ، ثم افتح الدولة التالية بعد النجاح.\n\n٤. تحتاج إلى 60٪ على الأقل لفتح البلد التالي.\n\n٥. الأسئلة متنوعة في التاريخ والجغرافيا والعلوم والثقافة وغيرها.\n\nتعمل اللعبة دون إنترنت وتحفظ تقدمك على الهاتف."
     rules.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     rules.add_theme_font_size_override("font_size", 19)
-    rules.add_theme_color_override("font_color", Color(0.88, 0.92, 1.0))
+    rules.add_theme_color_override("font_color", Color(0.91, 0.88, 0.80))
     rules.custom_minimum_size.y = 360
     content.add_child(rules)
     var back := _make_button("→   العودة للرئيسية")
@@ -646,6 +627,7 @@ func _show_world_map() -> void:
         world_globe.country_tapped.connect(_on_country_tapped)
         add_child(world_globe)
     world_globe.set_progress(unlocked_country_index)
+    world_globe.interaction_enabled = true
     world_globe.visible = true
     if globe_hud != null and is_instance_valid(globe_hud):
         globe_hud.queue_free()
@@ -1186,10 +1168,10 @@ func _make_button(caption: String) -> Button:
     button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     button.add_theme_font_size_override("font_size", 20)
     button.add_theme_color_override("font_color", Color.WHITE)
-    button.add_theme_color_override("font_hover_color", Color(0.75, 0.9, 1.0))
+    button.add_theme_color_override("font_hover_color", Color(1.0, 0.88, 0.66))
     var normal := StyleBoxFlat.new()
-    normal.bg_color = Color(0.12, 0.19, 0.38, 0.96)
-    normal.border_color = Color(0.27, 0.48, 0.85, 0.9)
+    normal.bg_color = Color(0.105, 0.094, 0.071, 0.97)
+    normal.border_color = Color(0.62, 0.48, 0.25, 0.92)
     normal.set_border_width_all(2)
     normal.set_corner_radius_all(18)
     normal.content_margin_left = 18
