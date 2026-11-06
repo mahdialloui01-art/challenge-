@@ -613,7 +613,12 @@ func _set_globe_mode(enabled: bool) -> void:
         if is_instance_valid(backdrop):
             backdrop.visible = not enabled
     if world_globe != null:
+        # The invisible globe must never receive taps from answer buttons or other UI.
         world_globe.visible = enabled
+        world_globe.interaction_enabled = enabled
+        if not enabled:
+            world_globe.drag_active = false
+            world_globe.pointer_moved = false
     if interface_margin != null:
         interface_margin.visible = not enabled
     if interface_root != null and interface_root.get_child_count() > 0:
