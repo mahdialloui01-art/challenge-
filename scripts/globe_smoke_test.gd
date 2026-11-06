@@ -81,6 +81,31 @@ func _initialize() -> void:
         push_error("Locked route markers do not cover every locked destination")
         quit(1)
         return
+    if globe.country_order_labels.size() != globe.country_route.size():
+        push_error("A route sequence number is missing")
+        quit(1)
+        return
+    for route_index in range(globe.country_route.size()):
+        var code: String = globe.country_route[route_index]
+        var lock: Label3D = globe.get_node_or_null("CountryLock_" + code)
+        var order: Label3D = globe.get_node_or_null("CountryLockOrder_" + code)
+        if lock == null or lock.font_size < 50:
+            push_error("Locked destination does not have a large visible lock")
+            quit(1)
+            return
+        if lock.modulate.r > 0.90 or lock.modulate.g > 0.92 or lock.modulate.b < 0.65:
+            push_error("Lock marker is not the requested neutral gray")
+            quit(1)
+            return
+        if order == null or order.text != "%02d" % (route_index + 1):
+            push_error("Country lock sequence number is incorrect")
+            quit(1)
+            return
+    for route_index in range(1, 30):
+        if globe.country_route[route_index] == globe.country_route[route_index - 1]:
+            push_error("Route contains a repeated consecutive country")
+            quit(1)
+            return
     if globe.get_node_or_null("AccurateGeographicCountryBorders") == null:
         push_error("Accurate country border overlay was not created")
         quit(1)
