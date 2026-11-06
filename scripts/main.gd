@@ -1,5 +1,7 @@
 extends Node3D
 
+const WorldMapArt = preload("res://scripts/world_map_art.gd")
+
 const QUESTIONS_PATH := "res://data/questions.json"
 const SAVE_PATH := "user://player_data.cfg"
 
