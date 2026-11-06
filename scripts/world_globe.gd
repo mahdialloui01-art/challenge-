@@ -105,7 +105,7 @@ func _build_globe() -> void:
     ring_mat.albedo_color = Color("#38aaff")
     ring_mat.emission_enabled = true
     ring_mat.emission = Color("#147dff")
-    ring.material_override = ring_mat
+    rim.material_override = ring_mat
     add_child(rim)
 
 func _load_country_geometry() -> void:
