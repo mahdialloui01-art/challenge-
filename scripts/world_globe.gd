@@ -374,8 +374,8 @@ func _get_country_label_anchor(geometry: Array) -> Array:
     return best_anchor
 
 func _create_country_lock_labels() -> void:
-    # Every locked destination gets its own visible lock marker.
-    # Markers are hidden only when they are on the far side of the globe.
+    # Compact electronic lock badges sit at each country's geographic centre.
+    # Their footprint is deliberately small so the map remains clearly visible.
     for code in country_route:
         if not features_by_code.has(code):
             continue
@@ -386,77 +386,110 @@ func _create_country_lock_labels() -> void:
         var route_index := country_route.find(code)
         var lock_root := Node3D.new()
         lock_root.name = "CountryLock_" + code
-        lock_root.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.065)
+        lock_root.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.038)
+        lock_root.scale = Vector3.ONE * 0.72
         lock_root.set_meta("route_index", route_index)
         lock_root.set_meta("country_code", code)
-        lock_root.set_meta("base_scale", 1.0)
+        lock_root.set_meta("base_scale", 0.72)
 
-        # Premium 3D lock: metallic rounded body, raised shackle, inset keyway.
-        var metal := StandardMaterial3D.new()
-        metal.albedo_color = Color(0.60, 0.66, 0.72, 1.0)
-        metal.metallic = 0.88
-        metal.roughness = 0.24
-        metal.clearcoat_enabled = true
-        metal.clearcoat = 0.72
-        metal.clearcoat_roughness = 0.18
-        metal.emission_enabled = true
-        metal.emission = Color(0.12, 0.15, 0.19)
-        metal.emission_energy_multiplier = 0.22
+        # Brushed titanium outer shell.
+        var titanium := StandardMaterial3D.new()
+        titanium.albedo_color = Color(0.57, 0.64, 0.72, 1.0)
+        titanium.metallic = 0.92
+        titanium.roughness = 0.2
+        titanium.clearcoat_enabled = true
+        titanium.clearcoat = 0.82
+        titanium.clearcoat_roughness = 0.12
 
+        var shell := MeshInstance3D.new()
+        shell.name = "MetalBody"
+        var shell_mesh := BoxMesh.new()
+        shell_mesh.size = Vector3(0.19, 0.16, 0.065)
+        shell.mesh = shell_mesh
+        shell.material_override = titanium
+        lock_root.add_child(shell)
+
+        # Dark glass-like electronic face.
+        var panel := MeshInstance3D.new()
+        panel.name = "ElectronicPanel"
+        var panel_mesh := BoxMesh.new()
+        panel_mesh.size = Vector3(0.151, 0.119, 0.012)
+        panel.mesh = panel_mesh
+        panel.position = Vector3(0.0, 0.0, 0.039)
+        var panel_material := StandardMaterial3D.new()
+        panel_material.albedo_color = Color(0.018, 0.055, 0.078, 1.0)
+        panel_material.metallic = 0.58
+        panel_material.roughness = 0.16
+        panel_material.emission_enabled = true
+        panel_material.emission = Color(0.008, 0.065, 0.09)
+        panel_material.emission_energy_multiplier = 0.45
+        panel.material_override = panel_material
+        lock_root.add_child(panel)
+
+        # Raised electronic shackle, kept narrow and compact.
         var shackle := MeshInstance3D.new()
         shackle.name = "Shackle"
         var ring := TorusMesh.new()
-        ring.inner_radius = 0.075
-        ring.outer_radius = 0.115
+        ring.inner_radius = 0.043
+        ring.outer_radius = 0.061
         shackle.mesh = ring
-        shackle.scale = Vector3(0.92, 1.12, 0.72)
-        shackle.position = Vector3(0.0, 0.105, -0.012)
-        shackle.material_override = metal
+        shackle.scale = Vector3(1.0, 1.12, 0.72)
+        shackle.position = Vector3(0.0, 0.102, -0.004)
+        shackle.material_override = titanium
         lock_root.add_child(shackle)
 
-        var body := MeshInstance3D.new()
-        body.name = "MetalBody"
-        var body_mesh := SphereMesh.new()
-        body_mesh.radius = 0.16
-        body_mesh.height = 0.28
-        body.mesh = body_mesh
-        body.scale = Vector3(1.12, 0.92, 0.72)
-        body.position = Vector3(0.0, -0.045, 0.025)
-        body.material_override = metal
-        lock_root.add_child(body)
-
+        # Glowing biometric/key sensor and tiny status light.
         var keyway := MeshInstance3D.new()
         keyway.name = "IlluminatedKeyway"
         var key_mesh := SphereMesh.new()
-        key_mesh.radius = 0.027
-        key_mesh.height = 0.054
+        key_mesh.radius = 0.014
+        key_mesh.height = 0.028
         keyway.mesh = key_mesh
-        keyway.scale = Vector3(0.82, 1.18, 0.36)
-        keyway.position = Vector3(0.0, -0.035, 0.139)
-        var key_material := StandardMaterial3D.new()
-        key_material.albedo_color = Color(0.30, 0.82, 0.96)
-        key_material.emission_enabled = true
-        key_material.emission = Color(0.10, 0.62, 0.95)
-        key_material.emission_energy_multiplier = 1.8
-        key_material.metallic = 0.25
-        keyway.material_override = key_material
+        keyway.scale = Vector3(0.78, 1.22, 0.42)
+        keyway.position = Vector3(0.0, -0.012, 0.049)
+        var cyan := StandardMaterial3D.new()
+        cyan.albedo_color = Color(0.20, 0.86, 1.0)
+        cyan.emission_enabled = true
+        cyan.emission = Color(0.04, 0.72, 1.0)
+        cyan.emission_energy_multiplier = 2.4
+        cyan.metallic = 0.35
+        keyway.material_override = cyan
         lock_root.add_child(keyway)
+
+        var status_led := MeshInstance3D.new()
+        status_led.name = "StatusLED"
+        var led_mesh := BoxMesh.new()
+        led_mesh.size = Vector3(0.052, 0.006, 0.008)
+        status_led.mesh = led_mesh
+        status_led.position = Vector3(0.0, 0.043, 0.049)
+        status_led.material_override = cyan
+        lock_root.add_child(status_led)
+
+        var circuit := MeshInstance3D.new()
+        circuit.name = "CircuitAccent"
+        var circuit_mesh := BoxMesh.new()
+        circuit_mesh.size = Vector3(0.006, 0.035, 0.008)
+        circuit.mesh = circuit_mesh
+        circuit.position = Vector3(0.058, -0.025, 0.049)
+        circuit.material_override = cyan
+        lock_root.add_child(circuit)
 
         var order_label := Label3D.new()
         order_label.name = "SequenceNumber"
         order_label.text = "%02d" % (route_index + 1)
-        order_label.font_size = 25
-        order_label.pixel_size = 0.0038
+        order_label.font_size = 20
+        order_label.pixel_size = 0.0027
         order_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
         order_label.no_depth_test = true
         order_label.shaded = false
-        order_label.modulate = Color(0.88, 0.93, 0.98, 1.0)
-        order_label.outline_size = 8
-        order_label.outline_modulate = Color(0.025, 0.035, 0.050, 1.0)
-        order_label.position = Vector3(0.0, -0.245, 0.11)
+        order_label.modulate = Color(0.82, 0.94, 1.0, 1.0)
+        order_label.outline_size = 6
+        order_label.outline_modulate = Color(0.012, 0.028, 0.042, 1.0)
+        order_label.position = Vector3(0.0, -0.145, 0.055)
         order_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         order_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
         lock_root.add_child(order_label)
+
         add_child(lock_root)
         country_lock_labels.append(lock_root)
         country_order_labels.append(order_label)
