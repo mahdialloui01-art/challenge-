@@ -267,7 +267,7 @@ func _pick_country(screen_position: Vector2) -> void:
     country_tapped.emit(index, code, name, index >= 0 and index <= unlocked_index)
 
 func _find_country(longitude: float, latitude: float) -> String:
-    for code in COUNTRY_ROUTE:
+    for code in country_route:
         if not features_by_code.has(code):
             continue
         var feature: Dictionary = features_by_code[code]
