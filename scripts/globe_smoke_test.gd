@@ -37,8 +37,13 @@ func _initialize() -> void:
         push_error("Expanded North Africa satellite detail layer was not created")
         quit(1)
         return
+    if globe.city_labels.size() < 15:
+        push_error("Close-zoom city label layer is incomplete")
+        quit(1)
+        return
     print("WORLD_GLOBE_SATELLITE_TEXTURE_OK")
     print("WORLD_GLOBE_CLOUD_LAYER_OK")
     print("WORLD_GLOBE_REGIONAL_DETAIL_OK")
+    print("WORLD_GLOBE_CITY_LABELS_OK")
     print("WORLD_GLOBE_SMOKE_OK")
     quit()
