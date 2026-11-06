@@ -60,6 +60,7 @@ func _build_globe() -> void:
     ocean.albedo_color = Color.WHITE
     ocean.metallic = 0.0
     ocean.roughness = 0.92
+    ocean.cull_mode = BaseMaterial3D.CULL_DISABLED
     ocean.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
     if ResourceLoader.exists("res://assets/earth_surface.jpg"):
         ocean.albedo_texture = load("res://assets/earth_surface.jpg")
