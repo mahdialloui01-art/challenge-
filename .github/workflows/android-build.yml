@@ -66,14 +66,14 @@ jobs:
           export/android/java_sdk_path = "$JAVA_HOME"
           EOF
 
-      - name: Build satellite Earth texture with precise country borders
+      - name: Build high-resolution satellite Earth texture with precise country borders
         run: |
           set -euxo pipefail
           mkdir -p assets
           python3 -m venv /tmp/globe-venv
           /tmp/globe-venv/bin/pip install pillow
           curl -fL --retry 3 --retry-delay 2 \
-            "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography/january/world.topo.200401.3x5400x2700.jpg" \
+            "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography/january/world.topo.200401.3x21600x10800.jpg" \
             -o /tmp/earth_base.jpg
           /tmp/globe-venv/bin/python - <<'PY'
           from PIL import Image, ImageDraw, ImageOps
@@ -122,7 +122,7 @@ jobs:
           PY
           test -s assets/earth_surface.jpg
 
-      - name: Build offline North Africa satellite detail mosaic
+      - name: Build expanded offline North Africa satellite detail mosaic
         run: |
           set -euxo pipefail
           /tmp/globe-venv/bin/python - <<'PY'
@@ -134,9 +134,9 @@ jobs:
           os.makedirs("assets", exist_ok=True)
 
           # Geographic coverage: northern Algeria, Tunisia and nearby coast.
-          lon_min, lon_max = -3.0, 12.0
-          lat_min, lat_max = 30.0, 38.0
-          zoom = 8
+          lon_min, lon_max = -9.0, 16.0
+          lat_min, lat_max = 18.0, 38.0
+          zoom = 7
           tiles_x = 2 ** zoom * 2
           tiles_y = 2 ** zoom
           x0 = int(math.floor((lon_min + 180.0) / 360.0 * tiles_x))
@@ -181,7 +181,7 @@ jobs:
           top = round((90.0 - lat_max) * px_per_degree_y - y0 * 512)
           bottom = round((90.0 - lat_min) * px_per_degree_y - y0 * 512)
           detail = mosaic.crop((left, top, right, bottom))
-          detail.thumbnail((6144, 6144), Image.Resampling.LANCZOS)
+          detail.thumbnail((8192, 8192), Image.Resampling.LANCZOS)
           detail.save("assets/north_africa_detail.jpg", "JPEG", quality=91, optimize=True)
           print(f"Created offline regional imagery {detail.size}; {success}/{len(tile_ids)} tiles")
           PY
