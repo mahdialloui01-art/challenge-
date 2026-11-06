@@ -26,6 +26,7 @@ var last_pointer := Vector2.ZERO
 var pointer_moved := false
 var rotation_velocity := Vector2.ZERO
 var globe_mesh: MeshInstance3D
+var country_labels: Array[Label3D] = []
 
 func _ready() -> void:
     set_process_input(true)
@@ -83,6 +84,7 @@ func _build_globe() -> void:
 
     _load_country_geometry()
     _append_remaining_countries()
+    _create_country_labels()
 
     var light := OmniLight3D.new()
     light.position = Vector3(-4.0, 4.0, 6.0)
@@ -109,6 +111,65 @@ func _load_country_geometry() -> void:
             continue
         features_by_code[code] = feature
         # The satellite texture carries the country outlines. GeoJSON is kept for accurate selection.
+
+
+func _create_country_labels() -> void:
+    # Geographic label anchors are derived from each country's offline GeoJSON bounds.
+    for code in country_route:
+        if not features_by_code.has(code):
+            continue
+        var feature: Dictionary = features_by_code[code]
+        var geometry: Array = feature.get("g", [])
+        var min_lon := 180.0
+        var max_lon := -180.0
+        var min_lat := 90.0
+        var max_lat := -90.0
+        var sample_count := 0
+        for polygon in geometry:
+            if polygon.is_empty():
+                continue
+            for ring in polygon:
+                for point in ring:
+                    if point.size() < 2:
+                        continue
+                    var lon := float(point[0])
+                    var lat := float(point[1])
+                    min_lon = minf(min_lon, lon)
+                    max_lon = maxf(max_lon, lon)
+                    min_lat = minf(min_lat, lat)
+                    max_lat = maxf(max_lat, lat)
+                    sample_count += 1
+        if sample_count == 0:
+            continue
+        var center_lon := wrapf((min_lon + max_lon) * 0.5, -180.0, 180.0)
+        var center_lat := (min_lat + max_lat) * 0.5
+        var label := Label3D.new()
+        label.name = "CountryLabel_" + code
+        label.text = get_country_name(code)
+        label.font_size = 34 if label.text.length() <= 7 else 27
+        label.pixel_size = 0.0038
+        label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+        label.no_depth_test = true
+        label.shaded = false
+        label.modulate = Color(0.94, 0.97, 1.0, 0.96)
+        label.outline_size = 9
+        label.outline_modulate = Color(0.015, 0.045, 0.10, 0.96)
+        label.position = _geo_to_sphere(center_lon, center_lat, GLOBE_RADIUS * 1.035)
+        label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+        add_child(label)
+        country_labels.append(label)
+
+func _update_country_label_visibility() -> void:
+    var camera := get_viewport().get_camera_3d()
+    if camera == null:
+        return
+    var camera_local := global_transform.affine_inverse() * camera.global_position
+    for label in country_labels:
+        if not is_instance_valid(label):
+            continue
+        var normal := label.position.normalized()
+        label.visible = normal.dot(camera_local.normalized()) > 0.12
 
 func _create_earth_mesh(longitude_segments: int, latitude_segments: int, radius: float = GLOBE_RADIUS) -> ArrayMesh:
     var vertices := PackedVector3Array()
@@ -148,6 +209,7 @@ func _geo_to_sphere(longitude: float, latitude: float, radius: float) -> Vector3
     return Vector3(cos(lat) * sin(lon), sin(lat), cos(lat) * cos(lon)) * radius
 
 func _process(delta: float) -> void:
+    _update_country_label_visibility()
     if not drag_active and rotation_velocity.length() > 0.001:
         rotate_y(rotation_velocity.x * delta)
         rotate_x(rotation_velocity.y * delta)
