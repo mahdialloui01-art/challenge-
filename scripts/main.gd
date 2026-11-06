@@ -39,6 +39,8 @@ const MUSIC_LOOP_SECONDS := 8.0
 
 var content: VBoxContainer
 var interface_root: Control
+var interface_margin: Control
+var globe_hud: Control
 var footer_label: Label
 var progress_label: Label
 var score_label: Label
@@ -414,6 +416,7 @@ func _build_interface() -> void:
     root.add_child(tint)
 
     var margin := MarginContainer.new()
+    interface_margin = margin
     margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     margin.add_theme_constant_override("margin_left", 30)
     margin.add_theme_constant_override("margin_right", 30)
@@ -613,7 +616,7 @@ func _set_globe_mode(enabled: bool) -> void:
     if world_camera != null:
         if enabled:
             world_camera.projection = Camera3D.PROJECTION_PERSPECTIVE
-            world_camera.position = Vector3(0, 0, 9.2)
+            world_camera.position = Vector3(0, 0, 7.6)
             world_camera.fov = 43.0
         else:
             world_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
@@ -624,6 +627,10 @@ func _set_globe_mode(enabled: bool) -> void:
             backdrop.visible = not enabled
     if world_globe != null:
         world_globe.visible = enabled
+    if interface_margin != null:
+        interface_margin.visible = not enabled
+    if interface_root != null and interface_root.get_child_count() > 0:
+        interface_root.get_child(0).visible = not enabled
 
 func _show_world_map() -> void:
     _clear_content()
@@ -634,25 +641,57 @@ func _show_world_map() -> void:
         add_child(world_globe)
     world_globe.set_progress(unlocked_country_index)
     world_globe.visible = true
-    _add_heading("رحلة العباقرة حول العالم", "اسحب الكرة لتدوير الأرض • اضغط على الدولة المفتوحة لبدء التحدي")
+    if globe_hud != null and is_instance_valid(globe_hud):
+        globe_hud.queue_free()
+    globe_hud = PanelContainer.new()
+    globe_hud.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+    globe_hud.offset_left = 22
+    globe_hud.offset_right = -22
+    globe_hud.offset_top = -206
+    globe_hud.offset_bottom = -22
+    globe_hud.mouse_filter = Control.MOUSE_FILTER_STOP
+    var hud_style := StyleBoxFlat.new()
+    hud_style.bg_color = Color(0.015, 0.045, 0.10, 0.88)
+    hud_style.border_color = Color(0.25, 0.62, 0.86, 0.78)
+    hud_style.set_border_width_all(1)
+    hud_style.set_corner_radius_all(22)
+    hud_style.content_margin_left = 18
+    hud_style.content_margin_right = 18
+    hud_style.content_margin_top = 12
+    hud_style.content_margin_bottom = 12
+    globe_hud.add_theme_stylebox_override("panel", hud_style)
+    var hud_box := VBoxContainer.new()
+    hud_box.add_theme_constant_override("separation", 7)
+    globe_hud.add_child(hud_box)
+    var title := Label.new()
+    title.text = "🌍  رحلة العباقرة حول العالم"
+    title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    title.add_theme_font_size_override("font_size", 21)
+    title.add_theme_color_override("font_color", Color("#f1f7ff"))
+    hud_box.add_child(title)
     var next_country: String = str(world_globe.get_route_country_name(unlocked_country_index))
-    _add_stat_card("الدولة المفتوحة في رحلتك", next_country)
-    var progress_label := Label.new()
-    progress_label.text = "تقدّم الرحلة: %d / 177 دولة" % (unlocked_country_index + 1)
-    progress_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    progress_label.add_theme_font_size_override("font_size", 18)
-    progress_label.add_theme_color_override("font_color", Color("#78e6cb"))
-    content.add_child(progress_label)
+    var progress := Label.new()
+    progress.text = "الوجهة المفتوحة: %s   •   %d / 177" % [next_country, unlocked_country_index + 1]
+    progress.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    progress.add_theme_font_size_override("font_size", 16)
+    progress.add_theme_color_override("font_color", Color("#82e7d2"))
+    hud_box.add_child(progress)
     var hint := Label.new()
-    hint.text = "الجزائر هي نقطة البداية 🇩🇿\nالدول المقفلة ستُفتح بالتتابع بعد النجاح في التحدي."
+    hint.text = "اسحب للتدوير • قرّب وأبعد بإصبعين • المس الدولة لاختيارها"
     hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    hint.add_theme_font_size_override("font_size", 16)
-    hint.add_theme_color_override("font_color", Color("#d5e8ff"))
-    content.add_child(hint)
-    var home := _make_button("⌂   القائمة الرئيسية")
+    hint.add_theme_font_size_override("font_size", 14)
+    hint.add_theme_color_override("font_color", Color("#c5d9f2"))
+    hud_box.add_child(hint)
+    var actions := HBoxContainer.new()
+    actions.add_theme_constant_override("separation", 10)
+    hud_box.add_child(actions)
+    var home := _make_button("⌂  الرئيسية")
+    home.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    home.custom_minimum_size.y = 54
+    home.add_theme_font_size_override("font_size", 17)
     home.pressed.connect(_show_main_menu)
-    content.add_child(home)
+    actions.add_child(home)
+    interface_root.add_child(globe_hud)
 
 func _on_country_tapped(index: int, code: String, name: String, unlocked: bool) -> void:
     if unlocked and index >= 0 and index <= unlocked_country_index:
@@ -698,7 +737,8 @@ func _play_country_arrival() -> void:
 
     var sky := ColorRect.new()
     sky.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    sky.color = Color(0.008, 0.018, 0.052, 0.98)
+    sky.color = Color(0.008, 0.018, 0.052, 0.12)
+    sky.mouse_filter = Control.MOUSE_FILTER_IGNORE
     flight_layer.add_child(sky)
 
     var glow := ColorRect.new()
@@ -726,27 +766,62 @@ func _play_country_arrival() -> void:
     flight_status.add_theme_color_override("font_color", Color(0.48, 0.82, 1.0))
     flight_layer.add_child(flight_status)
 
-    var aircraft := Label.new()
-    aircraft.text = "✈"
-    aircraft.position = Vector2(-150, 570)
-    aircraft.size = Vector2(150, 110)
-    aircraft.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    aircraft.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-    aircraft.add_theme_font_size_override("font_size", 76)
-    aircraft.add_theme_color_override("font_color", Color(0.95, 0.98, 1.0))
-    flight_layer.add_child(aircraft)
+    var aircraft := _make_cinematic_aircraft()
+    aircraft.position = Vector3(-8.5, 1.8, 0.0)
+    aircraft.scale = Vector3(0.28, 0.28, 0.28)
+    add_child(aircraft)
 
     var tween := create_tween()
     tween.set_parallel(true)
-    tween.tween_property(aircraft, "position", Vector2(720, 330), 2.1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
-    tween.tween_property(aircraft, "rotation", -0.16, 0.8)
+    tween.tween_property(aircraft, "position", Vector3(1.8, -0.8, 0.6), 2.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+    tween.tween_property(aircraft, "rotation", Vector3(0.12, 0.0, -0.22), 1.2)
+    tween.tween_property(aircraft, "scale", Vector3(0.72, 0.72, 0.72), 2.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+    tween.tween_property(world_camera, "position", Vector3(0.7, -0.2, 10.0), 2.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
     tween.tween_property(glow, "modulate:a", 0.9, 1.0)
     tween.chain().tween_interval(0.25)
     tween.tween_callback(func():
         if is_instance_valid(flight_layer):
             flight_layer.queue_free()
+        if is_instance_valid(aircraft):
+            aircraft.queue_free()
+        world_camera.position = Vector3(0, 0, 12)
         _show_country_briefing()
     )
+
+
+func _make_cinematic_aircraft() -> Node3D:
+    var plane := Node3D.new()
+    plane.name = "CinematicAircraft"
+    var silver := StandardMaterial3D.new()
+    silver.albedo_color = Color("#dce8f2")
+    silver.metallic = 0.62
+    silver.roughness = 0.28
+    var dark := StandardMaterial3D.new()
+    dark.albedo_color = Color("#253b56")
+    dark.metallic = 0.48
+    dark.roughness = 0.34
+    var glass := StandardMaterial3D.new()
+    glass.albedo_color = Color("#4badd8")
+    glass.metallic = 0.25
+    glass.roughness = 0.16
+    glass.emission_enabled = true
+    glass.emission = Color("#123c58")
+    _aircraft_part(plane, BoxMesh.new(), Vector3(0, 0, 0), Vector3(0.22, 0.24, 2.45), silver)
+    _aircraft_part(plane, BoxMesh.new(), Vector3(0, 0.03, -0.05), Vector3(2.5, 0.075, 0.72), silver)
+    _aircraft_part(plane, BoxMesh.new(), Vector3(0, 0.11, -0.91), Vector3(0.95, 0.06, 0.38), silver)
+    _aircraft_part(plane, BoxMesh.new(), Vector3(0, 0.45, -0.96), Vector3(0.08, 0.7, 0.34), silver)
+    _aircraft_part(plane, SphereMesh.new(), Vector3(0, 0.16, 0.68), Vector3(0.15, 0.13, 0.48), glass)
+    _aircraft_part(plane, BoxMesh.new(), Vector3(-0.72, -0.05, -0.02), Vector3(0.34, 0.13, 0.78), dark)
+    _aircraft_part(plane, BoxMesh.new(), Vector3(0.72, -0.05, -0.02), Vector3(0.34, 0.13, 0.78), dark)
+    return plane
+
+func _aircraft_part(parent: Node3D, mesh_resource: Mesh, at: Vector3, dimensions: Vector3, material: Material) -> void:
+    var part := MeshInstance3D.new()
+    part.mesh = mesh_resource
+    part.position = at
+    part.scale = dimensions
+    part.material_override = material
+    parent.add_child(part)
 
 func _show_country_briefing() -> void:
     _clear_content()
