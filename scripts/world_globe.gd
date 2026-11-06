@@ -512,17 +512,17 @@ func _create_country_lock_labels() -> void:
         var order_label := Label3D.new()
         order_label.name = "SequenceNumber"
         order_label.text = "%02d" % (route_index + 1)
-        order_label.font_size = 36
-        order_label.pixel_size = 0.0046
+        order_label.font_size = 22
+        order_label.pixel_size = 0.0018
         order_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
         order_label.no_depth_test = true
         order_label.shaded = false
         order_label.modulate = Color(0.92, 0.99, 1.0, 1.0)
-        order_label.outline_size = 7
+        order_label.outline_size = 3
         order_label.outline_modulate = Color(0.004, 0.018, 0.03, 1.0)
         order_label.position = Vector3(0.0, -0.172, 0.073)
-        # Counter-scale the number so it remains readable while the lock shrinks.
-        order_label.scale = Vector3.ONE * 2.4
+        # Keep the sequence number proportional to its compact metal plaque.
+        order_label.scale = Vector3.ONE
         order_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         order_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
         lock_root.add_child(order_label)
@@ -620,16 +620,35 @@ func _update_country_label_visibility() -> void:
         if marker_visible:
             var camera_basis_local: Basis = global_transform.basis.inverse() * camera.global_transform.basis
             lock_label.basis = camera_basis_local
+    # Screen-space decluttering: keep lock markers, but never let sequence
+    # numbers overlap. Route order gives early destinations visual priority.
+    var accepted_number_positions: Array[Vector2] = []
+    var viewport_size := get_viewport().get_visible_rect().size
+    var min_number_gap := 46.0 if zoom_distance > 6.0 else (34.0 if zoom_distance > 4.8 else 25.0)
     for order_label in country_order_labels:
         if not is_instance_valid(order_label):
             continue
-        var route_index := int(order_label.get_meta("route_index", -1))
         var marker_root := order_label.get_parent() as Node3D
         if marker_root == null:
             order_label.visible = false
             continue
+        var world_position := marker_root.global_position
+        if camera.is_position_behind(world_position):
+            order_label.visible = false
+            continue
+        var screen_position := camera.unproject_position(world_position)
+        var on_screen := screen_position.x >= 8.0 and screen_position.y >= 8.0 and screen_position.x <= viewport_size.x - 8.0 and screen_position.y <= viewport_size.y - 8.0
         var normal := marker_root.position.normalized()
-        order_label.visible = normal.dot(camera_local.normalized()) > 0.12
+        var front_facing := normal.dot(camera_local.normalized()) > 0.12
+        var spaced := true
+        if on_screen and front_facing:
+            for accepted_position in accepted_number_positions:
+                if screen_position.distance_to(accepted_position) < min_number_gap:
+                    spaced = false
+                    break
+        order_label.visible = on_screen and front_facing and spaced
+        if order_label.visible:
+            accepted_number_positions.append(screen_position)
 
 func _create_earth_mesh(longitude_segments: int, latitude_segments: int, radius: float = GLOBE_RADIUS) -> ArrayMesh:
     var vertices := PackedVector3Array()
