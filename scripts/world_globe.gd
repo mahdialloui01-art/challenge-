@@ -26,6 +26,7 @@ var last_pointer := Vector2.ZERO
 var pointer_moved := false
 var rotation_velocity := Vector2.ZERO
 var zoom_distance := 7.6
+var target_zoom_distance := 7.6
 var globe_mesh: MeshInstance3D
 var detail_patch: MeshInstance3D
 var detail_material: StandardMaterial3D
@@ -350,7 +351,7 @@ func _update_country_label_visibility() -> void:
             continue
         var normal := label.position.normalized()
         label.visible = normal.dot(camera_local.normalized()) > 0.12
-    var show_cities := zoom_distance <= 4.9
+    var show_cities := zoom_distance <= 6.15
     for label in city_labels:
         if not is_instance_valid(label):
             continue
@@ -396,6 +397,11 @@ func _geo_to_sphere(longitude: float, latitude: float, radius: float) -> Vector3
 
 func _process(delta: float) -> void:
     _update_country_label_visibility()
+    var camera := get_viewport().get_camera_3d()
+    if camera != null:
+        zoom_distance = lerpf(zoom_distance, target_zoom_distance, minf(1.0, delta * 4.2))
+        if absf(camera.position.z - zoom_distance) > 0.001:
+            camera.position.z = zoom_distance
     if detail_patch != null and detail_material != null:
         var detail_alpha := clampf(inverse_lerp(9.6, 7.7, zoom_distance), 0.0, 1.0)
         detail_patch.visible = detail_alpha > 0.01
@@ -405,7 +411,7 @@ func _process(delta: float) -> void:
         rotate_x(rotation_velocity.y * delta)
         rotation_velocity = rotation_velocity.lerp(Vector2.ZERO, minf(1.0, delta * 8.0))
     if not drag_active:
-        rotate_y(delta * 0.0035)
+        rotate_y(delta * 0.0018)
 
 func _input(event: InputEvent) -> void:
     if event is InputEventScreenTouch:
@@ -434,9 +440,8 @@ func _apply_zoom(factor: float) -> void:
     var camera := get_viewport().get_camera_3d()
     if camera == null:
         return
-    var gentle_factor := lerpf(1.0, factor, 0.28)
-    zoom_distance = clampf(zoom_distance / gentle_factor, 3.28, 14.0)
-    camera.position.z = zoom_distance
+    var gentle_factor := lerpf(1.0, factor, 0.22)
+    target_zoom_distance = clampf(target_zoom_distance / gentle_factor, 3.28, 14.0)
 
 func _begin_drag(position: Vector2) -> void:
     if position.y > 1060.0:
