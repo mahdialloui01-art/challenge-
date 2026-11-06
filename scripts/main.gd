@@ -24,6 +24,7 @@ var current_country_index := 0
 var current_country_code := "DZA"
 var current_country_name := "الجزائر"
 var question_pool: Array[int] = []
+var previous_question_ids: Dictionary = {}
 var world_globe
 var world_camera: Camera3D
 var correct_answers := 0
@@ -419,6 +420,9 @@ func _load_player_data() -> void:
         unlocked_level = int(config.get_value("progress", "unlocked_level", 1))
         unlocked_country_index = int(config.get_value("country_progress", "unlocked_index", 0))
         music_enabled = bool(config.get_value("settings", "music", true))
+        var saved_question_history = config.get_value("question_history", "by_country", {})
+        if saved_question_history is Dictionary:
+            previous_question_ids = saved_question_history
     if not DIFFICULTIES.has(difficulty):
         difficulty = "medium"
     unlocked_level = clampi(unlocked_level, 1, 11)
@@ -434,6 +438,7 @@ func _save_player_data() -> void:
     config.set_value("settings", "music", music_enabled)
     config.set_value("progress", "unlocked_level", unlocked_level)
     config.set_value("country_progress", "unlocked_index", unlocked_country_index)
+    config.set_value("question_history", "by_country", previous_question_ids)
     config.save(SAVE_PATH)
 
 func _build_interface() -> void:
@@ -1044,24 +1049,94 @@ func _start_level(level: int) -> void:
     showing_results = false
     question_index = 0
     question_pool.clear()
+
+    # Build a mixed pool: country-specific knowledge plus world science and culture.
     for i in range(questions.size()):
         var candidate: Dictionary = questions[i]
-        if str(candidate.get("country", "")) == current_country_code:
+        var candidate_country := str(candidate.get("country", ""))
+        if candidate_country == current_country_code or candidate_country.is_empty():
             question_pool.append(i)
-    if question_pool.is_empty():
-        for i in range(questions.size()):
-            var general_candidate: Dictionary = questions[i]
-            if str(general_candidate.get("country", "")).is_empty():
-                question_pool.append(i)
+
     if question_pool.is_empty():
         for i in range(questions.size()):
             question_pool.append(i)
+
+    var target_count := int(DIFFICULTIES.get(difficulty, DIFFICULTIES["medium"]).get("count", 10))
+    target_count = mini(target_count, question_pool.size())
+    var saved_ids: Array = previous_question_ids.get(current_country_code, [])
+    var seen_ids: Dictionary = {}
+    for saved_id in saved_ids:
+        seen_ids[str(saved_id)] = true
+
+    var fresh_pool: Array[int] = []
+    var repeat_pool: Array[int] = []
+    for candidate_index in question_pool:
+        var candidate_item: Dictionary = questions[candidate_index]
+        var stable_id := _question_replay_key(candidate_item)
+        if seen_ids.has(stable_id):
+            repeat_pool.append(candidate_index)
+        else:
+            fresh_pool.append(candidate_index)
+
+    # Never exceed 5% repeats from the immediately previous attempt.
+    var repeat_cap := int(floor(float(target_count) * 0.05))
+    var selected_indices := _pick_diverse_questions(fresh_pool, target_count)
+    if selected_indices.size() < target_count and repeat_cap > 0:
+        repeat_pool.shuffle()
+        var allowed_repeats := mini(repeat_cap, target_count - selected_indices.size())
+        for repeat_index in range(allowed_repeats):
+            selected_indices.append(repeat_pool[repeat_index])
+
+    # A sufficiently sized bank should always provide a full fresh test.
+    # If a future country has a smaller bank, keep the test honest and use only fresh items.
+    question_pool = selected_indices
     question_order.clear()
     for i in range(question_pool.size()):
         question_order.append(i)
     question_order.shuffle()
-    question_order.resize(mini(5, question_order.size()))
+
+    var current_ids: Array[String] = []
+    for selected_index in question_pool:
+        current_ids.append(_question_replay_key(questions[selected_index]))
+    previous_question_ids[current_country_code] = current_ids
+    _save_player_data()
     _display_question()
+
+func _question_replay_key(item: Dictionary) -> String:
+    # Country scope keeps the shared world-science bank independent for each destination.
+    return current_country_code + "|" + str(item.get("question", ""))
+
+
+func _pick_diverse_questions(indices: Array[int], limit: int) -> Array[int]:
+    var grouped: Dictionary = {}
+    for candidate_index in indices:
+        var item: Dictionary = questions[candidate_index]
+        var category := str(item.get("category", "معارف عامة"))
+        if not grouped.has(category):
+            grouped[category] = []
+        var bucket: Array = grouped[category]
+        bucket.append(candidate_index)
+        grouped[category] = bucket
+
+    var categories: Array = grouped.keys()
+    categories.shuffle()
+    for category in categories:
+        var bucket: Array = grouped[category]
+        bucket.shuffle()
+        grouped[category] = bucket
+
+    var selected: Array[int] = []
+    while selected.size() < limit:
+        var added_in_round := false
+        for category in categories:
+            var bucket: Array = grouped[category]
+            if not bucket.is_empty() and selected.size() < limit:
+                selected.append(int(bucket.pop_back()))
+                added_in_round = true
+        if not added_in_round:
+            break
+    return selected
+
 
 func _display_question() -> void:
     answered = false
