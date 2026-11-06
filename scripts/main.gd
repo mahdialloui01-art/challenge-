@@ -666,7 +666,7 @@ func _show_country_locked(index: int, code: String, name: String) -> void:
     elif index > unlocked_country_index:
         _add_stat_card("حالة الدولة", "🔒 مغلقة")
         var message := Label.new()
-        message.text = "أكمل تحدّي %s أولاً حتى تفتح هذه الدولة." % (world_globe.get_country_name("DZA") if unlocked_country_index == 0 else "الدولة السابقة")
+        message.text = "أكمل تحدّي %s أولاً حتى تفتح هذه الدولة." % world_globe.get_route_country_name(unlocked_country_index)
         message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
         message.add_theme_font_size_override("font_size", 18)
