@@ -373,6 +373,34 @@ func _get_country_label_anchor(geometry: Array) -> Array:
         best_anchor = [candidate_lon, candidate_lat]
     return best_anchor
 
+func _get_country_marker_scale(geometry: Array) -> float:
+    # Derive marker size from each country's largest outer boundary.
+    # Larger land areas get a more visible badge; compact countries stay unobstructed.
+    var best_bbox_area := 0.0
+    for polygon in geometry:
+        if polygon.is_empty():
+            continue
+        var ring: Array = polygon[0]
+        if ring.size() < 4:
+            continue
+        var min_lon := 180.0
+        var max_lon := -180.0
+        var min_lat := 90.0
+        var max_lat := -90.0
+        for point in ring:
+            var lon := float(point[0])
+            var lat := float(point[1])
+            min_lon = minf(min_lon, lon)
+            max_lon = maxf(max_lon, lon)
+            min_lat = minf(min_lat, lat)
+            max_lat = maxf(max_lat, lat)
+        var bbox_area := (max_lon - min_lon) * (max_lat - min_lat)
+        best_bbox_area = maxf(best_bbox_area, bbox_area)
+    if best_bbox_area <= 0.0:
+        return 0.75
+    return clampf(sqrt(best_bbox_area) / 18.0, 0.65, 1.35)
+
+
 func _create_country_lock_labels() -> void:
     # Compact electronic lock badges sit at each country's geographic centre.
     # Their footprint is deliberately small so the map remains clearly visible.
@@ -384,6 +412,7 @@ func _create_country_lock_labels() -> void:
         if anchor.size() < 2:
             continue
         var route_index := country_route.find(code)
+        var country_scale := _get_country_marker_scale(feature.get("g", []))
         var lock_root := Node3D.new()
         lock_root.name = "CountryLock_" + code
         lock_root.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.038) + Vector3(0.0, -0.13, 0.0)
@@ -392,10 +421,10 @@ func _create_country_lock_labels() -> void:
         lock_root.set_meta("country_code", code)
         lock_root.set_meta("base_scale", 0.12)
 
-        # Scale only the lock hardware down by 90%; keep the number box unchanged.
+        # Hardware, plaque and sequence number scale independently for each country.
         var lock_hardware := Node3D.new()
         lock_hardware.name = "LockHardware"
-        lock_hardware.scale = Vector3.ONE * 0.1
+        lock_hardware.scale = Vector3.ONE * 0.24 * country_scale
         lock_root.add_child(lock_hardware)
 
         # Brushed titanium outer shell.
@@ -487,7 +516,7 @@ func _create_country_lock_labels() -> void:
         frame_mesh.size = Vector3(0.1395, 0.0738, 0.009)
         number_frame.mesh = frame_mesh
         number_frame.position = Vector3(0.0, -0.1188, 0.052)
-        number_frame.scale = Vector3.ONE * 0.1
+        number_frame.scale = Vector3.ONE * 0.24 * country_scale
         number_frame.material_override = titanium
         lock_root.add_child(number_frame)
 
@@ -497,7 +526,7 @@ func _create_country_lock_labels() -> void:
         plate_mesh.size = Vector3(0.1251, 0.0585, 0.0072)
         number_plate.mesh = plate_mesh
         number_plate.position = Vector3(0.0, -0.1188, 0.0528)
-        number_plate.scale = Vector3.ONE * 0.1
+        number_plate.scale = Vector3.ONE * 0.24 * country_scale
         var plate_material := StandardMaterial3D.new()
         plate_material.albedo_color = Color(0.008, 0.025, 0.042, 1.0)
         plate_material.metallic = 0.72
@@ -514,7 +543,7 @@ func _create_country_lock_labels() -> void:
         accent_mesh.size = Vector3(0.090, 0.0027, 0.0027)
         number_accent.mesh = accent_mesh
         number_accent.position = Vector3(0.0, -0.12159, 0.0534)
-        number_accent.scale = Vector3.ONE * 0.1
+        number_accent.scale = Vector3.ONE * 0.24 * country_scale
         number_accent.material_override = cyan
         lock_root.add_child(number_accent)
 
@@ -530,8 +559,8 @@ func _create_country_lock_labels() -> void:
         order_label.outline_size = 3
         order_label.outline_modulate = Color(0.004, 0.018, 0.03, 1.0)
         order_label.position = Vector3(0.0, -0.1188, 0.0536)
-        order_label.scale = Vector3.ONE * 0.1
-        # Keep the sequence number at the same compact 10% scale as its plaque.
+        order_label.scale = Vector3.ONE * 0.24 * country_scale
+        # Match the number's scale to its independently sized plaque.
         order_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         order_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
         lock_root.add_child(order_label)
