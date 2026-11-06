@@ -386,11 +386,11 @@ func _create_country_lock_labels() -> void:
         var route_index := country_route.find(code)
         var lock_root := Node3D.new()
         lock_root.name = "CountryLock_" + code
-        lock_root.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.038)
-        lock_root.scale = Vector3.ONE * 0.20
+        lock_root.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.038) + Vector3(0.0, -0.13, 0.0)
+        lock_root.scale = Vector3.ONE * 0.12
         lock_root.set_meta("route_index", route_index)
         lock_root.set_meta("country_code", code)
-        lock_root.set_meta("base_scale", 0.20)
+        lock_root.set_meta("base_scale", 0.12)
 
         # Brushed titanium outer shell.
         var titanium := StandardMaterial3D.new()
@@ -478,18 +478,18 @@ func _create_country_lock_labels() -> void:
         var number_frame := MeshInstance3D.new()
         number_frame.name = "SequenceNumberFrame"
         var frame_mesh := BoxMesh.new()
-        frame_mesh.size = Vector3(0.205, 0.112, 0.012)
+        frame_mesh.size = Vector3(0.155, 0.082, 0.010)
         number_frame.mesh = frame_mesh
-        number_frame.position = Vector3(0.0, -0.172, 0.052)
+        number_frame.position = Vector3(0.0, -0.132, 0.052)
         number_frame.material_override = titanium
         lock_root.add_child(number_frame)
 
         var number_plate := MeshInstance3D.new()
         number_plate.name = "SequenceNumberPlate"
         var plate_mesh := BoxMesh.new()
-        plate_mesh.size = Vector3(0.184, 0.091, 0.009)
+        plate_mesh.size = Vector3(0.139, 0.065, 0.008)
         number_plate.mesh = plate_mesh
-        number_plate.position = Vector3(0.0, -0.172, 0.061)
+        number_plate.position = Vector3(0.0, -0.132, 0.060)
         var plate_material := StandardMaterial3D.new()
         plate_material.albedo_color = Color(0.008, 0.025, 0.042, 1.0)
         plate_material.metallic = 0.72
@@ -503,24 +503,24 @@ func _create_country_lock_labels() -> void:
         var number_accent := MeshInstance3D.new()
         number_accent.name = "SequenceNumberAccent"
         var accent_mesh := BoxMesh.new()
-        accent_mesh.size = Vector3(0.135, 0.004, 0.004)
+        accent_mesh.size = Vector3(0.100, 0.003, 0.003)
         number_accent.mesh = accent_mesh
-        number_accent.position = Vector3(0.0, -0.215, 0.069)
+        number_accent.position = Vector3(0.0, -0.163, 0.066)
         number_accent.material_override = cyan
         lock_root.add_child(number_accent)
 
         var order_label := Label3D.new()
         order_label.name = "SequenceNumber"
         order_label.text = "%02d" % (route_index + 1)
-        order_label.font_size = 22
-        order_label.pixel_size = 0.0018
+        order_label.font_size = 17
+        order_label.pixel_size = 0.00145
         order_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
         order_label.no_depth_test = true
         order_label.shaded = false
         order_label.modulate = Color(0.92, 0.99, 1.0, 1.0)
         order_label.outline_size = 3
         order_label.outline_modulate = Color(0.004, 0.018, 0.03, 1.0)
-        order_label.position = Vector3(0.0, -0.172, 0.073)
+        order_label.position = Vector3(0.0, -0.132, 0.068)
         # Keep the sequence number proportional to its compact metal plaque.
         order_label.scale = Vector3.ONE
         order_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
