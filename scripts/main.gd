@@ -653,7 +653,7 @@ func _show_world_map() -> void:
     content.add_child(home)
 
 func _on_country_tapped(index: int, code: String, name: String, unlocked: bool) -> void:
-    if unlocked and index == unlocked_country_index:
+    if unlocked and index >= 0 and index <= unlocked_country_index:
         _start_country(index, code, name)
     else:
         _show_country_locked(index, code, name)
