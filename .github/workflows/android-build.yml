@@ -82,6 +82,17 @@ jobs:
             exit 1
           fi
 
+      - name: Run world globe runtime smoke test
+        run: |
+          set -euxo pipefail
+          GODOT="$HOME/godot/Godot_v4.4.1-stable_linux.x86_64"
+          timeout 60 "$GODOT" --headless --path . --script res://scripts/globe_smoke_test.gd --quit-after 5 2>&1 | tee globe-smoke.log
+          if grep -E "SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:" globe-smoke.log; then
+            echo "World globe runtime smoke test detected an error."
+            exit 1
+          fi
+          grep "WORLD_GLOBE_SMOKE_OK" globe-smoke.log
+
       - name: Create Android debug keystore
         run: |
           set -euxo pipefail
