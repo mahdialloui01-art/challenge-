@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [main, map-progression-redesign, illustrated-world-map]
+    branches: [main, map-progression-redesign, illustrated-world-map, world-globe-country-journey]
   workflow_dispatch:
 
 permissions:
