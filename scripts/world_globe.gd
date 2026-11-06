@@ -303,10 +303,10 @@ func _create_country_labels() -> void:
 func _create_city_labels() -> void:
     # Accurate geographic anchors for the first playable region; labels appear only at close zoom.
     var cities: Array[Dictionary] = [
-        {"name":"الجزائر العاصمة", "lon":3.0588, "lat":36.7538},
-        {"name":"وهران", "lon":-0.6308, "lat":35.6971},
-        {"name":"قسنطينة", "lon":6.6147, "lat":36.3650},
-        {"name":"عنابة", "lon":7.7667, "lat":36.9000},
+        {"name":"الجزائر العاصمة", "lon":3.0588, "lat":36.7538, "tier":1},
+        {"name":"وهران", "lon":-0.6308, "lat":35.6971, "tier":1},
+        {"name":"قسنطينة", "lon":6.6147, "lat":36.3650, "tier":1},
+        {"name":"عنابة", "lon":7.7667, "lat":36.9000, "tier":1},
         {"name":"سطيف", "lon":5.4100, "lat":36.1900},
         {"name":"باتنة", "lon":6.1700, "lat":35.5500},
         {"name":"بجاية", "lon":5.0600, "lat":36.7500},
@@ -318,16 +318,34 @@ func _create_city_labels() -> void:
         {"name":"أدرار", "lon":-0.2900, "lat":27.8700},
         {"name":"بشار", "lon":-2.2200, "lat":31.6200},
         {"name":"الوادي", "lon":6.8600, "lat":33.3700},
-        {"name":"تونس", "lon":10.1815, "lat":36.8065},
-        {"name":"صفاقس", "lon":10.7603, "lat":34.7406},
-        {"name":"سوسة", "lon":10.6370, "lat":35.8256},
-        {"name":"قابس", "lon":10.0975, "lat":33.8881}
+        {"name":"تونس", "lon":10.1815, "lat":36.8065, "tier":1},
+        {"name":"صفاقس", "lon":10.7603, "lat":34.7406, "tier":1},
+        {"name":"سوسة", "lon":10.6370, "lat":35.8256, "tier":1},
+        {"name":"قابس", "lon":10.0975, "lat":33.8881, "tier":2},
+        {"name":"تيزي وزو", "lon":4.0459, "lat":36.7118, "tier":2},
+        {"name":"جيجل", "lon":5.7667, "lat":36.8167, "tier":2},
+        {"name":"سكيكدة", "lon":6.9063, "lat":36.8762, "tier":2},
+        {"name":"قالمة", "lon":7.4333, "lat":36.4667, "tier":2},
+        {"name":"الشلف", "lon":1.3333, "lat":36.1653, "tier":2},
+        {"name":"مستغانم", "lon":0.0892, "lat":35.9311, "tier":2},
+        {"name":"تيارت", "lon":1.3167, "lat":35.3667, "tier":2},
+        {"name":"الجلفة", "lon":3.2500, "lat":34.6667, "tier":2},
+        {"name":"الأغواط", "lon":2.8833, "lat":33.8000, "tier":2},
+        {"name":"المسيلة", "lon":4.5500, "lat":35.7000, "tier":2},
+        {"name":"تبسة", "lon":8.1200, "lat":35.4042, "tier":2},
+        {"name":"خنشلة", "lon":7.1433, "lat":35.4358, "tier":2},
+        {"name":"الوطن القبلي", "lon":10.7333, "lat":36.4500, "tier":2},
+        {"name":"بنزرت", "lon":9.8739, "lat":37.2744, "tier":2},
+        {"name":"القيروان", "lon":10.0963, "lat":35.6781, "tier":2},
+        {"name":"المنستير", "lon":10.8262, "lat":35.7770, "tier":2},
+        {"name":"مدنين", "lon":10.5055, "lat":33.3549, "tier":2}
     ]
     for city in cities:
         var label := Label3D.new()
         label.name = "CityLabel_" + str(city.name)
         label.text = str(city.name)
-        label.font_size = 25
+        label.font_size = 27 if int(city.get("tier", 2)) == 1 else 23
+        label.set_meta("zoom_tier", int(city.get("tier", 2)))
         label.pixel_size = 0.0032
         label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
         label.no_depth_test = true
@@ -351,12 +369,13 @@ func _update_country_label_visibility() -> void:
             continue
         var normal := label.position.normalized()
         label.visible = normal.dot(camera_local.normalized()) > 0.12
-    var show_cities := zoom_distance <= 6.15
     for label in city_labels:
         if not is_instance_valid(label):
             continue
         var normal := label.position.normalized()
-        label.visible = show_cities and normal.dot(camera_local.normalized()) > 0.18
+        var tier := int(label.get_meta("zoom_tier", 2))
+        var tier_visible := zoom_distance <= 5.45 or (tier == 1 and zoom_distance <= 6.15)
+        label.visible = tier_visible and normal.dot(camera_local.normalized()) > 0.18
 
 func _create_earth_mesh(longitude_segments: int, latitude_segments: int, radius: float = GLOBE_RADIUS) -> ArrayMesh:
     var vertices := PackedVector3Array()
