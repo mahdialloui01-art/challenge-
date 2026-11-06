@@ -679,7 +679,7 @@ func _show_world_map() -> void:
     progress.add_theme_color_override("font_color", Color("#82e7d2"))
     hud_box.add_child(progress)
     var hint := Label.new()
-    hint.text = "اسحب للتدوير • قرّب وأبعد بإصبعين • المس الدولة لاختيارها"
+    hint.text = "اسحب للتدوير • قرّب بإصبعين لرؤية تفاصيل شمال إفريقيا • المس الدولة"
     hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     hint.add_theme_font_size_override("font_size", 14)
     hint.add_theme_color_override("font_color", Color("#c5d9f2"))
