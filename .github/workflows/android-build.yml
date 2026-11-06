@@ -70,11 +70,12 @@ jobs:
         run: |
           set -euxo pipefail
           mkdir -p assets
-          python3 -m pip install --user pillow
+          python3 -m venv /tmp/globe-venv
+          /tmp/globe-venv/bin/pip install pillow
           curl -fL --retry 3 --retry-delay 2 \
             "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography/january/world.topo.200401.3x5400x2700.jpg" \
             -o /tmp/earth_base.jpg
-          python3 - <<'PY'
+          /tmp/globe-venv/bin/python - <<'PY'
           from PIL import Image, ImageDraw
           import json
           image = Image.open("/tmp/earth_base.jpg").convert("RGB")
