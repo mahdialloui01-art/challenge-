@@ -35,6 +35,19 @@ func _initialize() -> void:
         push_error("Satellite texture was not assigned to the Earth shader")
         quit(1)
         return
+    var earth_arrays := earth.mesh.surface_get_arrays(0)
+    var earth_uvs: PackedVector2Array = earth_arrays[Mesh.ARRAY_TEX_UV]
+    for x in range(193):
+        if absf(earth_uvs[x].x - 0.5) > 0.0001:
+            push_error("North pole UVs are not collapsed; polar texture streaks may appear")
+            quit(1)
+            return
+    var south_pole_start := 95 * 193
+    for x in range(193):
+        if absf(earth_uvs[south_pole_start + x].x - 0.5) > 0.0001:
+            push_error("South pole UVs are not collapsed; polar texture streaks may appear")
+            quit(1)
+            return
     var clouds := globe.get_node_or_null("AnimatedCloudShell") as MeshInstance3D
     if clouds == null or clouds.material_override == null:
         push_error("Animated cloud shell was not created")
@@ -42,6 +55,14 @@ func _initialize() -> void:
         return
     if globe.detail_patch == null or globe.detail_material == null:
         push_error("Expanded North Africa satellite detail layer was not created")
+        quit(1)
+        return
+    if not (globe.detail_material is ShaderMaterial):
+        push_error("Regional detail layer is missing its feathered blend shader")
+        quit(1)
+        return
+    if globe.detail_patch.visible:
+        push_error("Regional detail overlay must stay hidden at overview zoom")
         quit(1)
         return
     if globe.city_labels.size() < 15:
@@ -66,7 +87,7 @@ func _initialize() -> void:
         return
     print("WORLD_GLOBE_SATELLITE_TEXTURE_OK")
     print("WORLD_GLOBE_CLOUD_LAYER_OK")
-    print("WORLD_GLOBE_REGIONAL_DETAIL_OK")
+    print("WORLD_GLOBE_REGIONAL_DETAIL_BLEND_OK")\n    print("WORLD_GLOBE_POLAR_UV_OK")
     print("WORLD_GLOBE_CITY_LABELS_OK")
     print("WORLD_GLOBE_BORDER_OVERLAY_OK")
     print("WORLD_GLOBE_SMOKE_OK")
