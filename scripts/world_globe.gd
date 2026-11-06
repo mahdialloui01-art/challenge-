@@ -34,6 +34,7 @@ var detail_material: StandardMaterial3D
 var cloud_layer: MeshInstance3D
 var country_labels: Array[Label3D] = []
 var city_labels: Array[Label3D] = []
+var country_lock_labels: Array[Label3D] = []
 const DETAIL_LON_MIN := -9.0
 const DETAIL_LON_MAX := 16.0
 const DETAIL_LAT_MIN := 18.0
@@ -68,16 +69,38 @@ func _append_remaining_countries() -> void:
 func _build_globe() -> void:
     globe_mesh = MeshInstance3D.new()
     globe_mesh.mesh = _create_earth_mesh(192, 96)
-    var ocean := StandardMaterial3D.new()
-    ocean.albedo_color = Color.WHITE
-    ocean.metallic = 0.0
-    ocean.roughness = 0.92
-    ocean.cull_mode = BaseMaterial3D.CULL_DISABLED
-    ocean.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+    var ocean: Material
     if ResourceLoader.exists("res://assets/earth_surface.jpg"):
-        ocean.albedo_texture = load("res://assets/earth_surface.jpg")
+        var earth_texture := load("res://assets/earth_surface.jpg") as Texture2D
+        var earth_shader := Shader.new()
+        earth_shader.code = """shader_type spatial;
+render_mode cull_disabled;
+uniform sampler2D earth_texture : source_color, filter_linear_mipmap;
+void fragment() {
+    vec3 source = texture(earth_texture, UV).rgb;
+    // Preserve the satellite land detail while giving oceans a natural deep-blue
+    // colour with lighter coastal water; white clouds and polar ice stay untouched.
+    float blue_score = source.b - max(source.r, source.g) * 0.82;
+    float ocean_mask = smoothstep(0.025, 0.105, blue_score);
+    float depth_tone = clamp((source.b - source.r) * 1.8 + 0.22, 0.0, 1.0);
+    vec3 deep_sea = vec3(0.012, 0.075, 0.145);
+    vec3 open_water = vec3(0.025, 0.205, 0.305);
+    vec3 sea_colour = mix(deep_sea, open_water, depth_tone);
+    vec3 natural_land = source * vec3(1.02, 1.00, 0.94);
+    ALBEDO = mix(natural_land, sea_colour, ocean_mask);
+    ROUGHNESS = 0.94;
+}
+"""
+        var earth_material := ShaderMaterial.new()
+        earth_material.shader = earth_shader
+        earth_material.set_shader_parameter("earth_texture", earth_texture)
+        ocean = earth_material
     else:
-        ocean.albedo_color = Color("#8a8069")
+        var fallback_ocean := StandardMaterial3D.new()
+        fallback_ocean.albedo_color = Color("#31566a")
+        fallback_ocean.roughness = 0.94
+        fallback_ocean.cull_mode = BaseMaterial3D.CULL_DISABLED
+        ocean = fallback_ocean
     globe_mesh.material_override = ocean
     add_child(globe_mesh)
     _build_north_africa_detail_patch()
@@ -99,6 +122,7 @@ func _build_globe() -> void:
     _append_remaining_countries()
     _build_country_borders()
     _create_country_labels()
+    _create_country_lock_labels()
 
     var light := OmniLight3D.new()
     light.position = Vector3(-4.0, 4.0, 6.0)
@@ -328,6 +352,35 @@ func _get_country_label_anchor(geometry: Array) -> Array:
         best_anchor = [candidate_lon, candidate_lat]
     return best_anchor
 
+func _create_country_lock_labels() -> void:
+    # A prominent lock is anchored to the next locked destination on the globe.
+    # Labels for every route country are prepared once; only the next locked one
+    # is shown at a time to avoid cluttering the planet.
+    for code in country_route:
+        if not features_by_code.has(code):
+            continue
+        var feature: Dictionary = features_by_code[code]
+        var anchor := _get_country_label_anchor(feature.get("g", []))
+        if anchor.size() < 2:
+            continue
+        var lock_label := Label3D.new()
+        lock_label.name = "CountryLock_" + code
+        lock_label.text = "🔒"
+        lock_label.font_size = 34
+        lock_label.pixel_size = 0.0038
+        lock_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+        lock_label.no_depth_test = true
+        lock_label.shaded = false
+        lock_label.modulate = Color(1.0, 0.78, 0.30, 1.0)
+        lock_label.outline_size = 8
+        lock_label.outline_modulate = Color(0.025, 0.020, 0.012, 1.0)
+        lock_label.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.032)
+        lock_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        lock_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+        lock_label.set_meta("route_index", country_route.find(code))
+        add_child(lock_label)
+        country_lock_labels.append(lock_label)
+
 func _create_city_labels() -> void:
     # Accurate geographic anchors for the first playable region; labels appear only at close zoom.
     var cities: Array[Dictionary] = [
@@ -404,6 +457,12 @@ func _update_country_label_visibility() -> void:
         var tier := int(label.get_meta("zoom_tier", 2))
         var tier_visible := zoom_distance <= 5.45 or (tier == 1 and zoom_distance <= 6.15)
         label.visible = tier_visible and normal.dot(camera_local.normalized()) > 0.18
+    for lock_label in country_lock_labels:
+        if not is_instance_valid(lock_label):
+            continue
+        var route_index := int(lock_label.get_meta("route_index", -1))
+        var normal := lock_label.position.normalized()
+        lock_label.visible = route_index == unlocked_index + 1 and normal.dot(camera_local.normalized()) > 0.12
 
 func _create_earth_mesh(longitude_segments: int, latitude_segments: int, radius: float = GLOBE_RADIUS) -> ArrayMesh:
     var vertices := PackedVector3Array()
