@@ -128,6 +128,8 @@ func _build_3d_world() -> void:
     # A layered floating-island world map built from real 3D meshes.
     world_camera = Camera3D.new()
     world_camera.position = Vector3(0, 0, 12)
+    world_camera.near = 0.02
+    world_camera.far = 120.0
     world_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
     world_camera.size = 15.5
     world_camera.current = true
@@ -617,6 +619,8 @@ func _set_globe_mode(enabled: bool) -> void:
         if enabled:
             world_camera.projection = Camera3D.PROJECTION_PERSPECTIVE
             world_camera.position = Vector3(0, 0, 7.6)
+            world_camera.near = 0.02
+            world_camera.far = 120.0
             world_camera.fov = 43.0
         else:
             world_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
