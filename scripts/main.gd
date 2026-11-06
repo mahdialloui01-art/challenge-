@@ -24,7 +24,7 @@ var current_country_index := 0
 var current_country_code := "DZA"
 var current_country_name := "الجزائر"
 var question_pool: Array[int] = []
-var world_globe: Node3D
+var world_globe
 var world_camera: Camera3D
 var correct_answers := 0
 var question_timer: Timer
@@ -633,12 +633,7 @@ func _show_world_map() -> void:
     world_globe.set_progress(unlocked_country_index)
     world_globe.visible = true
     _add_heading("رحلة العباقرة حول العالم", "اسحب الكرة لتدوير الأرض • اضغط على الدولة المفتوحة لبدء التحدي")
-    var next_country := world_globe.get_country_name("DZA")
-    var route_codes: Array = ["DZA", "TUN", "LBY", "EGY", "MAR", "MRT", "NER", "MLI", "TCD", "SDN"]
-    if unlocked_country_index < route_codes.size():
-        next_country = world_globe.get_country_name(str(route_codes[unlocked_country_index]))
-    else:
-        next_country = "الدولة التالية"
+    var next_country := world_globe.get_route_country_name(unlocked_country_index)
     _add_stat_card("الدولة المفتوحة في رحلتك", next_country)
     var progress_label := Label.new()
     progress_label.text = "تقدّم الرحلة: %d / 177 دولة" % (unlocked_country_index + 1)
