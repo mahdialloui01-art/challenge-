@@ -76,7 +76,7 @@ jobs:
             "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography/january/world.topo.200401.3x21600x10800.jpg" \
             -o /tmp/earth_base.jpg
           /tmp/globe-venv/bin/python - <<'PY'
-          from PIL import Image, ImageDraw, ImageOps
+          from PIL import Image, ImageDraw, ImageEnhance
           import json
           # NASA's source is 21600x10800; allow this trusted image before downsampling.
           Image.MAX_IMAGE_PIXELS = None
@@ -108,19 +108,18 @@ jobs:
                   for ring in polygon:
                       if len(ring) >= 2:
                           valid_rings.append(ring)
-          # Give the dark ocean pixels a deep, natural blue while preserving
-          # the NASA surface shading and keeping land colors untouched.
-          ocean_luma = image.convert("L").point(lambda p: min(255, int(p * 3.2) + 8))
-          ocean_blue = ImageOps.colorize(ocean_luma, black="#041a36", white="#197eaa")
-          image = Image.composite(image, ocean_blue, land_mask)
+          # Preserve NASA Blue Marble true-colour oceans and land; only apply
+          # restrained photographic contrast and colour, never paint the sea blue.
+          image = ImageEnhance.Color(image).enhance(1.06)
+          image = ImageEnhance.Contrast(image).enhance(1.045)
           draw = ImageDraw.Draw(image)
           for ring in valid_rings:
               for a, b in zip(ring, ring[1:]):
                   p1, p2 = xy(a), xy(b)
                   if abs(p2[0] - p1[0]) > width * 0.5:
                       continue
-                  draw.line((p1, p2), fill=(16, 42, 59), width=5)
-                  draw.line((p1, p2), fill=(190, 225, 232), width=3)
+                  draw.line((p1, p2), fill=(48, 43, 34), width=4)
+                  draw.line((p1, p2), fill=(218, 210, 190), width=2)
           image.save("assets/earth_surface.jpg", "JPEG", quality=94, optimize=True)
           print(f"Created satellite globe texture: {width}x{height}")
           PY
