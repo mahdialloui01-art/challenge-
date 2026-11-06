@@ -497,6 +497,8 @@ func _show_main_menu() -> void:
         add_child(world_globe)
     world_globe.set_progress(unlocked_country_index)
     world_globe.interaction_enabled = false
+    world_globe.zoom_distance = 8.4
+    world_globe.target_zoom_distance = 8.4
     world_globe.visible = true
     world_camera.projection = Camera3D.PROJECTION_PERSPECTIVE
     world_camera.position = Vector3(0, 0, 8.4)
