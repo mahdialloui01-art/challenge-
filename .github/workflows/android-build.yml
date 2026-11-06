@@ -110,8 +110,8 @@ jobs:
                           valid_rings.append(ring)
           # Preserve NASA Blue Marble true-colour oceans and land; only apply
           # restrained photographic contrast and colour, never paint the sea blue.
-          image = ImageEnhance.Color(image).enhance(1.06)
-          image = ImageEnhance.Contrast(image).enhance(1.045)
+          image = ImageEnhance.Color(image).enhance(1.0)
+          image = ImageEnhance.Contrast(image).enhance(1.02)
           draw = ImageDraw.Draw(image)
           for ring in valid_rings:
               for a, b in zip(ring, ring[1:]):
