@@ -1236,7 +1236,7 @@ func _show_results() -> void:
     # directly instead of making the player search for the destination again.
     if unlocked_country_index > current_country_index and world_globe != null and unlocked_country_index < world_globe.country_route.size():
         var next_code := str(world_globe.country_route[unlocked_country_index])
-        var next_name := world_globe.get_route_country_name(unlocked_country_index)
+        var next_name: String = str(world_globe.get_route_country_name(unlocked_country_index))
         var flight_button := _make_button("✈️  الإقلاع إلى " + next_name)
         flight_button.custom_minimum_size.y = 78
         flight_button.pressed.connect(func():
