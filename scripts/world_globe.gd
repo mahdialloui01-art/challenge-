@@ -132,6 +132,7 @@ func _load_country_geometry() -> void:
         if code.is_empty():
             continue
         features_by_code[code] = feature
+        _add_country_land(feature, features_by_code.size())
         var country_lines := MeshInstance3D.new()
         var immediate := ImmediateMesh.new()
         var polygons: Array = feature.get("g", [])
@@ -148,6 +149,44 @@ func _load_country_geometry() -> void:
         add_child(country_lines)
 
     _add_country_labels()
+
+func _add_country_land(feature: Dictionary, country_number: int) -> void:
+    var land_mesh := ImmediateMesh.new()
+    var land_material := StandardMaterial3D.new()
+    land_material.albedo_color = Color("#397d68") if country_number % 3 == 0 else (Color("#47896e") if country_number % 3 == 1 else Color("#36745f"))
+    land_material.roughness = 0.92
+    land_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+    land_material.metallic = 0.0
+    for polygon in feature.get("g", []):
+        if polygon.is_empty():
+            continue
+        var outer_ring: Array = polygon[0]
+        var points := PackedVector2Array()
+        var previous_lon := 0.0
+        for coord in outer_ring:
+            var longitude := float(coord[0])
+            if not points.is_empty():
+                while longitude - previous_lon > 180.0:
+                    longitude -= 360.0
+                while longitude - previous_lon < -180.0:
+                    longitude += 360.0
+            points.append(Vector2(longitude, float(coord[1])))
+            previous_lon = longitude
+        if points.size() < 3:
+            continue
+        var triangles := Geometry2D.triangulate_polygon(points)
+        if triangles.size() < 3:
+            continue
+        land_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES, land_material)
+        for vertex_index in triangles:
+            var point: Vector2 = points[vertex_index]
+            land_mesh.surface_add_vertex(_geo_to_sphere(wrapf(point.x, -180.0, 180.0), point.y, GLOBE_RADIUS + 0.004))
+        land_mesh.surface_end()
+    if land_mesh.get_surface_count() > 0:
+        var land_instance := MeshInstance3D.new()
+        land_instance.mesh = land_mesh
+        land_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+        add_child(land_instance)
 
 func _add_country_labels() -> void:
     for code in country_route:
