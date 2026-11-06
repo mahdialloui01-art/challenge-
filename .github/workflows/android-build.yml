@@ -78,6 +78,8 @@ jobs:
           /tmp/globe-venv/bin/python - <<'PY'
           from PIL import Image, ImageDraw, ImageOps
           import json
+          # NASA's source is 21600x10800; allow this trusted image before downsampling.
+          Image.MAX_IMAGE_PIXELS = None
           image = Image.open("/tmp/earth_base.jpg").convert("RGB")
           # Keep a high-detail global texture while staying below common mobile GPU texture limits.
           image.thumbnail((10800, 5400), Image.Resampling.LANCZOS)
