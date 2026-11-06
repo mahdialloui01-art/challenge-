@@ -48,6 +48,18 @@ func _initialize() -> void:
         push_error("Close-zoom city label layer is incomplete")
         quit(1)
         return
+    if globe.country_lock_labels.size() != globe.country_route.size():
+        push_error("A lock marker is missing for one or more route countries")
+        quit(1)
+        return
+    var locked_route_markers := 0
+    for lock_label in globe.country_lock_labels:
+        if int(lock_label.get_meta("route_index", -1)) > globe.unlocked_index:
+            locked_route_markers += 1
+    if locked_route_markers != globe.country_route.size() - globe.unlocked_index - 1:
+        push_error("Locked route markers do not cover every locked destination")
+        quit(1)
+        return
     if globe.get_node_or_null("AccurateGeographicCountryBorders") == null:
         push_error("Accurate country border overlay was not created")
         quit(1)
