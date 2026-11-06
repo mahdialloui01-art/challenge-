@@ -34,7 +34,7 @@ var detail_material: ShaderMaterial
 var cloud_layer: MeshInstance3D
 var country_labels: Array[Label3D] = []
 var city_labels: Array[Label3D] = []
-var country_lock_labels: Array[Label3D] = []
+var country_lock_labels: Array[Node3D] = []
 var country_order_labels: Array[Label3D] = []
 const DETAIL_LON_MIN := -9.0
 const DETAIL_LON_MAX := 16.0
@@ -383,44 +383,82 @@ func _create_country_lock_labels() -> void:
         var anchor := _get_country_label_anchor(feature.get("g", []))
         if anchor.size() < 2:
             continue
-        var lock_label := Label3D.new()
-        lock_label.name = "CountryLock_" + code
-        lock_label.text = "🔒"
-        lock_label.font_size = 58
-        lock_label.pixel_size = 0.0054
-        lock_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-        lock_label.no_depth_test = true
-        lock_label.shaded = false
-        # Neutral metallic gray: unmistakable locked state, not a gold decoration.
-        lock_label.modulate = Color(0.76, 0.79, 0.83, 1.0)
-        lock_label.outline_size = 10
-        lock_label.outline_modulate = Color(0.035, 0.040, 0.050, 1.0)
-        lock_label.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.042)
-        lock_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-        lock_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
         var route_index := country_route.find(code)
-        lock_label.set_meta("route_index", route_index)
-        add_child(lock_label)
-        country_lock_labels.append(lock_label)
+        var lock_root := Node3D.new()
+        lock_root.name = "CountryLock_" + code
+        lock_root.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.065)
+        lock_root.set_meta("route_index", route_index)
+        lock_root.set_meta("country_code", code)
+        lock_root.set_meta("base_scale", 1.0)
 
-        # A compact sequence number sits just below the large lock so players
-        # can read the exact unlock order at a glance.
+        # Premium 3D lock: metallic rounded body, raised shackle, inset keyway.
+        var metal := StandardMaterial3D.new()
+        metal.albedo_color = Color(0. sixty, 0.66, 0.72, 1.0).replace("0. sixty", "0.60")
+        metal.metallic = 0.88
+        metal.roughness = 0.24
+        metal.clearcoat_enabled = true
+        metal.clearcoat = 0.72
+        metal.clearcoat_roughness = 0.18
+        metal.emission_enabled = true
+        metal.emission = Color(0.12, 0.15, 0.19)
+        metal.emission_energy_multiplier = 0.22
+
+        var shackle := MeshInstance3D.new()
+        shackle.name = "Shackle"
+        var ring := TorusMesh.new()
+        ring.inner_radius = 0.075
+        ring.outer_radius = 0.115
+        shackle.mesh = ring
+        shackle.scale = Vector3(0.92, 1.12, 0.72)
+        shackle.position = Vector3(0.0, 0.105, -0.012)
+        shackle.material_override = metal
+        lock_root.add_child(shackle)
+
+        var body := MeshInstance3D.new()
+        body.name = "MetalBody"
+        var body_mesh := SphereMesh.new()
+        body_mesh.radius = 0.16
+        body_mesh.height = 0.28
+        body.mesh = body_mesh
+        body.scale = Vector3(1.12, 0.92, 0.72)
+        body.position = Vector3(0.0, -0.045, 0.025)
+        body.material_override = metal
+        lock_root.add_child(body)
+
+        var keyway := MeshInstance3D.new()
+        keyway.name = "IlluminatedKeyway"
+        var key_mesh := SphereMesh.new()
+        key_mesh.radius = 0.027
+        key_mesh.height = 0.054
+        keyway.mesh = key_mesh
+        keyway.scale = Vector3(0.82, 1.18, 0.36)
+        keyway.position = Vector3(0.0, -0.035, 0.139)
+        var key_material := StandardMaterial3D.new()
+        key_material.albedo_color = Color(0.30, 0.82, 0.96)
+        key_material.emission_enabled = true
+        key_material.emission = Color(0.10, 0.62, 0.95)
+        key_material.emission_energy_multiplier = 1.8
+        key_material.metallic = 0.25
+        keyway.material_override = key_material
+        lock_root.add_child(keyway)
+
         var order_label := Label3D.new()
-        order_label.name = "CountryLockOrder_%s" % code
+        order_label.name = "SequenceNumber"
         order_label.text = "%02d" % (route_index + 1)
-        order_label.font_size = 19
-        order_label.pixel_size = 0.0032
+        order_label.font_size = 25
+        order_label.pixel_size = 0.0038
         order_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
         order_label.no_depth_test = true
         order_label.shaded = false
-        order_label.modulate = Color(0.82, 0.85, 0.89, 1.0)
-        order_label.outline_size = 7
-        order_label.outline_modulate = Color(0.025, 0.030, 0.040, 1.0)
-        order_label.position = lock_label.position + Vector3(0.0, -0.17, 0.0)
+        order_label.modulate = Color(0.88, 0.93, 0.98, 1.0)
+        order_label.outline_size = 8
+        order_label.outline_modulate = Color(0.025, 0.035, 0.050, 1.0)
+        order_label.position = Vector3(0.0, -0.245, 0.11)
         order_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         order_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-        order_label.set_meta("route_index", route_index)
-        add_child(order_label)
+        lock_root.add_child(order_label)
+        add_child(lock_root)
+        country_lock_labels.append(lock_root)
         country_order_labels.append(order_label)
 
 func _create_city_labels() -> void:
