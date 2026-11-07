@@ -127,7 +127,7 @@ func _initialize() -> void:
             push_error("Lock body is not a neutral metallic gray")
             quit(1)
             return
-        var expected_badge_scale := 0.24 * globe._get_country_marker_scale(globe.features_by_code[code].get("g", []))
+        var expected_badge_scale := 0.312 * globe._get_country_marker_scale(globe.features_by_code[code].get("g", []))
         if number_frame == null or number_plate == null or number_accent == null or absf(number_frame.scale.x - expected_badge_scale) > 0.001 or absf(number_plate.scale.x - expected_badge_scale) > 0.001 or absf(number_accent.scale.x - expected_badge_scale) > 0.001:
             push_error("Futuristic sequence number badge is missing its frame, plate, or cyan accent")
             quit(1)
