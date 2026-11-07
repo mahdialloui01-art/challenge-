@@ -415,7 +415,9 @@ func _create_country_lock_labels() -> void:
         var country_scale := _get_country_marker_scale(feature.get("g", []))
         var lock_root := Node3D.new()
         lock_root.name = "CountryLock_" + code
-        lock_root.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.038) + Vector3(0.0, -0.13, 0.0)
+        # Anchor the marker directly above its own geographic country anchor.
+        # Use a radial offset so it stays on the globe surface at every longitude.
+        lock_root.position = _geo_to_sphere(float(anchor[0]), float(anchor[1]), GLOBE_RADIUS * 1.045)
         lock_root.scale = Vector3.ONE * 0.12
         lock_root.set_meta("route_index", route_index)
         lock_root.set_meta("country_code", code)
@@ -424,7 +426,7 @@ func _create_country_lock_labels() -> void:
         # Hardware, plaque and sequence number scale independently for each country.
         var lock_hardware := Node3D.new()
         lock_hardware.name = "LockHardware"
-        lock_hardware.scale = Vector3.ONE * 0.24 * country_scale
+        lock_hardware.scale = Vector3.ONE * 0.312 * country_scale
         lock_root.add_child(lock_hardware)
 
         # Brushed titanium outer shell.
@@ -516,7 +518,7 @@ func _create_country_lock_labels() -> void:
         frame_mesh.size = Vector3(0.1395, 0.0738, 0.009)
         number_frame.mesh = frame_mesh
         number_frame.position = Vector3(0.0, -0.1188, 0.052)
-        number_frame.scale = Vector3.ONE * 0.24 * country_scale
+        number_frame.scale = Vector3.ONE * 0.312 * country_scale
         number_frame.material_override = titanium
         lock_root.add_child(number_frame)
 
@@ -526,7 +528,7 @@ func _create_country_lock_labels() -> void:
         plate_mesh.size = Vector3(0.1251, 0.0585, 0.0072)
         number_plate.mesh = plate_mesh
         number_plate.position = Vector3(0.0, -0.1188, 0.0528)
-        number_plate.scale = Vector3.ONE * 0.24 * country_scale
+        number_plate.scale = Vector3.ONE * 0.312 * country_scale
         var plate_material := StandardMaterial3D.new()
         plate_material.albedo_color = Color(0.008, 0.025, 0.042, 1.0)
         plate_material.metallic = 0.72
@@ -543,7 +545,7 @@ func _create_country_lock_labels() -> void:
         accent_mesh.size = Vector3(0.090, 0.0027, 0.0027)
         number_accent.mesh = accent_mesh
         number_accent.position = Vector3(0.0, -0.12159, 0.0534)
-        number_accent.scale = Vector3.ONE * 0.24 * country_scale
+        number_accent.scale = Vector3.ONE * 0.312 * country_scale
         number_accent.material_override = cyan
         lock_root.add_child(number_accent)
 
@@ -559,7 +561,7 @@ func _create_country_lock_labels() -> void:
         order_label.outline_size = 3
         order_label.outline_modulate = Color(0.004, 0.018, 0.03, 1.0)
         order_label.position = Vector3(0.0, -0.1188, 0.0536)
-        order_label.scale = Vector3.ONE * 0.24 * country_scale
+        order_label.scale = Vector3.ONE * 0.312 * country_scale
         # Match the number's scale to its independently sized plaque.
         order_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         order_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
