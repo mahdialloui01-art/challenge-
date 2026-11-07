@@ -274,3 +274,21 @@ jobs:
           path: build/Challenge.apk
           if-no-files-found: error
           retention-days: 14
+
+      - name: Package complete Godot 4 editor project
+        run: |
+          set -euxo pipefail
+          test -s project.godot
+          test -s assets/earth_surface.jpg
+          test -s assets/north_africa_detail.jpg
+          zip -r build/Challenge-Godot-Project.zip project.godot README.md export_presets.cfg scenes scripts data assets
+          test -s build/Challenge-Godot-Project.zip
+          ls -lh build/Challenge-Godot-Project.zip
+
+      - name: Upload Godot editor project
+        uses: actions/upload-artifact@v4
+        with:
+          name: challenge-godot-editor-project
+          path: build/Challenge-Godot-Project.zip
+          if-no-files-found: error
+          retention-days: 14
