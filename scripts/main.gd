@@ -451,9 +451,41 @@ func _build_interface() -> void:
     layer.add_child(root)
     interface_root = root
 
+    # Lightweight premium cosmic background for Android GL Compatibility.
+    var backdrop := ColorRect.new()
+    backdrop.name = "PremiumCosmicBackdrop"
+    backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    var backdrop_shader := Shader.new()
+    backdrop_shader.code = """shader_type canvas_item;
+void fragment() {
+    vec2 uv = SCREEN_UV;
+    vec2 p = uv - vec2(0.5, 0.48);
+    float vignette = smoothstep(0.92, 0.12, length(p * vec2(0.82, 1.0)));
+    float blue_halo = exp(-length((uv - vec2(0.18, 0.34)) * vec2(1.0, 1.25)) * 4.2);
+    float gold_halo = exp(-length((uv - vec2(0.86, 0.72)) * vec2(1.1, 1.0)) * 5.0);
+    vec3 base = vec3(0.010, 0.016, 0.034);
+    base += vec3(0.018, 0.060, 0.115) * blue_halo;
+    base += vec3(0.095, 0.055, 0.018) * gold_halo;
+    vec2 grid = floor(uv * vec2(38.0, 68.0));
+    float seed = fract(sin(dot(grid, vec2(127.1, 311.7))) * 43758.5453);
+    float star = step(0.994, seed) * (0.35 + 0.65 * fract(seed * 91.7));
+    float shimmer = 0.72 + 0.28 * sin(TIME * 0.7 + seed * 40.0);
+    base += vec3(0.48, 0.58, 0.72) * star * shimmer;
+    base *= 0.72 + 0.28 * vignette;
+    COLOR = vec4(base, 1.0);
+}
+"""
+    var backdrop_material := ShaderMaterial.new()
+    backdrop_material.shader = backdrop_shader
+    backdrop.material = backdrop_material
+    root.add_child(backdrop)
+
     var tint := ColorRect.new()
+    tint.name = "AtmosphericOverlay"
     tint.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    tint.color = Color(0.018, 0.017, 0.014, 0.28)
+    tint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    tint.color = Color(0.006, 0.010, 0.022, 0.34)
     root.add_child(tint)
 
     var margin := MarginContainer.new()
@@ -473,7 +505,11 @@ func _build_interface() -> void:
     brand.text = "✦ تَحَدّي العَباقِرَة ✦"
     brand.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     brand.add_theme_font_size_override("font_size", 34)
-    brand.add_theme_color_override("font_color", Color(0.93, 0.96, 1.0))
+    brand.add_theme_color_override("font_color", Color(1.0, 0.91, 0.70))
+    brand.add_theme_color_override("font_shadow_color", Color(0.20, 0.12, 0.035, 0.90))
+    brand.add_theme_constant_override("shadow_offset_x", 0)
+    brand.add_theme_constant_override("shadow_offset_y", 3)
+    brand.add_theme_constant_override("shadow_outline_size", 2)
     page.add_child(brand)
 
     var tagline := Label.new()
@@ -531,10 +567,13 @@ func _add_heading(title_text: String, subtitle_text: String = "") -> void:
 func _add_stat_card(caption: String, value: String) -> void:
     var card := PanelContainer.new()
     var style := StyleBoxFlat.new()
-    style.bg_color = Color(0.09, 0.15, 0.31, 0.94)
-    style.border_color = Color(0.25, 0.43, 0.78, 0.85)
+    style.bg_color = Color(0.035, 0.060, 0.105, 0.94)
+    style.border_color = Color(0.66, 0.51, 0.27, 0.88)
     style.set_border_width_all(1)
-    style.set_corner_radius_all(18)
+    style.set_corner_radius_all(20)
+    style.shadow_color = Color(0.0, 0.0, 0.0, 0.34)
+    style.shadow_size = 8
+    style.shadow_offset = Vector2(0, 4)
     style.content_margin_left = 18
     style.content_margin_right = 18
     style.content_margin_top = 14
@@ -1340,17 +1379,22 @@ func _make_button(caption: String) -> Button:
     button.add_theme_color_override("font_color", Color.WHITE)
     button.add_theme_color_override("font_hover_color", Color(1.0, 0.88, 0.66))
     var normal := StyleBoxFlat.new()
-    normal.bg_color = Color(0.105, 0.094, 0.071, 0.97)
-    normal.border_color = Color(0.62, 0.48, 0.25, 0.92)
+    normal.bg_color = Color(0.045, 0.075, 0.125, 0.98)
+    normal.border_color = Color(0.72, 0.57, 0.31, 0.96)
     normal.set_border_width_all(2)
-    normal.set_corner_radius_all(18)
+    normal.set_corner_radius_all(20)
+    normal.shadow_color = Color(0.0, 0.0, 0.0, 0.38)
+    normal.shadow_size = 7
+    normal.shadow_offset = Vector2(0, 3)
     normal.content_margin_left = 18
     normal.content_margin_right = 18
     normal.content_margin_top = 8
     normal.content_margin_bottom = 8
     button.add_theme_stylebox_override("normal", normal)
     var hover := normal.duplicate()
-    hover.bg_color = Color(0.17, 0.28, 0.52, 1.0)
+    hover.bg_color = Color(0.105, 0.18, 0.29, 1.0)
+    hover.border_color = Color(1.0, 0.82, 0.48, 1.0)
+    hover.shadow_size = 10
     button.add_theme_stylebox_override("hover", hover)
     button.add_theme_stylebox_override("pressed", hover)
     var disabled_style := normal.duplicate()
