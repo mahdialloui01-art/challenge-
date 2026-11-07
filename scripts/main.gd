@@ -461,7 +461,7 @@ func _build_interface() -> void:
 void fragment() {
     vec2 uv = SCREEN_UV;
     vec2 p = uv - vec2(0.5, 0.48);
-    float vignette = smoothstep(0.92, 0.12, length(p * vec2(0.82, 1.0)));
+    float vignette = (1.0 - smoothstep(0.12, 0.92, length(p * vec2(0.82, 1.0))));
     float blue_halo = exp(-length((uv - vec2(0.18, 0.34)) * vec2(1.0, 1.25)) * 4.2);
     float gold_halo = exp(-length((uv - vec2(0.86, 0.72)) * vec2(1.1, 1.0)) * 5.0);
     vec3 base = vec3(0.010, 0.016, 0.034);
