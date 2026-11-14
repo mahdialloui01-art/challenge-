@@ -1196,12 +1196,12 @@ func _start_level(level: int) -> void:
     question_index = 0
     question_pool.clear()
 
-    # Strict country isolation: only questions explicitly assigned to this country.
-    # Untagged/general questions are never allowed into a country's challenge.
+    # Allow country-specific questions for the selected country plus general questions.
+    # Questions tagged for another country are never included.
     for i in range(questions.size()):
         var candidate: Dictionary = questions[i]
         var candidate_country := str(candidate.get("country", "")).strip_edges().to_upper()
-        if candidate_country == current_country_code:
+        if candidate_country.is_empty() or candidate_country == "GENERAL" or candidate_country == "ALL" or candidate_country == current_country_code:
             question_pool.append(i)
 
     var target_count := int(DIFFICULTIES.get(difficulty, DIFFICULTIES["medium"]).get("count", 10))
@@ -1226,7 +1226,7 @@ func _start_level(level: int) -> void:
 
     if question_order.is_empty():
         _clear_content()
-        _add_heading("لا توجد أسئلة جديدة لهذه الدولة", "لا نعرض أسئلة عامة أو أسئلة تخص دولاً أخرى. سنضيف أسئلة موثوقة خاصة بهذه الدولة قبل متابعة التحدّي.")
+        _add_heading("لا توجد أسئلة جديدة", "لقد استُخدمت كل الأسئلة المتاحة لهذا التحدّي. سنضيف أسئلة جديدة دون تكرار.")
         var back_empty := _make_button("العودة إلى الخريطة")
         back_empty.pressed.connect(_show_world_map)
         content.add_child(back_empty)
