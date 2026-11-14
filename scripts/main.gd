@@ -50,6 +50,8 @@ var question_label: Label
 var category_label: Label
 var feedback_label: Label
 var next_button: Button
+var answer_buttons: Array[Button] = []
+var question_timer_bar: ProgressBar
 
 const DIFFICULTIES := {
     "easy": {"name": "سهل", "count": 5, "description": "5 أسئلة — بداية ممتعة"},
@@ -94,7 +96,11 @@ func _process(delta: float) -> void:
                 music_sample_index += 1
             music_playback.push_buffer(buffer)
     if question_timer != null and question_timer.time_left > 0.0 and time_label != null and is_instance_valid(time_label):
-        time_label.text = "⏱  الوقت المتبقي: %d ثانية" % int(ceil(question_timer.time_left))
+        time_label.text = "⏱  %02d" % int(ceil(question_timer.time_left))
+        if question_timer.time_left <= 5.0:
+            time_label.add_theme_color_override("font_color", Color("#ff7788"))
+        else:
+            time_label.add_theme_color_override("font_color", Color("#ffbd73"))
     for gem in get_tree().get_nodes_in_group("map_gems"):
         if is_instance_valid(gem):
             gem.rotate_y(delta * 0.9)
@@ -1248,72 +1254,222 @@ func _pick_diverse_questions(indices: Array[int], limit: int) -> Array[int]:
 
 func _display_question() -> void:
     answered = false
+    answer_buttons.clear()
     _clear_content()
     var item: Dictionary = questions[question_pool[question_order[question_index]]]
 
-    category_label = Label.new()
-    category_label.text = "✦  %s  ✦" % str(item.get("category", "تحدّي عام"))
-    category_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    category_label.add_theme_font_size_override("font_size", 20)
-    category_label.add_theme_color_override("font_color", Color(0.42, 0.85, 1.0))
-    content.add_child(category_label)
+    # Premium quiz header: category, destination, score and a luminous progress track.
+    var eyebrow := Label.new()
+    eyebrow.text = "✦  تحدّي العباقرة  ✦     •     " + current_country_name
+    eyebrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    eyebrow.add_theme_font_size_override("font_size", 15)
+    eyebrow.add_theme_color_override("font_color", Color("#83dff4"))
+    content.add_child(eyebrow)
+
+    var top_row := HBoxContainer.new()
+    top_row.add_theme_constant_override("separation", 8)
+    content.add_child(top_row)
+
+    var category_card := _make_quiz_info_card("المجال", str(item.get("category", "معارف عامة")), Color("#75d9f4"))
+    category_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    top_row.add_child(category_card)
+    var score_card := _make_quiz_info_card("رصيدك", "★  %d" % score, Color("#ffd477"))
+    score_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    top_row.add_child(score_card)
+    var timer_card := _make_quiz_info_card("الوقت", "⏱  %02d" % int(time_limit), Color("#ffbd73"))
+    timer_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    top_row.add_child(timer_card)
+    time_label = timer_card.get_meta("value_label") as Label
 
     progress_label = Label.new()
-    progress_label.text = "السؤال %d / %d" % [question_index + 1, question_order.size()]
+    progress_label.text = "السؤال  %02d   /   %02d" % [question_index + 1, question_order.size()]
     progress_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    progress_label.add_theme_font_size_override("font_size", 17)
-    progress_label.add_theme_color_override("font_color", Color(0.78, 0.84, 1.0))
+    progress_label.add_theme_font_size_override("font_size", 16)
+    progress_label.add_theme_color_override("font_color", Color("#dcecff"))
     content.add_child(progress_label)
 
-    score_label = Label.new()
-    score_label.text = "⭐ %d نقطة" % score
-    score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    score_label.add_theme_font_size_override("font_size", 18)
-    score_label.add_theme_color_override("font_color", Color(1.0, 0.82, 0.35))
-    content.add_child(score_label)
+    var progress_track := ProgressBar.new()
+    progress_track.min_value = 0
+    progress_track.max_value = maxf(1.0, float(question_order.size()))
+    progress_track.value = question_index + 1
+    progress_track.show_percentage = false
+    progress_track.custom_minimum_size = Vector2(0, 9)
+    var progress_bg := StyleBoxFlat.new()
+    progress_bg.bg_color = Color("#142b43")
+    progress_bg.set_corner_radius_all(8)
+    progress_track.add_theme_stylebox_override("background", progress_bg)
+    var progress_fill := StyleBoxFlat.new()
+    progress_fill.bg_color = Color("#42c7dc")
+    progress_fill.set_corner_radius_all(8)
+    progress_track.add_theme_stylebox_override("fill", progress_fill)
+    content.add_child(progress_track)
 
-    time_label = Label.new()
-    time_label.text = "⏱  الوقت المتبقي: %d ثانية" % int(time_limit)
-    time_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    time_label.add_theme_font_size_override("font_size", 20)
-    time_label.add_theme_color_override("font_color", Color(1.0, 0.72, 0.32))
-    content.add_child(time_label)
+    var question_panel := PanelContainer.new()
+    var question_style := StyleBoxFlat.new()
+    question_style.bg_color = Color(0.035, 0.075, 0.13, 0.98)
+    question_style.border_color = Color("#4b9eae")
+    question_style.set_border_width_all(2)
+    question_style.set_corner_radius_all(24)
+    question_style.shadow_color = Color(0.0, 0.55, 0.85, 0.20)
+    question_style.shadow_size = 16
+    question_style.shadow_offset = Vector2(0, 5)
+    question_style.content_margin_left = 20
+    question_style.content_margin_right = 20
+    question_style.content_margin_top = 18
+    question_style.content_margin_bottom = 18
+    question_panel.add_theme_stylebox_override("panel", question_style)
+    question_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    content.add_child(question_panel)
+
+    var question_box := VBoxContainer.new()
+    question_box.add_theme_constant_override("separation", 12)
+    question_panel.add_child(question_box)
+
+    var question_kicker := Label.new()
+    question_kicker.text = "السؤال"
+    question_kicker.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    question_kicker.add_theme_font_size_override("font_size", 15)
+    question_kicker.add_theme_color_override("font_color", Color("#f1c978"))
+    question_box.add_child(question_kicker)
 
     question_label = Label.new()
     question_label.text = str(item.get("question", ""))
     question_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     question_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
     question_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    question_label.custom_minimum_size.y = 150
-    question_label.add_theme_font_size_override("font_size", 26)
-    question_label.add_theme_color_override("font_color", Color.WHITE)
-    content.add_child(question_label)
+    question_label.custom_minimum_size.y = 132
+    question_label.add_theme_font_size_override("font_size", 25)
+    question_label.add_theme_color_override("font_color", Color("#f5f8ff"))
+    question_box.add_child(question_label)
+
+    var answers_title := Label.new()
+    answers_title.text = "اختر الإجابة الصحيحة"
+    answers_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+    answers_title.add_theme_font_size_override("font_size", 15)
+    answers_title.add_theme_color_override("font_color", Color("#9dbbd4"))
+    content.add_child(answers_title)
 
     var options: Array = item.get("answers", [])
+    var answer_marks := ["Ａ", "Ｂ", "Ｃ", "Ｄ"]
     for i in range(options.size()):
         var answer_text := str(options[i])
-        var answer_button := _make_button(answer_text)
+        var answer_button := _make_quiz_answer_button(answer_marks[i] if i < answer_marks.size() else str(i + 1), answer_text)
         answer_button.pressed.connect(_select_answer.bind(answer_text))
+        answer_buttons.append(answer_button)
         content.add_child(answer_button)
 
     feedback_label = Label.new()
     feedback_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    feedback_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
     feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    feedback_label.custom_minimum_size.y = 72
-    feedback_label.add_theme_font_size_override("font_size", 17)
-    feedback_label.add_theme_color_override("font_color", Color(0.55, 1.0, 0.75))
+    feedback_label.custom_minimum_size.y = 62
+    feedback_label.add_theme_font_size_override("font_size", 16)
+    feedback_label.add_theme_color_override("font_color", Color("#9de9cf"))
     content.add_child(feedback_label)
 
-    next_button = _make_button("السؤال التالي  ←")
+    next_button = _make_button("السؤال التالي   ←")
+    next_button.custom_minimum_size.y = 68
     next_button.disabled = true
     next_button.pressed.connect(_next_question)
     content.add_child(next_button)
 
-    question_timer.start(time_limit)
-
-    var home_button := _make_button("القائمة الرئيسية")
+    var home_button := _make_button("⌂   خروج إلى القائمة الرئيسية")
+    home_button.custom_minimum_size.y = 52
     home_button.pressed.connect(_show_main_menu)
     content.add_child(home_button)
+
+    question_timer.start(time_limit)
+
+
+func _make_quiz_info_card(caption: String, value: String, accent: Color) -> PanelContainer:
+    var panel := PanelContainer.new()
+    var style := StyleBoxFlat.new()
+    style.bg_color = Color(0.035, 0.075, 0.13, 0.96)
+    style.border_color = accent.darkened(0.38)
+    style.set_border_width_all(1)
+    style.set_corner_radius_all(15)
+    style.content_margin_left = 7
+    style.content_margin_right = 7
+    style.content_margin_top = 9
+    style.content_margin_bottom = 9
+    panel.add_theme_stylebox_override("panel", style)
+    var stack := VBoxContainer.new()
+    stack.add_theme_constant_override("separation", 3)
+    panel.add_child(stack)
+    var title := Label.new()
+    title.text = caption
+    title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    title.add_theme_font_size_override("font_size", 12)
+    title.add_theme_color_override("font_color", Color("#91a9c2"))
+    stack.add_child(title)
+    var value_label := Label.new()
+    value_label.text = value
+    value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    value_label.add_theme_font_size_override("font_size", 17)
+    value_label.add_theme_color_override("font_color", accent)
+    stack.add_child(value_label)
+    panel.set_meta("value_label", value_label)
+    return panel
+
+
+func _make_quiz_answer_button(mark: String, answer_text: String) -> Button:
+    var button := Button.new()
+    button.text = mark + "     " + answer_text
+    button.custom_minimum_size = Vector2(0, 72)
+    button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    button.alignment = HORIZONTAL_ALIGNMENT_RIGHT
+    button.add_theme_font_size_override("font_size", 18)
+    button.add_theme_color_override("font_color", Color("#eaf4ff"))
+    button.add_theme_color_override("font_hover_color", Color("#ffffff"))
+    button.add_theme_color_override("font_pressed_color", Color("#ffffff"))
+    var normal := StyleBoxFlat.new()
+    normal.bg_color = Color(0.045, 0.095, 0.16, 0.98)
+    normal.border_color = Color("#315b78")
+    normal.set_border_width_all(1)
+    normal.set_corner_radius_all(18)
+    normal.shadow_color = Color(0.0, 0.0, 0.0, 0.24)
+    normal.shadow_size = 5
+    normal.shadow_offset = Vector2(0, 3)
+    normal.content_margin_left = 18
+    normal.content_margin_right = 18
+    normal.content_margin_top = 9
+    normal.content_margin_bottom = 9
+    button.add_theme_stylebox_override("normal", normal)
+    var hover := normal.duplicate()
+    hover.bg_color = Color("#123653")
+    hover.border_color = Color("#64d7e8")
+    hover.set_border_width_all(2)
+    hover.shadow_color = Color(0.0, 0.68, 0.88, 0.22)
+    hover.shadow_size = 10
+    button.add_theme_stylebox_override("hover", hover)
+    button.add_theme_stylebox_override("pressed", hover)
+    button.add_theme_stylebox_override("focus", hover)
+    return button
+
+
+func _set_quiz_answer_state(button: Button, state: String) -> void:
+    var style := StyleBoxFlat.new()
+    style.set_corner_radius_all(18)
+    style.set_border_width_all(2)
+    style.content_margin_left = 18
+    style.content_margin_right = 18
+    style.content_margin_top = 9
+    style.content_margin_bottom = 9
+    if state == "correct":
+        style.bg_color = Color("#124b3d")
+        style.border_color = Color("#62f0b5")
+        button.add_theme_color_override("font_color", Color("#caffdf"))
+    elif state == "wrong":
+        style.bg_color = Color("#552b3b")
+        style.border_color = Color("#ff8291")
+        button.add_theme_color_override("font_color", Color("#ffe1e5"))
+    else:
+        style.bg_color = Color("#17283b")
+        style.border_color = Color("#40546b")
+        button.add_theme_color_override("font_color", Color("#a8b7c8"))
+    button.add_theme_stylebox_override("normal", style)
+    button.add_theme_stylebox_override("hover", style)
+    button.add_theme_stylebox_override("pressed", style)
 
 func _select_answer(selected: String) -> void:
     # Ignore duplicate taps and stale callbacks after a screen change.
@@ -1338,6 +1494,18 @@ func _select_answer(selected: String) -> void:
         correct_answer = str(options[correct_index])
 
     var is_correct := not correct_answer.is_empty() and selected == correct_answer
+    for i in range(answer_buttons.size()):
+        var button := answer_buttons[i]
+        if not is_instance_valid(button):
+            continue
+        var option_text := str(options[i]) if i < options.size() else ""
+        if option_text == correct_answer:
+            _set_quiz_answer_state(button, "correct")
+        elif option_text == selected:
+            _set_quiz_answer_state(button, "wrong")
+        else:
+            _set_quiz_answer_state(button, "muted")
+        button.disabled = true
     if is_correct:
         _play_sfx("correct")
         correct_answers += 1
