@@ -467,9 +467,11 @@ void fragment() {
     vec2 centered = uv - vec2(0.5);
     vec2 tile = fract(uv * vec2(13.0, 21.0)) - vec2(0.5);
     float diamond = abs(tile.x) + abs(tile.y);
-    float star_ring = 1.0 - smoothstep(0.012, 0.030, abs(diamond - 0.31));
-    float diagonal = 1.0 - smoothstep(0.010, 0.024, abs(abs(tile.x) - abs(tile.y)));
-    float geometry = max(star_ring, diagonal * 0.22);
+    float star_ring = 1.0 - smoothstep(0.008, 0.024, abs(diamond - 0.31));
+    float diagonal = 1.0 - smoothstep(0.007, 0.019, abs(abs(tile.x) - abs(tile.y)));
+    float geometry_core = max(star_ring, diagonal * 0.34);
+    float geometry_halo = max(1.0 - smoothstep(0.018, 0.060, abs(diamond - 0.31)), 1.0 - smoothstep(0.016, 0.050, abs(abs(tile.x) - abs(tile.y))));
+    float geometry = geometry_core;
     float edge_x = smoothstep(0.20, 0.50, abs(centered.x));
     float edge_y = smoothstep(0.24, 0.50, abs(centered.y));
     float edge = max(edge_x, edge_y);
@@ -482,7 +484,10 @@ void fragment() {
     vec3 copper = vec3(0.95, 0.48, 0.19);
     cocoa += copper * (glow_left + glow_right) * 0.105;
     cocoa += copper * (glow_top + glow_bottom) * 0.052;
-    cocoa += vec3(0.66, 0.36, 0.16) * geometry * edge * 0.040;
+    // Brighter etched Islamic geometry: crisp copper-gold lines with a restrained soft halo.
+    cocoa += vec3(0.95, 0.58, 0.27) * geometry * (0.075 + edge * 0.095);
+    cocoa += vec3(0.92, 0.43, 0.15) * geometry_halo * edge * 0.040;
+    cocoa += vec3(1.0, 0.68, 0.34) * geometry_core * edge * 0.025;
     cocoa *= 0.90 + 0.10 * vignette;
     COLOR = vec4(cocoa, 1.0);
 }
@@ -1326,8 +1331,8 @@ func _display_question() -> void:
     question_style.border_color = Color("#E0A96D")
     question_style.set_border_width_all(2)
     question_style.set_corner_radius_all(24)
-    question_style.shadow_color = Color(0.95, 0.55, 0.24, 0.30)
-    question_style.shadow_size = 24
+    question_style.shadow_color = Color(1.0, 0.57, 0.22, 0.42)
+    question_style.shadow_size = 30
     question_style.shadow_offset = Vector2(0, 5)
     question_style.content_margin_left = 20
     question_style.content_margin_right = 20
@@ -1401,9 +1406,12 @@ func _make_quiz_info_card(caption: String, value: String, accent: Color) -> Pane
     var panel := PanelContainer.new()
     var style := StyleBoxFlat.new()
     style.bg_color = Color("#2C1C14")
-    style.border_color = accent.lightened(0.08)
-    style.set_border_width_all(1)
+    style.border_color = accent.lightened(0.24)
+    style.set_border_width_all(2)
     style.set_corner_radius_all(15)
+    style.shadow_color = Color(1.0, 0.55, 0.22, 0.30)
+    style.shadow_size = 12
+    style.shadow_offset = Vector2(0, 2)
     style.content_margin_left = 7
     style.content_margin_right = 7
     style.content_margin_top = 9
@@ -1440,11 +1448,11 @@ func _make_quiz_answer_button(mark: String, answer_text: String) -> Button:
     button.add_theme_color_override("font_pressed_color", Color("#ffffff"))
     var normal := StyleBoxFlat.new()
     normal.bg_color = Color("#2C1C14")
-    normal.border_color = Color("#E0A96D")
-    normal.set_border_width_all(1)
+    normal.border_color = Color("#F2BD7B")
+    normal.set_border_width_all(2)
     normal.set_corner_radius_all(18)
-    normal.shadow_color = Color(1.0, 0.40, 0.06, 0.34)
-    normal.shadow_size = 10
+    normal.shadow_color = Color(1.0, 0.48, 0.12, 0.42)
+    normal.shadow_size = 14
     normal.shadow_offset = Vector2(0, 3)
     normal.content_margin_left = 18
     normal.content_margin_right = 18
