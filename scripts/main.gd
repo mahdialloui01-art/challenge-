@@ -100,7 +100,7 @@ func _process(delta: float) -> void:
         if question_timer.time_left <= 5.0:
             time_label.add_theme_color_override("font_color", Color("#ff7788"))
         else:
-            time_label.add_theme_color_override("font_color", Color("#ffbd73"))
+            time_label.add_theme_color_override("font_color", Color("#ffb45e"))
     for gem in get_tree().get_nodes_in_group("map_gems"):
         if is_instance_valid(gem):
             gem.rotate_y(delta * 0.9)
@@ -468,7 +468,7 @@ void fragment() {
     float glow_a = exp(-length((uv - vec2(0.12, 0.28)) * vec2(1.0, 1.2)) * 4.0);
     float glow_b = exp(-length((uv - vec2(0.88, 0.78)) * vec2(1.1, 1.0)) * 5.0);
     float vignette = 1.0 - smoothstep(0.15, 0.95, length(p));
-    vec3 base = vec3(0.012, 0.021, 0.042) + vec3(0.018, 0.060, 0.11) * glow_a + vec3(0.075, 0.045, 0.018) * glow_b;
+    vec3 warm_a = exp(-length((uv - vec2(0.08, 0.18)) * vec2(1.0, 1.1)) * 3.0);\n    vec3 warm_b = exp(-length((uv - vec2(0.92, 0.82)) * vec2(1.0, 1.0)) * 3.8;\n    vec3 base = vec3(0.018, 0.009, 0.006) + vec3(0.16, 0.055, 0.012) * glow_a + vec3(0.12, 0.035, 0.008) * glow_b + vec3(0.11, 0.045, 0.012) * warm_a + vec3(0.10, 0.025, 0.008) * warm_b;
     COLOR = vec4(base * (0.76 + 0.24 * vignette), 1.0);
 }
 """
@@ -1263,17 +1263,17 @@ func _display_question() -> void:
     eyebrow.text = "✦  تحدّي العباقرة  ✦     •     " + current_country_name
     eyebrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     eyebrow.add_theme_font_size_override("font_size", 15)
-    eyebrow.add_theme_color_override("font_color", Color("#83dff4"))
+    eyebrow.add_theme_color_override("font_color", Color("#ffd27a"))
     content.add_child(eyebrow)
 
     var top_row := HBoxContainer.new()
     top_row.add_theme_constant_override("separation", 8)
     content.add_child(top_row)
 
-    var category_card := _make_quiz_info_card("المجال", str(item.get("category", "معارف عامة")), Color("#75d9f4"))
+    var category_card := _make_quiz_info_card("المجال", str(item.get("category", "معارف عامة")), Color("#e8a84c"))
     category_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     top_row.add_child(category_card)
-    var score_card := _make_quiz_info_card("رصيدك", "★  %d" % score, Color("#ffd477"))
+    var score_card := _make_quiz_info_card("رصيدك", "★  %d" % score, Color("#ffe2a0"))
     score_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     top_row.add_child(score_card)
     score_label = score_card.get_meta("value_label") as Label
@@ -1286,7 +1286,7 @@ func _display_question() -> void:
     progress_label.text = "السؤال  %02d   /   %02d" % [question_index + 1, question_order.size()]
     progress_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     progress_label.add_theme_font_size_override("font_size", 16)
-    progress_label.add_theme_color_override("font_color", Color("#dcecff"))
+    progress_label.add_theme_color_override("font_color", Color("#f6d9a4"))
     content.add_child(progress_label)
 
     var progress_track := ProgressBar.new()
@@ -1296,23 +1296,23 @@ func _display_question() -> void:
     progress_track.show_percentage = false
     progress_track.custom_minimum_size = Vector2(0, 9)
     var progress_bg := StyleBoxFlat.new()
-    progress_bg.bg_color = Color("#142b43")
+    progress_bg.bg_color = Color("#2b160c")
     progress_bg.set_corner_radius_all(8)
     progress_track.add_theme_stylebox_override("background", progress_bg)
     var progress_fill := StyleBoxFlat.new()
-    progress_fill.bg_color = Color("#42c7dc")
+    progress_fill.bg_color = Color("#ffb84d")
     progress_fill.set_corner_radius_all(8)
     progress_track.add_theme_stylebox_override("fill", progress_fill)
     content.add_child(progress_track)
 
     var question_panel := PanelContainer.new()
     var question_style := StyleBoxFlat.new()
-    question_style.bg_color = Color(0.035, 0.075, 0.13, 0.98)
-    question_style.border_color = Color("#4b9eae")
+    question_style.bg_color = Color(0.075, 0.030, 0.012, 0.99)
+    question_style.border_color = Color("#ffbd62")
     question_style.set_border_width_all(2)
     question_style.set_corner_radius_all(24)
-    question_style.shadow_color = Color(0.0, 0.55, 0.85, 0.20)
-    question_style.shadow_size = 16
+    question_style.shadow_color = Color(1.0, 0.42, 0.06, 0.42)
+    question_style.shadow_size = 24
     question_style.shadow_offset = Vector2(0, 5)
     question_style.content_margin_left = 20
     question_style.content_margin_right = 20
@@ -1330,7 +1330,7 @@ func _display_question() -> void:
     question_kicker.text = "السؤال"
     question_kicker.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     question_kicker.add_theme_font_size_override("font_size", 15)
-    question_kicker.add_theme_color_override("font_color", Color("#f1c978"))
+    question_kicker.add_theme_color_override("font_color", Color("#ffce76"))
     question_box.add_child(question_kicker)
 
     question_label = Label.new()
@@ -1340,14 +1340,14 @@ func _display_question() -> void:
     question_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     question_label.custom_minimum_size.y = 132
     question_label.add_theme_font_size_override("font_size", 25)
-    question_label.add_theme_color_override("font_color", Color("#f5f8ff"))
+    question_label.add_theme_color_override("font_color", Color("#fff2d8"))
     question_box.add_child(question_label)
 
     var answers_title := Label.new()
     answers_title.text = "اختر الإجابة الصحيحة"
     answers_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
     answers_title.add_theme_font_size_override("font_size", 15)
-    answers_title.add_theme_color_override("font_color", Color("#9dbbd4"))
+    answers_title.add_theme_color_override("font_color", Color("#d8b98b"))
     content.add_child(answers_title)
 
     var options: Array = item.get("answers", [])
@@ -1385,8 +1385,8 @@ func _display_question() -> void:
 func _make_quiz_info_card(caption: String, value: String, accent: Color) -> PanelContainer:
     var panel := PanelContainer.new()
     var style := StyleBoxFlat.new()
-    style.bg_color = Color(0.035, 0.075, 0.13, 0.96)
-    style.border_color = accent.darkened(0.38)
+    style.bg_color = Color(0.075, 0.032, 0.014, 0.98)
+    style.border_color = accent.lightened(0.08)
     style.set_border_width_all(1)
     style.set_corner_radius_all(15)
     style.content_margin_left = 7
@@ -1401,7 +1401,7 @@ func _make_quiz_info_card(caption: String, value: String, accent: Color) -> Pane
     title.text = caption
     title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     title.add_theme_font_size_override("font_size", 12)
-    title.add_theme_color_override("font_color", Color("#91a9c2"))
+    title.add_theme_color_override("font_color", Color("#c9a878"))
     stack.add_child(title)
     var value_label := Label.new()
     value_label.text = value
@@ -1424,12 +1424,12 @@ func _make_quiz_answer_button(mark: String, answer_text: String) -> Button:
     button.add_theme_color_override("font_hover_color", Color("#ffffff"))
     button.add_theme_color_override("font_pressed_color", Color("#ffffff"))
     var normal := StyleBoxFlat.new()
-    normal.bg_color = Color(0.045, 0.095, 0.16, 0.98)
-    normal.border_color = Color("#315b78")
+    normal.bg_color = Color(0.09, 0.038, 0.016, 0.99)
+    normal.border_color = Color("#a9632a")
     normal.set_border_width_all(1)
     normal.set_corner_radius_all(18)
-    normal.shadow_color = Color(0.0, 0.0, 0.0, 0.24)
-    normal.shadow_size = 5
+    normal.shadow_color = Color(1.0, 0.40, 0.06, 0.34)
+    normal.shadow_size = 10
     normal.shadow_offset = Vector2(0, 3)
     normal.content_margin_left = 18
     normal.content_margin_right = 18
@@ -1437,11 +1437,11 @@ func _make_quiz_answer_button(mark: String, answer_text: String) -> Button:
     normal.content_margin_bottom = 9
     button.add_theme_stylebox_override("normal", normal)
     var hover := normal.duplicate()
-    hover.bg_color = Color("#123653")
-    hover.border_color = Color("#64d7e8")
+    hover.bg_color = Color("#4b260f")
+    hover.border_color = Color("#ffd078")
     hover.set_border_width_all(2)
-    hover.shadow_color = Color(0.0, 0.68, 0.88, 0.22)
-    hover.shadow_size = 10
+    hover.shadow_color = Color(1.0, 0.52, 0.10, 0.55)
+    hover.shadow_size = 17
     button.add_theme_stylebox_override("hover", hover)
     button.add_theme_stylebox_override("pressed", hover)
     button.add_theme_stylebox_override("focus", hover)
@@ -1457,16 +1457,16 @@ func _set_quiz_answer_state(button: Button, state: String) -> void:
     style.content_margin_top = 9
     style.content_margin_bottom = 9
     if state == "correct":
-        style.bg_color = Color("#124b3d")
-        style.border_color = Color("#62f0b5")
+        style.bg_color = Color("#17452c")
+        style.border_color = Color("#8dffad")
         button.add_theme_color_override("font_color", Color("#caffdf"))
     elif state == "wrong":
-        style.bg_color = Color("#552b3b")
-        style.border_color = Color("#ff8291")
+        style.bg_color = Color("#592018")
+        style.border_color = Color("#ff7657")
         button.add_theme_color_override("font_color", Color("#ffe1e5"))
     else:
-        style.bg_color = Color("#17283b")
-        style.border_color = Color("#40546b")
+        style.bg_color = Color("#302014")
+        style.border_color = Color("#76502e")
         button.add_theme_color_override("font_color", Color("#a8b7c8"))
     button.add_theme_stylebox_override("normal", style)
     button.add_theme_stylebox_override("hover", style)
