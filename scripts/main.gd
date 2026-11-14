@@ -468,7 +468,7 @@ void fragment() {
     float glow_a = exp(-length((uv - vec2(0.12, 0.28)) * vec2(1.0, 1.2)) * 4.0);
     float glow_b = exp(-length((uv - vec2(0.88, 0.78)) * vec2(1.1, 1.0)) * 5.0);
     float vignette = 1.0 - smoothstep(0.15, 0.95, length(p));
-    vec3 warm_a = exp(-length((uv - vec2(0.08, 0.18)) * vec2(1.0, 1.1)) * 3.0);\n    vec3 warm_b = exp(-length((uv - vec2(0.92, 0.82)) * vec2(1.0, 1.0)) * 3.8;\n    vec3 base = vec3(0.018, 0.009, 0.006) + vec3(0.16, 0.055, 0.012) * glow_a + vec3(0.12, 0.035, 0.008) * glow_b + vec3(0.11, 0.045, 0.012) * warm_a + vec3(0.10, 0.025, 0.008) * warm_b;
+    float warm_a = exp(-length((uv - vec2(0.08, 0.18)) * vec2(1.0, 1.1)) * 3.0);\n    float warm_b = exp(-length((uv - vec2(0.92, 0.82)) * vec2(1.0, 1.0)) * 3.8;\n    vec3 base = vec3(0.018, 0.009, 0.006) + vec3(0.16, 0.055, 0.012) * glow_a + vec3(0.12, 0.035, 0.008) * glow_b + vec3(0.11, 0.045, 0.012) * warm_a + vec3(0.10, 0.025, 0.008) * warm_b;
     COLOR = vec4(base * (0.76 + 0.24 * vignette), 1.0);
 }
 """
