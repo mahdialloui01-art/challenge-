@@ -89255,6 +89255,646 @@
         "repository": "mahdialloui01-art/challenge-",
         "rights_review_status": "original wording; fact-check recommended before publication"
       }
+    },
+    {
+      "category": "فيزياء",
+      "question": "ما الوحدة الأساسية لقياس شدة التيار الكهربائي؟",
+      "answers": [
+        "الفولت",
+        "الأمبير",
+        "الأوم",
+        "الواط"
+      ],
+      "correct": 1,
+      "explanation": "الأمبير هو وحدة قياس شدة التيار الكهربائي في النظام الدولي.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "فيزياء",
+      "question": "أي جسيم يحمل شحنة كهربائية سالبة؟",
+      "answers": [
+        "البروتون",
+        "النيوترون",
+        "الإلكترون",
+        "الفوتون"
+      ],
+      "correct": 2,
+      "explanation": "الإلكترون يحمل شحنة سالبة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "فيزياء",
+      "question": "ما اسم الظاهرة التي يتغير فيها اتجاه الضوء عند انتقاله بين وسطين؟",
+      "answers": [
+        "الانعكاس",
+        "الانكسار",
+        "الحيود",
+        "الاستقطاب"
+      ],
+      "correct": 1,
+      "explanation": "الانكسار هو تغير مسار الضوء عند انتقاله بين وسطين مختلفين.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "كيمياء",
+      "question": "ما قيمة الرقم الهيدروجيني للماء النقي تقريباً عند 25 درجة مئوية؟",
+      "answers": [
+        "3",
+        "5",
+        "7",
+        "9"
+      ],
+      "correct": 2,
+      "explanation": "يكون الماء النقي متعادلاً ويبلغ رقمه الهيدروجيني نحو 7.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "أحياء",
+      "question": "ما العضية المسؤولة أساساً عن إنتاج الطاقة في الخلية؟",
+      "answers": [
+        "النواة",
+        "الميتوكوندريا",
+        "جهاز غولجي",
+        "الريبوسوم"
+      ],
+      "correct": 1,
+      "explanation": "تنتج الميتوكوندريا معظم جزيئات ATP التي تستخدمها الخلية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "أحياء",
+      "question": "ما المادة الوراثية الأساسية لدى معظم الكائنات الحية؟",
+      "answers": [
+        "RNA فقط",
+        "DNA",
+        "البروتين",
+        "الدهون"
+      ],
+      "correct": 1,
+      "explanation": "يحمل الحمض النووي DNA معظم المعلومات الوراثية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "أحياء",
+      "question": "ما الجزء الذي ينقل الماء والأملاح من جذور النبات إلى أوراقه؟",
+      "answers": [
+        "اللحاء",
+        "الخشب",
+        "البشرة",
+        "القشرة"
+      ],
+      "correct": 1,
+      "explanation": "ينقل نسيج الخشب الماء والأملاح المعدنية صعوداً في النبات.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "فلك",
+      "question": "ما اسم المجرة التي تقع فيها المجموعة الشمسية؟",
+      "answers": [
+        "المرأة المسلسلة",
+        "درب التبانة",
+        "مجرة المثلث",
+        "سحابة ماجلان"
+      ],
+      "correct": 1,
+      "explanation": "تقع الشمس وكواكبها داخل مجرة درب التبانة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "فلك",
+      "question": "ما الكوكب الذي يمتلك أكبر عدد معروف من الأقمار وفق الاكتشافات الحديثة؟",
+      "answers": [
+        "عطارد",
+        "الأرض",
+        "زحل",
+        "الزهرة"
+      ],
+      "correct": 2,
+      "explanation": "يتصدر زحل سجلات الأقمار المؤكدة في الإحصاءات الفلكية الحديثة، وقد تتغير الأعداد مع الاكتشافات.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "رياضيات",
+      "question": "ما قيمة الجذر التربيعي للعدد 144؟",
+      "answers": [
+        "10",
+        "11",
+        "12",
+        "14"
+      ],
+      "correct": 2,
+      "explanation": "لأن 12 مضروباً في نفسه يساوي 144.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "حاسوب",
+      "question": "ماذا تعني CPU في الحاسوب؟",
+      "answers": [
+        "وحدة معالجة الرسوميات",
+        "وحدة المعالجة المركزية",
+        "ذاكرة الوصول العشوائي",
+        "وحدة التخزين"
+      ],
+      "correct": 1,
+      "explanation": "CPU اختصار لوحدة المعالجة المركزية التي تنفذ التعليمات.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "حاسوب",
+      "question": "أي نظام عددي يستخدمه الحاسوب على مستوى البتات؟",
+      "answers": [
+        "العشري",
+        "الثماني",
+        "الثنائي",
+        "السادس عشري فقط"
+      ],
+      "correct": 2,
+      "explanation": "يعتمد التمثيل الرقمي الأساسي في الحواسيب على الصفر والواحد.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "حاسوب",
+      "question": "ما الوظيفة الأساسية لنظام DNS على الإنترنت؟",
+      "answers": [
+        "تشفير الملفات",
+        "تحويل أسماء النطاقات إلى عناوين IP",
+        "زيادة سرعة المعالج",
+        "ضغط الصور"
+      ],
+      "correct": 1,
+      "explanation": "يساعد DNS على العثور على عنوان IP المرتبط باسم النطاق.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "جغرافيا",
+      "question": "ما المضيق الذي يفصل بين قارتي آسيا وأمريكا الشمالية؟",
+      "answers": [
+        "جبل طارق",
+        "بيرينغ",
+        "ملقا",
+        "البوسفور"
+      ],
+      "correct": 1,
+      "explanation": "يقع مضيق بيرينغ بين ألاسكا وشرق روسيا.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "تاريخ",
+      "question": "في أي عام سقط جدار برلين؟",
+      "answers": [
+        "1985",
+        "1989",
+        "1991",
+        "1995"
+      ],
+      "correct": 1,
+      "explanation": "فُتح جدار برلين في نوفمبر 1989.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "تاريخ",
+      "question": "أي حضارة قديمة ارتبطت بالكتابة المسمارية؟",
+      "answers": [
+        "الرومانية",
+        "السومرية",
+        "الفينيقية",
+        "الإغريقية"
+      ],
+      "correct": 1,
+      "explanation": "طوّر السومريون الكتابة المسمارية في بلاد الرافدين.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "تاريخ",
+      "question": "من القائد القرطاجي الذي عبر جبال الألب لمواجهة روما؟",
+      "answers": [
+        "يوليوس قيصر",
+        "حنبعل",
+        "سكيبيو",
+        "أغسطس"
+      ],
+      "correct": 1,
+      "explanation": "قاد حنبعل جيش قرطاج عبر جبال الألب خلال الحرب البونيقية الثانية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "أدب",
+      "question": "من صاحب مسرحية هاملت؟",
+      "answers": [
+        "تشارلز ديكنز",
+        "ويليام شكسبير",
+        "جون ميلتون",
+        "جيفري تشوسر"
+      ],
+      "correct": 1,
+      "explanation": "هاملت من أشهر المآسي التي كتبها ويليام شكسبير.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "أدب عربي",
+      "question": "من مؤلف كتاب الأيام؟",
+      "answers": [
+        "طه حسين",
+        "العقاد",
+        "توفيق الحكيم",
+        "نجيب محفوظ"
+      ],
+      "correct": 0,
+      "explanation": "كتاب الأيام سيرة ذاتية للأديب المصري طه حسين.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "لغة",
+      "question": "ما نوع كلمة «الذي» في النحو العربي؟",
+      "answers": [
+        "اسم إشارة",
+        "اسم موصول",
+        "حرف جر",
+        "ظرف"
+      ],
+      "correct": 1,
+      "explanation": "الذي اسم موصول للمفرد المذكر.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "لغة",
+      "question": "ما جمع كلمة «قاضٍ»؟",
+      "answers": [
+        "قاضيون",
+        "قضاة",
+        "قاضيات",
+        "قواضي"
+      ],
+      "correct": 1,
+      "explanation": "جمع قاضٍ هو قضاة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "فلسفة",
+      "question": "من الفيلسوف الذي ارتبط بعبارة «أنا أفكر إذن أنا موجود»؟",
+      "answers": [
+        "أفلاطون",
+        "ديكارت",
+        "أرسطو",
+        "كانط"
+      ],
+      "correct": 1,
+      "explanation": "تُنسب العبارة إلى الفيلسوف الفرنسي رينيه ديكارت.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "اقتصاد",
+      "question": "ماذا يقيس الناتج المحلي الإجمالي؟",
+      "answers": [
+        "عدد السكان",
+        "قيمة السلع والخدمات النهائية المنتجة داخل بلد خلال مدة",
+        "قيمة الصادرات فقط",
+        "حجم الدين الخارجي"
+      ],
+      "correct": 1,
+      "explanation": "يقيس GDP القيمة السوقية للسلع والخدمات النهائية المنتجة محلياً خلال فترة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "اقتصاد",
+      "question": "ما المقصود بالتضخم؟",
+      "answers": [
+        "انخفاض عام ومستمر في الأسعار",
+        "ارتفاع عام ومستمر في مستوى الأسعار",
+        "زيادة الإنتاج فقط",
+        "ثبات قيمة العملة"
+      ],
+      "correct": 1,
+      "explanation": "التضخم هو ارتفاع مستمر في المستوى العام للأسعار.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "قانون",
+      "question": "ما المبدأ الذي يعني أن المتهم بريء حتى تثبت إدانته؟",
+      "answers": [
+        "عدم رجعية القوانين",
+        "قرينة البراءة",
+        "الفصل بين السلطات",
+        "التقادم"
+      ],
+      "correct": 1,
+      "explanation": "قرينة البراءة تقتضي افتراض براءة المتهم إلى أن تثبت إدانته وفق القانون.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "طب عام",
+      "question": "أي فصيلة دم تُعرف بأنها مانح عام لكريات الدم الحمراء؟",
+      "answers": [
+        "AB موجب",
+        "O سالب",
+        "A موجب",
+        "B سالب"
+      ],
+      "correct": 1,
+      "explanation": "تُعد O سالباً مانحاً عاماً لكريات الدم الحمراء في نقل الدم المعتاد.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "طب عام",
+      "question": "ما الفيتامين الذي يساعد الجسم على امتصاص الكالسيوم؟",
+      "answers": [
+        "فيتامين A",
+        "فيتامين C",
+        "فيتامين D",
+        "فيتامين K"
+      ],
+      "correct": 2,
+      "explanation": "يساعد فيتامين D على امتصاص الكالسيوم من الأمعاء.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "بيئة",
+      "question": "أي غاز يعد من أبرز غازات الدفيئة الناتجة عن حرق الوقود الأحفوري؟",
+      "answers": [
+        "الأكسجين",
+        "ثاني أكسيد الكربون",
+        "النيون",
+        "الهيدروجين"
+      ],
+      "correct": 1,
+      "explanation": "ينتج ثاني أكسيد الكربون عن احتراق الفحم والنفط والغاز ويسهم في الاحترار العالمي.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "فن",
+      "question": "من رسم لوحة الموناليزا؟",
+      "answers": [
+        "رافائيل",
+        "ليوناردو دافنشي",
+        "ميكيلانجيلو",
+        "رامبرانت"
+      ],
+      "correct": 1,
+      "explanation": "رسم ليوناردو دافنشي لوحة الموناليزا.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "موسيقى",
+      "question": "إلى أي عائلة آلية ينتمي الكمان؟",
+      "answers": [
+        "النفخ",
+        "الوتريات",
+        "الإيقاع",
+        "لوحات المفاتيح"
+      ],
+      "correct": 1,
+      "explanation": "الكمان آلة وترية يعزف عليها عادة باستخدام القوس.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "رياضة",
+      "question": "كم عدد اللاعبين الأساسيين في فريق كرة السلة داخل الملعب؟",
+      "answers": [
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "correct": 1,
+      "explanation": "يتكون كل فريق كرة سلة من خمسة لاعبين داخل الملعب.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "رياضة",
+      "question": "في أي رياضة تُستخدم بطولة ويمبلدون؟",
+      "answers": [
+        "الغولف",
+        "التنس",
+        "الكريكيت",
+        "الرجبي"
+      ],
+      "correct": 1,
+      "explanation": "ويمبلدون إحدى البطولات الأربع الكبرى في رياضة التنس.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "ثقافة عامة",
+      "question": "ما اللغة الرسمية في البرازيل؟",
+      "answers": [
+        "الإسبانية",
+        "البرتغالية",
+        "الفرنسية",
+        "الإنجليزية"
+      ],
+      "correct": 1,
+      "explanation": "البرتغالية هي اللغة الرسمية في البرازيل.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "علوم الأرض",
+      "question": "ما اسم الطبقة الخارجية الصلبة للأرض؟",
+      "answers": [
+        "اللب الداخلي",
+        "الوشاح",
+        "القشرة الأرضية",
+        "اللب الخارجي"
+      ],
+      "correct": 2,
+      "explanation": "القشرة الأرضية هي الطبقة الصلبة الخارجية للكوكب.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "علوم الأرض",
+      "question": "ما نوع الصخور التي تتكون من تبرد الصهارة أو اللابة؟",
+      "answers": [
+        "رسوبية",
+        "متحولة",
+        "نارية",
+        "عضوية"
+      ],
+      "correct": 2,
+      "explanation": "تتشكل الصخور النارية عندما تبرد المواد المنصهرة وتتصلب.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "بحار",
+      "question": "ما أكثر المحيطات مساحة على سطح الأرض؟",
+      "answers": [
+        "الأطلسي",
+        "الهندي",
+        "الهادئ",
+        "المتجمد الشمالي"
+      ],
+      "correct": 2,
+      "explanation": "المحيط الهادئ هو أكبر محيطات الأرض مساحة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "علم نفس",
+      "question": "ما المصطلح الذي يصف القدرة على تذكر أحداث وتجارب سابقة؟",
+      "answers": [
+        "الإدراك الحسي",
+        "الذاكرة",
+        "الانتباه",
+        "الدافعية"
+      ],
+      "correct": 1,
+      "explanation": "الذاكرة هي العمليات التي تسمح بترميز المعلومات وتخزينها واسترجاعها.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "إحصاء",
+      "question": "ما الوسيط في مجموعة مرتبة من القيم؟",
+      "answers": [
+        "أكبر قيمة",
+        "القيمة الوسطى",
+        "مجموع القيم",
+        "القيمة الأكثر تكراراً دائماً"
+      ],
+      "correct": 1,
+      "explanation": "الوسيط هو القيمة التي تقع في المنتصف بعد ترتيب البيانات.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "هندسة",
+      "question": "كم ضلعاً للشكل السداسي؟",
+      "answers": [
+        "خمسة",
+        "ستة",
+        "سبعة",
+        "ثمانية"
+      ],
+      "correct": 1,
+      "explanation": "السداسي مضلع له ستة أضلاع.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
+    },
+    {
+      "category": "علوم",
+      "question": "ما الجهاز المستخدم لقياس الضغط الجوي؟",
+      "answers": [
+        "الترمومتر",
+        "البارومتر",
+        "الأميتر",
+        "الهيدرومتر"
+      ],
+      "correct": 1,
+      "explanation": "يقيس البارومتر الضغط الجوي.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "license": "Original question wording; facts summarized from general reference knowledge"
+      }
     }
   ]
 }
