@@ -1196,15 +1196,12 @@ func _start_level(level: int) -> void:
     question_index = 0
     question_pool.clear()
 
-    # Build a mixed pool: country-specific knowledge plus world science and culture.
+    # Strict country isolation: only questions explicitly assigned to this country.
+    # Untagged/general questions are never allowed into a country's challenge.
     for i in range(questions.size()):
         var candidate: Dictionary = questions[i]
-        var candidate_country := str(candidate.get("country", ""))
-        if candidate_country == current_country_code or candidate_country.is_empty():
-            question_pool.append(i)
-
-    if question_pool.is_empty():
-        for i in range(questions.size()):
+        var candidate_country := str(candidate.get("country", "")).strip_edges().to_upper()
+        if candidate_country == current_country_code:
             question_pool.append(i)
 
     var target_count := int(DIFFICULTIES.get(difficulty, DIFFICULTIES["medium"]).get("count", 10))
@@ -1229,7 +1226,7 @@ func _start_level(level: int) -> void:
 
     if question_order.is_empty():
         _clear_content()
-        _add_heading("انتهت الأسئلة الجديدة", "لقد أجبت عن كل الأسئلة المتاحة في هذا التحدّي. لن نعيد أي سؤال سبق عرضه.")
+        _add_heading("لا توجد أسئلة جديدة لهذه الدولة", "لا نعرض أسئلة عامة أو أسئلة تخص دولاً أخرى. سنضيف أسئلة موثوقة خاصة بهذه الدولة قبل متابعة التحدّي.")
         var back_empty := _make_button("العودة إلى الخريطة")
         back_empty.pressed.connect(_show_world_map)
         content.add_child(back_empty)
