@@ -1276,6 +1276,7 @@ func _display_question() -> void:
     var score_card := _make_quiz_info_card("رصيدك", "★  %d" % score, Color("#ffd477"))
     score_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     top_row.add_child(score_card)
+    score_label = score_card.get_meta("value_label") as Label
     var timer_card := _make_quiz_info_card("الوقت", "⏱  %02d" % int(time_limit), Color("#ffbd73"))
     timer_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     top_row.add_child(timer_card)
