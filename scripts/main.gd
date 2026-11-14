@@ -464,12 +464,24 @@ func _build_interface() -> void:
     shader.code = """shader_type canvas_item;
 void fragment() {
     vec2 uv = SCREEN_UV;
-    vec2 p = uv - vec2(0.5, 0.5);
-    float glow_a = exp(-length((uv - vec2(0.12, 0.28)) * vec2(1.0, 1.2)) * 4.0);
-    float glow_b = exp(-length((uv - vec2(0.88, 0.78)) * vec2(1.1, 1.0)) * 5.0);
-    float vignette = 1.0 - smoothstep(0.15, 0.95, length(p));
-    float warm_a = exp(-length((uv - vec2(0.08, 0.18)) * vec2(1.0, 1.1)) * 3.0);\n    float warm_b = exp(-length((uv - vec2(0.92, 0.82)) * vec2(1.0, 1.0)) * 3.8;\n    vec3 base = vec3(0.018, 0.009, 0.006) + vec3(0.16, 0.055, 0.012) * glow_a + vec3(0.12, 0.035, 0.008) * glow_b + vec3(0.11, 0.045, 0.012) * warm_a + vec3(0.10, 0.025, 0.008) * warm_b;
-    COLOR = vec4(base * (0.76 + 0.24 * vignette), 1.0);
+    vec2 centered = uv - vec2(0.5);
+    vec2 tile = fract(uv * vec2(15.0, 24.0)) - vec2(0.5);
+    float diamond = abs(tile.x) + abs(tile.y);
+    float motif = 1.0 - smoothstep(0.018, 0.045, abs(diamond - 0.34));
+    float cross_line = 1.0 - smoothstep(0.012, 0.032, min(abs(tile.x), abs(tile.y)));
+    float lattice = max(motif, cross_line * 0.34);
+    float edge = smoothstep(0.18, 0.48, abs(centered.x)) * 0.72 + smoothstep(0.20, 0.48, abs(centered.y)) * 0.28;
+    float glow_left = exp(-length((uv - vec2(0.03, 0.48)) * vec2(2.0, 0.85)) * 5.0);
+    float glow_right = exp(-length((uv - vec2(0.97, 0.56)) * vec2(2.0, 0.9)) * 5.0);
+    float top_glow = exp(-length((uv - vec2(0.5, 0.02)) * vec2(1.0, 2.5)) * 5.5);
+    float vignette = 1.0 - smoothstep(0.18, 0.78, length(centered));
+    vec3 base = vec3(0.012, 0.006, 0.004);
+    base += vec3(0.105, 0.038, 0.012) * (glow_left + glow_right) * 0.72;
+    base += vec3(0.075, 0.025, 0.008) * top_glow;
+    base += vec3(0.105, 0.050, 0.018) * lattice * edge * 0.42;
+    base += vec3(0.025, 0.010, 0.004) * (1.0 - edge);
+    base *= 0.78 + 0.22 * vignette;
+    COLOR = vec4(base, 1.0);
 }
 """
     var shader_material := ShaderMaterial.new()
@@ -492,8 +504,8 @@ void fragment() {
 
     var masthead := PanelContainer.new()
     var masthead_style := StyleBoxFlat.new()
-    masthead_style.bg_color = Color(0.025, 0.045, 0.075, 0.96)
-    masthead_style.border_color = Color(0.62, 0.49, 0.28, 0.75)
+    masthead_style.bg_color = Color(0.075, 0.027, 0.010, 0.97)
+    masthead_style.border_color = Color(0.92, 0.49, 0.17, 0.92)
     masthead_style.set_border_width_all(1)
     masthead_style.set_corner_radius_all(22)
     masthead_style.content_margin_left = 12
@@ -516,14 +528,14 @@ void fragment() {
     tagline.text = "رحلة معرفية تفتح لك أبواب العالم"
     tagline.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     tagline.add_theme_font_size_override("font_size", 14)
-    tagline.add_theme_color_override("font_color", Color("#a9c7dc"))
+    tagline.add_theme_color_override("font_color", Color("#d9b58a"))
     masthead_box.add_child(tagline)
 
     var bank_label := Label.new()
     bank_label.text = "◈  %s سؤالاً  •  تجربة كاملة دون إنترنت" % _format_number(questions.size())
     bank_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     bank_label.add_theme_font_size_override("font_size", 13)
-    bank_label.add_theme_color_override("font_color", Color("#80dfc8"))
+    bank_label.add_theme_color_override("font_color", Color("#d8a45d"))
     page.add_child(bank_label)
 
     var scroll := ScrollContainer.new()
@@ -540,7 +552,7 @@ void fragment() {
     footer_label.text = "تعلّم  •  اكتشف  •  تحدَّ نفسك"
     footer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     footer_label.add_theme_font_size_override("font_size", 12)
-    footer_label.add_theme_color_override("font_color", Color(0.52, 0.65, 0.78, 0.9))
+    footer_label.add_theme_color_override("font_color", Color(0.72, 0.52, 0.32, 0.92))
     page.add_child(footer_label)
 
 func _format_number(value: int) -> String:
@@ -1620,12 +1632,12 @@ func _make_button(caption: String) -> Button:
     button.add_theme_color_override("font_pressed_color", Color("#f4d18a"))
     button.add_theme_color_override("font_disabled_color", Color("#8c9aaa"))
     var normal := StyleBoxFlat.new()
-    normal.bg_color = Color(0.045, 0.085, 0.135, 0.98)
-    normal.border_color = Color(0.60, 0.48, 0.29, 0.82)
+    normal.bg_color = Color(0.070, 0.027, 0.012, 0.99)
+    normal.border_color = Color(0.72, 0.36, 0.13, 0.95)
     normal.set_border_width_all(1)
     normal.set_corner_radius_all(17)
-    normal.shadow_color = Color(0.0, 0.0, 0.0, 0.30)
-    normal.shadow_size = 5
+    normal.shadow_color = Color(1.0, 0.34, 0.06, 0.28)
+    normal.shadow_size = 9
     normal.shadow_offset = Vector2(0, 2)
     normal.content_margin_left = 16
     normal.content_margin_right = 16
@@ -1633,13 +1645,13 @@ func _make_button(caption: String) -> Button:
     normal.content_margin_bottom = 8
     button.add_theme_stylebox_override("normal", normal)
     var hover := normal.duplicate()
-    hover.bg_color = Color(0.085, 0.145, 0.205, 1.0)
-    hover.border_color = Color("#e4bd70")
+    hover.bg_color = Color(0.19, 0.075, 0.025, 1.0)
+    hover.border_color = Color("#ffd078")
     hover.shadow_size = 7
     button.add_theme_stylebox_override("hover", hover)
     button.add_theme_stylebox_override("pressed", hover)
     var focus := hover.duplicate()
-    focus.border_color = Color("#8bd9d0")
+    focus.border_color = Color("#ffca75")
     button.add_theme_stylebox_override("focus", focus)
     var disabled_style := normal.duplicate()
     disabled_style.bg_color = Color(0.055, 0.075, 0.105, 0.92)
