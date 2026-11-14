@@ -426,7 +426,7 @@ func _load_player_data() -> void:
         unlocked_level = int(config.get_value("progress", "unlocked_level", 1))
         unlocked_country_index = int(config.get_value("country_progress", "unlocked_index", 0))
         music_enabled = bool(config.get_value("settings", "music", true))
-        var saved_question_history = config.get_value("question_history", "global", {})
+        var saved_question_history = config.get_value("question_history", "global", null)
         if saved_question_history is Dictionary:
             previous_question_ids = saved_question_history
         else:
@@ -1211,11 +1211,13 @@ func _start_level(level: int) -> void:
     target_count = mini(target_count, question_pool.size())
 
     var fresh_pool: Array[int] = []
+    var unique_candidate_ids: Dictionary = {}
     for candidate_index in question_pool:
         var candidate_item: Dictionary = questions[candidate_index]
         var stable_id := _question_replay_key(candidate_item)
-        if not previous_question_ids.has(stable_id):
+        if not previous_question_ids.has(stable_id) and not unique_candidate_ids.has(stable_id):
             fresh_pool.append(candidate_index)
+            unique_candidate_ids[stable_id] = true
 
     # Strict global no-repeat: never put an already displayed question back into a test.
     var selected_indices := _pick_diverse_questions(fresh_pool, target_count)
