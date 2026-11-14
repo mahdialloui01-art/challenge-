@@ -441,105 +441,110 @@ func _save_player_data() -> void:
     config.set_value("question_history", "by_country", previous_question_ids)
     config.save(SAVE_PATH)
 
+
 func _build_interface() -> void:
     var layer := CanvasLayer.new()
     add_child(layer)
-
     var root := Control.new()
     root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     root.layout_direction = Control.LAYOUT_DIRECTION_RTL
     layer.add_child(root)
     interface_root = root
 
-    # Lightweight premium cosmic background for Android GL Compatibility.
     var backdrop := ColorRect.new()
-    backdrop.name = "PremiumCosmicBackdrop"
     backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    var backdrop_shader := Shader.new()
-    backdrop_shader.code = """shader_type canvas_item;
+    var shader := Shader.new()
+    shader.code = """shader_type canvas_item;
 void fragment() {
     vec2 uv = SCREEN_UV;
-    vec2 p = uv - vec2(0.5, 0.48);
-    float vignette = (1.0 - smoothstep(0.12, 0.92, length(p * vec2(0.82, 1.0))));
-    float blue_halo = exp(-length((uv - vec2(0.18, 0.34)) * vec2(1.0, 1.25)) * 4.2);
-    float gold_halo = exp(-length((uv - vec2(0.86, 0.72)) * vec2(1.1, 1.0)) * 5.0);
-    vec3 base = vec3(0.010, 0.016, 0.034);
-    base += vec3(0.018, 0.060, 0.115) * blue_halo;
-    base += vec3(0.095, 0.055, 0.018) * gold_halo;
-    vec2 grid = floor(uv * vec2(38.0, 68.0));
-    float seed = fract(sin(dot(grid, vec2(127.1, 311.7))) * 43758.5453);
-    float star = step(0.994, seed) * (0.35 + 0.65 * fract(seed * 91.7));
-    float shimmer = 0.72 + 0.28 * sin(TIME * 0.7 + seed * 40.0);
-    base += vec3(0.48, 0.58, 0.72) * star * shimmer;
-    base *= 0.72 + 0.28 * vignette;
-    COLOR = vec4(base, 1.0);
+    vec2 p = uv - vec2(0.5, 0.5);
+    float glow_a = exp(-length((uv - vec2(0.12, 0.28)) * vec2(1.0, 1.2)) * 4.0);
+    float glow_b = exp(-length((uv - vec2(0.88, 0.78)) * vec2(1.1, 1.0)) * 5.0);
+    float vignette = 1.0 - smoothstep(0.15, 0.95, length(p));
+    vec3 base = vec3(0.012, 0.021, 0.042) + vec3(0.018, 0.060, 0.11) * glow_a + vec3(0.075, 0.045, 0.018) * glow_b;
+    COLOR = vec4(base * (0.76 + 0.24 * vignette), 1.0);
 }
 """
-    var backdrop_material := ShaderMaterial.new()
-    backdrop_material.shader = backdrop_shader
-    backdrop.material = backdrop_material
+    var shader_material := ShaderMaterial.new()
+    shader_material.shader = shader
+    backdrop.material = shader_material
     root.add_child(backdrop)
-
-    var tint := ColorRect.new()
-    tint.name = "AtmosphericOverlay"
-    tint.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    tint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    tint.color = Color(0.006, 0.010, 0.022, 0.34)
-    root.add_child(tint)
 
     var margin := MarginContainer.new()
     interface_margin = margin
     margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    margin.add_theme_constant_override("margin_left", 30)
-    margin.add_theme_constant_override("margin_right", 30)
-    margin.add_theme_constant_override("margin_top", 38)
-    margin.add_theme_constant_override("margin_bottom", 28)
+    margin.add_theme_constant_override("margin_left", 25)
+    margin.add_theme_constant_override("margin_right", 25)
+    margin.add_theme_constant_override("margin_top", 24)
+    margin.add_theme_constant_override("margin_bottom", 20)
     root.add_child(margin)
 
     var page := VBoxContainer.new()
-    page.add_theme_constant_override("separation", 14)
+    page.add_theme_constant_override("separation", 9)
     margin.add_child(page)
 
+    var masthead := PanelContainer.new()
+    var masthead_style := StyleBoxFlat.new()
+    masthead_style.bg_color = Color(0.025, 0.045, 0.075, 0.96)
+    masthead_style.border_color = Color(0.62, 0.49, 0.28, 0.75)
+    masthead_style.set_border_width_all(1)
+    masthead_style.set_corner_radius_all(22)
+    masthead_style.content_margin_left = 12
+    masthead_style.content_margin_right = 12
+    masthead_style.content_margin_top = 9
+    masthead_style.content_margin_bottom = 9
+    masthead.add_theme_stylebox_override("panel", masthead_style)
+    page.add_child(masthead)
+    var masthead_box := VBoxContainer.new()
+    masthead_box.add_theme_constant_override("separation", 3)
+    masthead.add_child(masthead_box)
+
     var brand := Label.new()
-    brand.text = "✦ تَحَدّي العَباقِرَة ✦"
+    brand.text = "✦  تَحَدّي العَباقِرَة  ✦"
     brand.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    brand.add_theme_font_size_override("font_size", 34)
-    brand.add_theme_color_override("font_color", Color(1.0, 0.91, 0.70))
-    brand.add_theme_color_override("font_shadow_color", Color(0.20, 0.12, 0.035, 0.90))
-    brand.add_theme_constant_override("shadow_offset_x", 0)
-    brand.add_theme_constant_override("shadow_offset_y", 3)
-    brand.add_theme_constant_override("shadow_outline_size", 2)
-    page.add_child(brand)
-
+    brand.add_theme_font_size_override("font_size", 29)
+    brand.add_theme_color_override("font_color", Color("#f3d99f"))
+    masthead_box.add_child(brand)
     var tagline := Label.new()
-    tagline.text = "فكّر بذكاء… وتفوّق!"
+    tagline.text = "رحلة معرفية تفتح لك أبواب العالم"
     tagline.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    tagline.add_theme_font_size_override("font_size", 17)
-    tagline.add_theme_color_override("font_color", Color(0.48, 0.78, 1.0))
-    page.add_child(tagline)
+    tagline.add_theme_font_size_override("font_size", 14)
+    tagline.add_theme_color_override("font_color", Color("#a9c7dc"))
+    masthead_box.add_child(tagline)
 
-    var separator := HSeparator.new()
-    separator.add_theme_color_override("color", Color(0.25, 0.43, 0.75, 0.65))
-    page.add_child(separator)
+    var bank_label := Label.new()
+    bank_label.text = "◈  %s سؤالاً  •  تجربة كاملة دون إنترنت" % _format_number(questions.size())
+    bank_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    bank_label.add_theme_font_size_override("font_size", 13)
+    bank_label.add_theme_color_override("font_color", Color("#80dfc8"))
+    page.add_child(bank_label)
 
     var scroll := ScrollContainer.new()
     scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
     scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
     page.add_child(scroll)
-
     content = VBoxContainer.new()
     content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    content.add_theme_constant_override("separation", 16)
+    content.add_theme_constant_override("separation", 11)
     scroll.add_child(content)
 
     footer_label = Label.new()
-    footer_label.text = "◆ تعمل دون إنترنت  •  استمتع بالتحدّي ◆"
+    footer_label.text = "تعلّم  •  اكتشف  •  تحدَّ نفسك"
     footer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    footer_label.add_theme_font_size_override("font_size", 14)
-    footer_label.add_theme_color_override("font_color", Color(0.58, 0.68, 0.88))
+    footer_label.add_theme_font_size_override("font_size", 12)
+    footer_label.add_theme_color_override("font_color", Color(0.52, 0.65, 0.78, 0.9))
     page.add_child(footer_label)
+
+func _format_number(value: int) -> String:
+    var raw := str(value)
+    var result := ""
+    for i in range(raw.length()):
+        if i > 0 and (raw.length() - i) % 3 == 0:
+            result += "٬"
+        result += raw.substr(i, 1)
+    return result
 
 func _clear_content() -> void:
     if question_timer != null:
@@ -548,53 +553,69 @@ func _clear_content() -> void:
     for child in content.get_children():
         child.queue_free()
 
+
 func _add_heading(title_text: String, subtitle_text: String = "") -> void:
+    var panel := PanelContainer.new()
+    var style := StyleBoxFlat.new()
+    style.bg_color = Color(0.035, 0.065, 0.105, 0.94)
+    style.border_color = Color(0.30, 0.54, 0.68, 0.45)
+    style.set_border_width_all(1)
+    style.set_corner_radius_all(19)
+    style.content_margin_left = 14
+    style.content_margin_right = 14
+    style.content_margin_top = 12
+    style.content_margin_bottom = 12
+    panel.add_theme_stylebox_override("panel", style)
+    content.add_child(panel)
+    var box := VBoxContainer.new()
+    box.add_theme_constant_override("separation", 5)
+    panel.add_child(box)
     var heading := Label.new()
     heading.text = title_text
     heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    heading.add_theme_font_size_override("font_size", 29)
-    heading.add_theme_color_override("font_color", Color(0.94, 0.97, 1.0))
-    content.add_child(heading)
+    heading.add_theme_font_size_override("font_size", 25)
+    heading.add_theme_color_override("font_color", Color("#f4e5c4"))
+    box.add_child(heading)
     if not subtitle_text.is_empty():
         var subtitle := Label.new()
         subtitle.text = subtitle_text
         subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-        subtitle.add_theme_font_size_override("font_size", 17)
-        subtitle.add_theme_color_override("font_color", Color(0.64, 0.78, 1.0))
-        content.add_child(subtitle)
+        subtitle.add_theme_font_size_override("font_size", 15)
+        subtitle.add_theme_color_override("font_color", Color("#a9c5d9"))
+        box.add_child(subtitle)
+
 
 func _add_stat_card(caption: String, value: String) -> void:
     var card := PanelContainer.new()
+    card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     var style := StyleBoxFlat.new()
-    style.bg_color = Color(0.035, 0.060, 0.105, 0.94)
-    style.border_color = Color(0.66, 0.51, 0.27, 0.88)
+    style.bg_color = Color(0.035, 0.060, 0.095, 0.96)
+    style.border_color = Color(0.55, 0.43, 0.25, 0.72)
     style.set_border_width_all(1)
-    style.set_corner_radius_all(20)
-    style.shadow_color = Color(0.0, 0.0, 0.0, 0.34)
-    style.shadow_size = 8
-    style.shadow_offset = Vector2(0, 4)
-    style.content_margin_left = 18
-    style.content_margin_right = 18
-    style.content_margin_top = 14
-    style.content_margin_bottom = 14
+    style.set_corner_radius_all(17)
+    style.content_margin_left = 9
+    style.content_margin_right = 9
+    style.content_margin_top = 10
+    style.content_margin_bottom = 10
     card.add_theme_stylebox_override("panel", style)
     var box := VBoxContainer.new()
-    box.add_theme_constant_override("separation", 5)
+    box.add_theme_constant_override("separation", 3)
     card.add_child(box)
     var value_label := Label.new()
     value_label.text = value
     value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    value_label.add_theme_font_size_override("font_size", 27)
-    value_label.add_theme_color_override("font_color", Color(1.0, 0.82, 0.36))
+    value_label.add_theme_font_size_override("font_size", 22)
+    value_label.add_theme_color_override("font_color", Color("#f1cf83"))
     box.add_child(value_label)
     var caption_label := Label.new()
     caption_label.text = caption
     caption_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    caption_label.add_theme_font_size_override("font_size", 15)
-    caption_label.add_theme_color_override("font_color", Color(0.84, 0.80, 0.70))
+    caption_label.add_theme_font_size_override("font_size", 13)
+    caption_label.add_theme_color_override("font_color", Color("#a9bacb"))
     box.add_child(caption_label)
     content.add_child(card)
+
 
 func _show_main_menu() -> void:
     _set_menu_music_active(true)
@@ -612,34 +633,82 @@ func _show_main_menu() -> void:
     world_camera.position = Vector3(0, 0, 8.4)
     world_camera.fov = 48.0
     _clear_content()
-    _add_heading("مرحباً بك أيها العبقري!", "هل أنت مستعد لاختبار معلوماتك؟")
-    _add_stat_card("أفضل نتيجة شخصية", "🏆  %d نقطة" % best_score)
-    _add_stat_card("عدد الجولات المكتملة", "🎮  %d" % games_played)
 
-    var play := _make_button("▶   ابدأ التحدّي")
-    play.custom_minimum_size.y = 78
+    _add_heading("أهلاً بك في تحدّي العباقرة", "اختبر معرفتك، افتح دول العالم، واجمع لقب العبقري")
+    var bank_card := _make_button("📚  بنك معرفي يضم %s سؤالاً" % _format_number(questions.size()))
+    bank_card.disabled = true
+    bank_card.custom_minimum_size.y = 54
+    content.add_child(bank_card)
+
+    var stats_row := HBoxContainer.new()
+    stats_row.add_theme_constant_override("separation", 9)
+    content.add_child(stats_row)
+    _add_stat_card("أفضل نتيجة", "🏆  %d" % best_score)
+    var best_card := content.get_child(content.get_child_count() - 1)
+    content.remove_child(best_card)
+    stats_row.add_child(best_card)
+    _add_stat_card("الجولات المكتملة", "🎮  %d" % games_played)
+    var games_card := content.get_child(content.get_child_count() - 1)
+    content.remove_child(games_card)
+    stats_row.add_child(games_card)
+
+    var journey := PanelContainer.new()
+    var journey_style := StyleBoxFlat.new()
+    journey_style.bg_color = Color(0.025, 0.075, 0.080, 0.94)
+    journey_style.border_color = Color(0.20, 0.62, 0.52, 0.65)
+    journey_style.set_border_width_all(1)
+    journey_style.set_corner_radius_all(18)
+    journey_style.content_margin_left = 14
+    journey_style.content_margin_right = 14
+    journey_style.content_margin_top = 9
+    journey_style.content_margin_bottom = 9
+    journey.add_theme_stylebox_override("panel", journey_style)
+    content.add_child(journey)
+    var journey_box := VBoxContainer.new()
+    journey_box.add_theme_constant_override("separation", 5)
+    journey.add_child(journey_box)
+    var journey_title := Label.new()
+    journey_title.text = "🌍  رحلتك حول العالم"
+    journey_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    journey_title.add_theme_font_size_override("font_size", 17)
+    journey_title.add_theme_color_override("font_color", Color("#b9f0df"))
+    journey_box.add_child(journey_title)
+    var progress := ProgressBar.new()
+    progress.min_value = 0
+    progress.max_value = 177
+    progress.value = unlocked_country_index + 1
+    progress.show_percentage = false
+    progress.custom_minimum_size.y = 11
+    journey_box.add_child(progress)
+    var progress_text := Label.new()
+    progress_text.text = "الدول المفتوحة: %d من 177" % (unlocked_country_index + 1)
+    progress_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    progress_text.add_theme_font_size_override("font_size", 13)
+    progress_text.add_theme_color_override("font_color", Color("#a8c7c5"))
+    journey_box.add_child(progress_text)
+
+    var play := _make_button("▶   ابدأ الرحلة")
+    play.custom_minimum_size.y = 72
     play.pressed.connect(_show_world_map)
     content.add_child(play)
-
-    var settings_button := _make_button("⚙   الإعدادات")
+    var actions := HBoxContainer.new()
+    actions.add_theme_constant_override("separation", 9)
+    content.add_child(actions)
+    var settings_button := _make_button("⚙  الإعدادات")
+    settings_button.custom_minimum_size.y = 58
+    settings_button.add_theme_font_size_override("font_size", 16)
     settings_button.pressed.connect(_show_settings)
-    content.add_child(settings_button)
-
-    var achievements_button := _make_button("★   النجوم والإنجازات")
+    actions.add_child(settings_button)
+    var achievements_button := _make_button("★  الإنجازات")
+    achievements_button.custom_minimum_size.y = 58
+    achievements_button.add_theme_font_size_override("font_size", 16)
     achievements_button.pressed.connect(_show_achievements)
-    content.add_child(achievements_button)
-
+    actions.add_child(achievements_button)
     var help_button := _make_button("؟   طريقة اللعب")
+    help_button.custom_minimum_size.y = 54
+    help_button.add_theme_font_size_override("font_size", 16)
     help_button.pressed.connect(_show_help)
     content.add_child(help_button)
-
-    var mode: Dictionary = DIFFICULTIES[difficulty]
-    var mode_label := Label.new()
-    mode_label.text = "الدول المفتوحة: %d / 177" % (unlocked_country_index + 1)
-    mode_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    mode_label.add_theme_font_size_override("font_size", 16)
-    mode_label.add_theme_color_override("font_color", Color(0.55, 0.88, 0.78))
-    content.add_child(mode_label)
 
 func _show_settings() -> void:
     _set_menu_music_active(true)
@@ -1369,35 +1438,43 @@ func _show_results() -> void:
     home.pressed.connect(_show_main_menu)
     content.add_child(home)
 
+
 func _make_button(caption: String) -> Button:
     var button := Button.new()
     button.pressed.connect(_play_ui_tap)
     button.text = caption
-    button.custom_minimum_size = Vector2(0, 64)
+    button.custom_minimum_size = Vector2(0, 62)
     button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    button.add_theme_font_size_override("font_size", 20)
-    button.add_theme_color_override("font_color", Color.WHITE)
-    button.add_theme_color_override("font_hover_color", Color(1.0, 0.88, 0.66))
+    button.add_theme_font_size_override("font_size", 18)
+    button.add_theme_color_override("font_color", Color("#f5f7fb"))
+    button.add_theme_color_override("font_hover_color", Color("#ffe2a2"))
+    button.add_theme_color_override("font_pressed_color", Color("#f4d18a"))
+    button.add_theme_color_override("font_disabled_color", Color("#8c9aaa"))
     var normal := StyleBoxFlat.new()
-    normal.bg_color = Color(0.045, 0.075, 0.125, 0.98)
-    normal.border_color = Color(0.72, 0.57, 0.31, 0.96)
-    normal.set_border_width_all(2)
-    normal.set_corner_radius_all(20)
-    normal.shadow_color = Color(0.0, 0.0, 0.0, 0.38)
-    normal.shadow_size = 7
-    normal.shadow_offset = Vector2(0, 3)
-    normal.content_margin_left = 18
-    normal.content_margin_right = 18
+    normal.bg_color = Color(0.045, 0.085, 0.135, 0.98)
+    normal.border_color = Color(0.60, 0.48, 0.29, 0.82)
+    normal.set_border_width_all(1)
+    normal.set_corner_radius_all(17)
+    normal.shadow_color = Color(0.0, 0.0, 0.0, 0.30)
+    normal.shadow_size = 5
+    normal.shadow_offset = Vector2(0, 2)
+    normal.content_margin_left = 16
+    normal.content_margin_right = 16
     normal.content_margin_top = 8
     normal.content_margin_bottom = 8
     button.add_theme_stylebox_override("normal", normal)
     var hover := normal.duplicate()
-    hover.bg_color = Color(0.105, 0.18, 0.29, 1.0)
-    hover.border_color = Color(1.0, 0.82, 0.48, 1.0)
-    hover.shadow_size = 10
+    hover.bg_color = Color(0.085, 0.145, 0.205, 1.0)
+    hover.border_color = Color("#e4bd70")
+    hover.shadow_size = 7
     button.add_theme_stylebox_override("hover", hover)
     button.add_theme_stylebox_override("pressed", hover)
+    var focus := hover.duplicate()
+    focus.border_color = Color("#8bd9d0")
+    button.add_theme_stylebox_override("focus", focus)
     var disabled_style := normal.duplicate()
-    disabled_style.bg_color = Color(0.08, 0.11, 0.20, 0.9)
+    disabled_style.bg_color = Color(0.055, 0.075, 0.105, 0.92)
+    disabled_style.border_color = Color(0.25, 0.31, 0.38, 0.55)
     button.add_theme_stylebox_override("disabled", disabled_style)
     return button
+
