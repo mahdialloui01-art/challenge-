@@ -87779,6 +87779,1482 @@
         "repository": "mahdialloui01-art/challenge-",
         "rights_review_status": "original wording; fact-check recommended before publication"
       }
+    },
+    {
+      "category": "فيزياء",
+      "question": "ما وحدة قياس الضغط في النظام الدولي؟",
+      "answers": [
+        "الباسكال",
+        "الجول",
+        "النيوتن",
+        "الواط"
+      ],
+      "correct": 0,
+      "explanation": "الباسكال هو وحدة قياس الضغط.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "فيزياء",
+      "question": "أي ظاهرة تفسر انحراف الضوء عند انتقاله بين وسطين؟",
+      "answers": [
+        "الانعكاس",
+        "الحيود",
+        "التداخل",
+        "الانكسار"
+      ],
+      "correct": 3,
+      "explanation": "الانكسار يغير اتجاه الضوء عند تغير الوسط.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "فيزياء",
+      "question": "ما اسم الطاقة المرتبطة بحركة الجسم؟",
+      "answers": [
+        "الطاقة النووية",
+        "الطاقة الكيميائية",
+        "الطاقة الحركية",
+        "طاقة الوضع"
+      ],
+      "correct": 2,
+      "explanation": "الطاقة الحركية تعتمد على الكتلة ومربع السرعة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "فيزياء",
+      "question": "أي جسيم ذري لا يحمل شحنة كهربائية؟",
+      "answers": [
+        "البوزيترون",
+        "النيوترون",
+        "الإلكترون",
+        "البروتون"
+      ],
+      "correct": 1,
+      "explanation": "النيوترون متعادل كهربائياً.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "كيمياء",
+      "question": "ما الرمز الكيميائي للذهب؟",
+      "answers": [
+        "Au",
+        "Ag",
+        "Fe",
+        "Gd"
+      ],
+      "correct": 0,
+      "explanation": "يرمز للذهب بالرمز Au.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "كيمياء",
+      "question": "ما الغاز الناتج غالباً عن تفاعل الحمض مع كربونات؟",
+      "answers": [
+        "الأكسجين",
+        "الكلور",
+        "النيتروجين",
+        "ثاني أكسيد الكربون"
+      ],
+      "correct": 3,
+      "explanation": "تنتج الكربونات مع الأحماض غاز ثاني أكسيد الكربون.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "كيمياء",
+      "question": "أي عنصر أساسي يدخل في تركيب الهيموغلوبين؟",
+      "answers": [
+        "الصوديوم",
+        "اليود",
+        "الحديد",
+        "الكالسيوم"
+      ],
+      "correct": 2,
+      "explanation": "تحتوي مجموعة الهيم في الهيموغلوبين على الحديد.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "كيمياء",
+      "question": "ما الصيغة الكيميائية للأمونيا؟",
+      "answers": [
+        "CO",
+        "NH₃",
+        "CH₄",
+        "H₂O₂"
+      ],
+      "correct": 1,
+      "explanation": "الأمونيا تتكون من ذرة نيتروجين وثلاث ذرات هيدروجين.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "كيمياء",
+      "question": "ما اسم الجدول الذي يرتب العناصر حسب العدد الذري؟",
+      "answers": [
+        "الجدول الدوري",
+        "جدول الذوبانية",
+        "جدول المعايرة",
+        "جدول النشاط الحيوي"
+      ],
+      "correct": 0,
+      "explanation": "يرتب الجدول الدوري العناصر وفق أعدادها الذرية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "أحياء",
+      "question": "ما العضية التي تحتوي المادة الوراثية في الخلية حقيقية النواة؟",
+      "answers": [
+        "الجدار الخلوي",
+        "الفجوة",
+        "الريبوسوم",
+        "النواة"
+      ],
+      "correct": 3,
+      "explanation": "توجد معظم المادة الوراثية في نواة الخلايا حقيقية النواة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "أحياء",
+      "question": "ما اسم انقسام الخلية الذي ينتج خليتين متماثلتين غالباً؟",
+      "answers": [
+        "الإخصاب",
+        "التبرعم",
+        "الانقسام المتساوي",
+        "الانقسام المنصف"
+      ],
+      "correct": 2,
+      "explanation": "ينتج الانقسام المتساوي خليتين بنتين متقاربتين وراثياً.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "أحياء",
+      "question": "أي فصيلة دم تعد مانحاً عاماً لكريات الدم الحمراء عند مراعاة عامل Rh؟",
+      "answers": [
+        "B سالب",
+        "O سالب",
+        "AB موجب",
+        "A موجب"
+      ],
+      "correct": 1,
+      "explanation": "تعد O سالب مانحاً عاماً لكريات الدم الحمراء في النقل التقليدي.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "أحياء",
+      "question": "ما الجزء المسؤول عن تبادل الغازات في الرئتين؟",
+      "answers": [
+        "الحويصلات الهوائية",
+        "القصبة الهوائية",
+        "الحنجرة",
+        "الحجاب الحاجز"
+      ],
+      "correct": 0,
+      "explanation": "تتم مبادلة الغازات عبر جدران الحويصلات الهوائية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "أحياء",
+      "question": "أي كائن يصنع غذاءه غالباً بالتمثيل الضوئي؟",
+      "answers": [
+        "الفطر",
+        "الإنسان",
+        "معظم الحيوانات",
+        "النبات الأخضر"
+      ],
+      "correct": 3,
+      "explanation": "تحتوي النباتات الخضراء على صبغات تمكّنها من البناء الضوئي.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "رياضيات",
+      "question": "ما ناتج 7 × 8؟",
+      "answers": [
+        "48",
+        "64",
+        "56",
+        "54"
+      ],
+      "correct": 2,
+      "explanation": "سبعة مضروبة في ثمانية تساوي 56.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "رياضيات",
+      "question": "كم يساوي مجموع زوايا الشكل الرباعي؟",
+      "answers": [
+        "540 درجة",
+        "360 درجة",
+        "180 درجة",
+        "270 درجة"
+      ],
+      "correct": 1,
+      "explanation": "مجموع الزوايا الداخلية لأي شكل رباعي يساوي 360 درجة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "رياضيات",
+      "question": "ما قيمة √81؟",
+      "answers": [
+        "9",
+        "8",
+        "7",
+        "10"
+      ],
+      "correct": 0,
+      "explanation": "الجذر التربيعي الرئيسي للعدد 81 هو 9.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "رياضيات",
+      "question": "ما محيط مربع طول ضلعه 6 سم؟",
+      "answers": [
+        "12 سم",
+        "18 سم",
+        "36 سم",
+        "24 سم"
+      ],
+      "correct": 3,
+      "explanation": "محيط المربع يساوي أربعة أضعاف طول الضلع.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "رياضيات",
+      "question": "ما العدد التالي في المتتالية 2، 4، 8، 16؟",
+      "answers": [
+        "30",
+        "64",
+        "32",
+        "24"
+      ],
+      "correct": 2,
+      "explanation": "كل حد يساوي ضعف الحد السابق.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "فلك",
+      "question": "ما الكوكب الذي يدور حول الشمس في أقصر مدة؟",
+      "answers": [
+        "المريخ",
+        "عطارد",
+        "الزهرة",
+        "الأرض"
+      ],
+      "correct": 1,
+      "explanation": "يتم عطارد دورة حول الشمس في نحو 88 يوماً أرضياً.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "فلك",
+      "question": "ما اسم الظاهرة التي تقع عندما تحجب الأرض ضوء الشمس عن القمر؟",
+      "answers": [
+        "خسوف القمر",
+        "كسوف الشمس",
+        "الاقتران",
+        "الاعتدال"
+      ],
+      "correct": 0,
+      "explanation": "يحدث خسوف القمر عندما تقع الأرض بين الشمس والقمر.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "فلك",
+      "question": "ما الكوكب المعروف بلونه الأزرق بسبب غاز الميثان في غلافه؟",
+      "answers": [
+        "المريخ",
+        "عطارد",
+        "الزهرة",
+        "نبتون"
+      ],
+      "correct": 3,
+      "explanation": "يسهم الميثان في امتصاص الضوء الأحمر وإظهار نبتون بلون أزرق.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "جغرافيا",
+      "question": "في أي قارة تقع دولة سورينام؟",
+      "answers": [
+        "آسيا",
+        "أوروبا",
+        "أمريكا الجنوبية",
+        "أفريقيا"
+      ],
+      "correct": 2,
+      "explanation": "تقع سورينام على الساحل الشمالي لأمريكا الجنوبية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "جغرافيا",
+      "question": "ما أكبر دولة في العالم من حيث المساحة؟",
+      "answers": [
+        "الولايات المتحدة",
+        "روسيا",
+        "كندا",
+        "الصين"
+      ],
+      "correct": 1,
+      "explanation": "روسيا هي أكبر دولة مساحةً.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "جغرافيا",
+      "question": "ما النهر الذي يمر بالعاصمة المصرية القاهرة؟",
+      "answers": [
+        "النيل",
+        "الكونغو",
+        "النيجر",
+        "السنغال"
+      ],
+      "correct": 0,
+      "explanation": "تقع القاهرة على نهر النيل.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "تاريخ",
+      "question": "من أول إنسان دار حول الأرض في الفضاء؟",
+      "answers": [
+        "نيل أرمسترونغ",
+        "أليكسي ليونوف",
+        "جون غلين",
+        "يوري غاغارين"
+      ],
+      "correct": 3,
+      "explanation": "أكمل يوري غاغارين أول رحلة مدارية بشرية عام 1961.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "تاريخ",
+      "question": "في أي عام بدأت الثورة الفرنسية؟",
+      "answers": [
+        "1815",
+        "1848",
+        "1789",
+        "1776"
+      ],
+      "correct": 2,
+      "explanation": "بدأت الثورة الفرنسية عام 1789.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "تاريخ",
+      "question": "ما الحضارة القديمة التي اشتهرت بالكتابة المسمارية في بلاد الرافدين؟",
+      "answers": [
+        "الفينيقية",
+        "السومرية",
+        "الإغريقية",
+        "الرومانية"
+      ],
+      "correct": 1,
+      "explanation": "طور السومريون نظام الكتابة المسمارية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "تاريخ",
+      "question": "من مؤسس الدولة الأموية؟",
+      "answers": [
+        "معاوية بن أبي سفيان",
+        "عبد الملك بن مروان",
+        "عمر بن عبد العزيز",
+        "يزيد بن معاوية"
+      ],
+      "correct": 0,
+      "explanation": "تأسست الدولة الأموية على يد معاوية بن أبي سفيان.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "تاريخ",
+      "question": "ما اسم السفينة التي أبحر بها تشارلز داروين في رحلته الشهيرة؟",
+      "answers": [
+        "مايفلاور",
+        "فيكتوريا",
+        "إنديفور",
+        "بيغل"
+      ],
+      "correct": 3,
+      "explanation": "كانت سفينة بيغل أساس رحلة داروين العلمية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "أدب",
+      "question": "من مؤلف رواية «مئة عام من العزلة»؟",
+      "answers": [
+        "بابلو نيرودا",
+        "ماريو فارغاس يوسا",
+        "غابرييل غارسيا ماركيز",
+        "خورخي لويس بورخيس"
+      ],
+      "correct": 2,
+      "explanation": "كتب ماركيز الرواية التي تعد من أشهر أعمال الواقعية السحرية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "أدب",
+      "question": "من صاحب رواية «الأمير الصغير»؟",
+      "answers": [
+        "فيكتور هوغو",
+        "أنطوان دو سانت إكزوبيري",
+        "ألبير كامو",
+        "جول فيرن"
+      ],
+      "correct": 1,
+      "explanation": "ألّف الكاتب الفرنسي سانت إكزوبيري الأمير الصغير.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "أدب",
+      "question": "من الشاعر العربي صاحب معلقة «قفا نبك»؟",
+      "answers": [
+        "امرؤ القيس",
+        "زهير بن أبي سلمى",
+        "عنترة بن شداد",
+        "لبيد بن ربيعة"
+      ],
+      "correct": 0,
+      "explanation": "تبدأ معلقة امرئ القيس بعبارة قفا نبك.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "أدب",
+      "question": "من مؤلف رواية «ثلاثية القاهرة»؟",
+      "answers": [
+        "يوسف إدريس",
+        "إحسان عبد القدوس",
+        "توفيق الحكيم",
+        "نجيب محفوظ"
+      ],
+      "correct": 3,
+      "explanation": "كتب نجيب محفوظ بين القصرين وقصر الشوق والسكرية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "لغة",
+      "question": "ما إعراب الفاعل في الجملة الفعلية؟",
+      "answers": [
+        "مجرور",
+        "مجزوم",
+        "مرفوع",
+        "منصوب"
+      ],
+      "correct": 2,
+      "explanation": "الفاعل مرفوع في الأصل.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "لغة",
+      "question": "ما نوع الهمزة في كلمة «ابن» عندما تقع بين علمين؟",
+      "answers": [
+        "همزة متطرفة",
+        "همزة وصل",
+        "همزة قطع",
+        "همزة متوسطة"
+      ],
+      "correct": 1,
+      "explanation": "همزة ابن همزة وصل وتسقط في درج الكلام وفق مواضعها.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "لغة",
+      "question": "ما جمع كلمة «كتاب»؟",
+      "answers": [
+        "كتب",
+        "كتاباتون",
+        "كتابين",
+        "كتابون"
+      ],
+      "correct": 0,
+      "explanation": "كتب جمع تكسير لكلمة كتاب.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "اقتصاد",
+      "question": "ما الجهة التي تجمع الضرائب عادة لتمويل الخدمات العامة؟",
+      "answers": [
+        "الشركات الخاصة فقط",
+        "البنوك التجارية",
+        "البورصة",
+        "الحكومة"
+      ],
+      "correct": 3,
+      "explanation": "تجمع الحكومات الضرائب لتمويل الإنفاق والخدمات العامة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "اقتصاد",
+      "question": "ماذا يعني مصطلح العرض في السوق؟",
+      "answers": [
+        "مجموع الأجور",
+        "قيمة العملة",
+        "الكميات التي يرغب المنتجون في بيعها",
+        "رغبات المستهلكين في الشراء"
+      ],
+      "correct": 2,
+      "explanation": "العرض هو الكمية التي يكون المنتجون مستعدين لبيعها عند أسعار مختلفة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "حاسوب",
+      "question": "ما الامتداد الشائع لملفات مستندات PDF؟",
+      "answers": [
+        ".png",
+        ".pdf",
+        ".exe",
+        ".mp3"
+      ],
+      "correct": 1,
+      "explanation": "PDF اختصار Portable Document Format.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "حاسوب",
+      "question": "ما وظيفة HTML؟",
+      "answers": [
+        "بناء هيكل صفحات الويب",
+        "إدارة قواعد البيانات",
+        "تشفير الشبكات",
+        "تشغيل نظام التشغيل"
+      ],
+      "correct": 0,
+      "explanation": "HTML لغة ترميز لبناء بنية محتوى صفحات الويب.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "حاسوب",
+      "question": "أي بروتوكول يستخدم عادة لإرسال البريد الإلكتروني من العميل إلى الخادم؟",
+      "answers": [
+        "DNS",
+        "SSH",
+        "DHCP",
+        "SMTP"
+      ],
+      "correct": 3,
+      "explanation": "SMTP بروتوكول شائع لإرسال البريد الإلكتروني.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "حاسوب",
+      "question": "ما المقصود بالبرمجيات مفتوحة المصدر؟",
+      "answers": [
+        "برامج لا تعمل دون إنترنت",
+        "برامج مخصصة للألعاب",
+        "برمجيات تتاح شيفرتها وفق ترخيص يسمح بالاطلاع والتعديل",
+        "برامج مجانية دائماً بلا شروط"
+      ],
+      "correct": 2,
+      "explanation": "تتيح تراخيص المصدر المفتوح استخدام الشيفرة ودراستها وتعديلها وفق شروط الترخيص.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "بيئة",
+      "question": "ما الظاهرة التي تؤدي إلى تدهور الأراضي في المناطق الجافة؟",
+      "answers": [
+        "التكاثف",
+        "التصحر",
+        "المد والجزر",
+        "التعرية البحرية فقط"
+      ],
+      "correct": 1,
+      "explanation": "التصحر تدهور الأراضي في المناطق الجافة وشبه الجافة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "بيئة",
+      "question": "ما المصدر المتجدد للطاقة الذي يعتمد على حركة الهواء؟",
+      "answers": [
+        "طاقة الرياح",
+        "الفحم",
+        "الغاز الطبيعي",
+        "النفط"
+      ],
+      "correct": 0,
+      "explanation": "تُحوّل توربينات الرياح طاقة حركة الهواء إلى كهرباء.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "بيئة",
+      "question": "ما اسم الكائنات التي تحلل بقايا الكائنات الميتة؟",
+      "answers": [
+        "المنتجات",
+        "المستهلكات الأولية",
+        "الملقحات",
+        "المحللات"
+      ],
+      "correct": 3,
+      "explanation": "الفطريات والبكتيريا من أهم المحللات في الأنظمة البيئية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "طب",
+      "question": "ما الهرمون الذي ينظم مستوى السكر في الدم بخفضه؟",
+      "answers": [
+        "الثيروكسين",
+        "الميلاتونين",
+        "الإنسولين",
+        "الأدرينالين"
+      ],
+      "correct": 2,
+      "explanation": "يساعد الإنسولين على خفض سكر الدم عبر تسهيل دخول الغلوكوز إلى الخلايا.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "طب",
+      "question": "ما العضو المسؤول عن تنقية الدم وإنتاج البول؟",
+      "answers": [
+        "البنكرياس",
+        "الكليتان",
+        "الرئتان",
+        "المعدة"
+      ],
+      "correct": 1,
+      "explanation": "ترشح الكليتان الدم وتنتجان البول.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "طب",
+      "question": "ما الفيتامين الذي يرتبط نقصه بمرض الإسقربوط؟",
+      "answers": [
+        "فيتامين C",
+        "فيتامين A",
+        "فيتامين D",
+        "فيتامين B1"
+      ],
+      "correct": 0,
+      "explanation": "يسبب نقص فيتامين C مرض الإسقربوط.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "فن",
+      "question": "من نحت تمثال داود الشهير في عصر النهضة؟",
+      "answers": [
+        "دوناتيلو",
+        "برنيني",
+        "رودان",
+        "ميكيلانجيلو"
+      ],
+      "correct": 3,
+      "explanation": "نحت ميكيلانجيلو تمثال داود من الرخام.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "رياضة",
+      "question": "كم شوطاً في مباراة كرة السلة وفق القواعد الدولية FIBA؟",
+      "answers": [
+        "ثلاثة أشواط",
+        "خمسة أشواط",
+        "أربعة أشواط",
+        "شوطان"
+      ],
+      "correct": 2,
+      "explanation": "تقسم مباراة كرة السلة الدولية إلى أربعة أشواط.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "رياضة",
+      "question": "في أي رياضة تُستخدم المضارب والريشة؟",
+      "answers": [
+        "البيسبول",
+        "تنس الريشة",
+        "تنس الطاولة",
+        "الاسكواش"
+      ],
+      "correct": 1,
+      "explanation": "تستخدم لعبة تنس الريشة مضارب وريشة خفيفة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "فلسفة",
+      "question": "من الفيلسوف الذي ألّف كتاب «الأخلاق إلى نيقوماخوس»؟",
+      "answers": [
+        "أرسطو",
+        "أفلاطون",
+        "سقراط",
+        "زينون الرواقي"
+      ],
+      "correct": 0,
+      "explanation": "الأخلاق إلى نيقوماخوس من مؤلفات أرسطو.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "فلسفة",
+      "question": "ما الفرع الذي يبحث في الصواب والخطأ والسلوك؟",
+      "answers": [
+        "المنطق",
+        "علم الجمال",
+        "نظرية المعرفة",
+        "الأخلاق"
+      ],
+      "correct": 3,
+      "explanation": "تدرس الأخلاق المبادئ والقيم المتعلقة بالسلوك.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "علوم عامة",
+      "question": "ما الصخر الناتج عن تبريد الصهارة؟",
+      "answers": [
+        "الصخر المتحول",
+        "الفحم الحجري",
+        "الصخر الناري",
+        "الصخر الرسوبي"
+      ],
+      "correct": 2,
+      "explanation": "تتكون الصخور النارية من تبريد وتصلب الصهارة أو اللابة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "علوم عامة",
+      "question": "ما اسم العلم الذي يدرس الطقس والغلاف الجوي؟",
+      "answers": [
+        "علم الوراثة",
+        "الأرصاد الجوية",
+        "علم المعادن",
+        "علم الآثار"
+      ],
+      "correct": 1,
+      "explanation": "الأرصاد الجوية تدرس الغلاف الجوي والظواهر الجوية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "ثقافة",
+      "question": "ما العملة الرسمية للمملكة المتحدة؟",
+      "answers": [
+        "الجنيه الإسترليني",
+        "اليورو",
+        "الفرنك",
+        "الكرونة"
+      ],
+      "correct": 0,
+      "explanation": "الجنيه الإسترليني هو العملة الرسمية للمملكة المتحدة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "ثقافة",
+      "question": "ما اللغة الرسمية في النمسا؟",
+      "answers": [
+        "الفرنسية",
+        "الإيطالية",
+        "الهولندية",
+        "الألمانية"
+      ],
+      "correct": 3,
+      "explanation": "الألمانية هي اللغة الرسمية في النمسا.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "علوم سياسية",
+      "question": "ما الوثيقة التي تحدد المبادئ الأساسية ونظام الحكم في الدولة؟",
+      "answers": [
+        "القانون التجاري",
+        "المعاهدة الدولية",
+        "الدستور",
+        "الميزانية"
+      ],
+      "correct": 2,
+      "explanation": "الدستور هو القانون الأساسي الذي ينظم سلطات الدولة وحقوق الأفراد.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "علوم سياسية",
+      "question": "ما المقصود بالاقتراع العام؟",
+      "answers": [
+        "انتخاب القضاة من البرلمان",
+        "حق المواطنين المؤهلين في التصويت",
+        "تعيين النواب دون انتخابات",
+        "تصويت الوزراء فقط"
+      ],
+      "correct": 1,
+      "explanation": "الاقتراع العام يوسع حق التصويت للمواطنين وفق شروط القانون.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "إحصاء",
+      "question": "ما احتمال الحصول على عدد زوجي عند رمي نرد عادل؟",
+      "answers": [
+        "النصف",
+        "الثلث",
+        "الربع",
+        "الثلثان"
+      ],
+      "correct": 0,
+      "explanation": "الأعداد الزوجية 2 و4 و6 من أصل ست نتائج متساوية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "إحصاء",
+      "question": "ما الفرق بين أكبر قيمة وأصغر قيمة في البيانات؟",
+      "answers": [
+        "المنوال",
+        "الوسيط",
+        "التباين",
+        "المدى"
+      ],
+      "correct": 3,
+      "explanation": "المدى يساوي أكبر قيمة ناقص أصغر قيمة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "دين",
+      "question": "ما السورة التي تسمى أم الكتاب؟",
+      "answers": [
+        "يس",
+        "الرحمن",
+        "الفاتحة",
+        "الإخلاص"
+      ],
+      "correct": 2,
+      "explanation": "تُعرف سورة الفاتحة بأم الكتاب وأم القرآن.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "دين",
+      "question": "كم عدد أركان الإسلام؟",
+      "answers": [
+        "سبعة",
+        "خمسة",
+        "أربعة",
+        "ستة"
+      ],
+      "correct": 1,
+      "explanation": "أركان الإسلام خمسة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "دين",
+      "question": "ما اسم الليلة التي هي خير من ألف شهر؟",
+      "answers": [
+        "ليلة القدر",
+        "ليلة النصف من شعبان",
+        "ليلة الإسراء",
+        "ليلة العيد"
+      ],
+      "correct": 0,
+      "explanation": "ورد في القرآن أن ليلة القدر خير من ألف شهر.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "جغرافيا",
+      "question": "ما عاصمة سويسرا الاتحادية؟",
+      "answers": [
+        "زيورخ",
+        "جنيف",
+        "بازل",
+        "برن"
+      ],
+      "correct": 3,
+      "explanation": "برن هي المدينة الاتحادية وعاصمة سويسرا بحكم الواقع.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "جغرافيا",
+      "question": "ما الدولة التي عاصمتها تبليسي؟",
+      "answers": [
+        "أذربيجان",
+        "مولدوفا",
+        "جورجيا",
+        "أرمينيا"
+      ],
+      "correct": 2,
+      "explanation": "تبليسي عاصمة جورجيا.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "تاريخ",
+      "question": "ما اسم الجدار الذي قسم برلين خلال الحرب الباردة؟",
+      "answers": [
+        "الجدار الأطلسي",
+        "جدار برلين",
+        "سور الصين",
+        "خط ماجينو"
+      ],
+      "correct": 1,
+      "explanation": "قسم جدار برلين المدينة من 1961 حتى 1989.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "تاريخ",
+      "question": "من كان أول رئيس للولايات المتحدة؟",
+      "answers": [
+        "جورج واشنطن",
+        "توماس جيفرسون",
+        "أبراهام لينكولن",
+        "جون آدامز"
+      ],
+      "correct": 0,
+      "explanation": "كان جورج واشنطن أول رئيس للولايات المتحدة.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "أدب",
+      "question": "من كتب رواية «الجريمة والعقاب»؟",
+      "answers": [
+        "ليو تولستوي",
+        "أنطون تشيخوف",
+        "إيفان تورغينيف",
+        "فيودور دوستويفسكي"
+      ],
+      "correct": 3,
+      "explanation": "الجريمة والعقاب رواية شهيرة لدوستويفسكي.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "أدب",
+      "question": "من مؤلف «حي بن يقظان»؟",
+      "answers": [
+        "ابن سينا",
+        "الجاحظ",
+        "ابن طفيل",
+        "ابن رشد"
+      ],
+      "correct": 2,
+      "explanation": "ألّف الفيلسوف الأندلسي ابن طفيل قصة حي بن يقظان.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "لغة",
+      "question": "ما الحرف الذي يفيد الاستدراك في جملة «حضر الجميع لكن علياً غاب»؟",
+      "answers": [
+        "لعل",
+        "لكن",
+        "ثم",
+        "أو"
+      ],
+      "correct": 1,
+      "explanation": "لكن حرف استدراك.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "لغة",
+      "question": "ما المثنى من كلمة «معلم» في حالة الرفع؟",
+      "answers": [
+        "معلمان",
+        "معلمين",
+        "معلمون",
+        "معلمات"
+      ],
+      "correct": 0,
+      "explanation": "يرفع المثنى بالألف فيقال معلمان.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "اقتصاد",
+      "question": "ما المقصود بالاحتكار؟",
+      "answers": [
+        "وجود عدد كبير من المنافسين",
+        "انخفاض الأسعار تلقائياً",
+        "تساوي العرض والطلب دائماً",
+        "سيطرة بائع واحد أو جهة واحدة على سوق سلعة أو خدمة"
+      ],
+      "correct": 3,
+      "explanation": "الاحتكار يعني غياب المنافسة الفعلية بسبب سيطرة مورد واحد.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "حاسوب",
+      "question": "ما وظيفة قاعدة البيانات؟",
+      "answers": [
+        "توليد الكهرباء",
+        "تبريد الخادم",
+        "تنظيم البيانات وتخزينها واسترجاعها",
+        "تسريع الشاشة فقط"
+      ],
+      "correct": 2,
+      "explanation": "تتيح قواعد البيانات حفظ المعلومات وتنظيمها والاستعلام عنها.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "بيئة",
+      "question": "أي غاز تمتصه النباتات في عملية البناء الضوئي؟",
+      "answers": [
+        "الأوزون",
+        "ثاني أكسيد الكربون",
+        "الأكسجين",
+        "الهيليوم"
+      ],
+      "correct": 1,
+      "explanation": "تستخدم النباتات ثاني أكسيد الكربون في البناء الضوئي.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "طب",
+      "question": "ما الجزء الذي يربط العضلة بالعظم؟",
+      "answers": [
+        "الوتر",
+        "الرباط",
+        "الغضروف",
+        "العصب"
+      ],
+      "correct": 0,
+      "explanation": "يربط الوتر العضلة بالعظم.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "فلك",
+      "question": "ما اسم المسار الذي يسلكه جسم حول جسم آخر بفعل الجاذبية؟",
+      "answers": [
+        "المحور",
+        "خط الاستواء",
+        "المجرة",
+        "المدار"
+      ],
+      "correct": 3,
+      "explanation": "المدار هو المسار الذي يتبعه جسم تحت تأثير الجاذبية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "علوم عامة",
+      "question": "ما وحدة قياس شدة المجال المغناطيسي في النظام الدولي؟",
+      "answers": [
+        "الفاراد",
+        "اللومن",
+        "التسلا",
+        "الأوم"
+      ],
+      "correct": 2,
+      "explanation": "التسلا وحدة قياس كثافة الفيض المغناطيسي.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "رياضيات",
+      "question": "ما قيمة 0! في الرياضيات؟",
+      "answers": [
+        "10",
+        "1",
+        "0",
+        "غير معرّف"
+      ],
+      "correct": 1,
+      "explanation": "مضروب الصفر يساوي واحداً بالتعريف الرياضي.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "جغرافيا",
+      "question": "ما البحر الذي يقع بين تركيا وأوكرانيا؟",
+      "answers": [
+        "البحر الأسود",
+        "بحر البلطيق",
+        "بحر الشمال",
+        "بحر العرب"
+      ],
+      "correct": 0,
+      "explanation": "تقع تركيا جنوب البحر الأسود وأوكرانيا شماله.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
+    },
+    {
+      "category": "تاريخ",
+      "question": "أي مدينة كانت عاصمة الإمبراطورية الأزتكية؟",
+      "answers": [
+        "كوسكو",
+        "تشيتشن إيتزا",
+        "تيكال",
+        "تينوتشتيتلان"
+      ],
+      "correct": 3,
+      "explanation": "كانت تينوتشتيتلان عاصمة الأزتك في موقع مدينة مكسيكو الحالية.",
+      "provenance": {
+        "dataset": "Challenge original question expansion batch 2026-11",
+        "source_type": "newly authored question; factual answer based on general reference knowledge",
+        "repository": "mahdialloui01-art/challenge-",
+        "rights_review_status": "original wording; fact-check recommended before publication"
+      }
     }
   ]
 }
