@@ -426,9 +426,21 @@ func _load_player_data() -> void:
         unlocked_level = int(config.get_value("progress", "unlocked_level", 1))
         unlocked_country_index = int(config.get_value("country_progress", "unlocked_index", 0))
         music_enabled = bool(config.get_value("settings", "music", true))
-        var saved_question_history = config.get_value("question_history", "by_country", {})
+        var saved_question_history = config.get_value("question_history", "global", {})
         if saved_question_history is Dictionary:
             previous_question_ids = saved_question_history
+        else:
+            # Migrate older per-country history into one global no-repeat history.
+            var legacy_history = config.get_value("question_history", "by_country", {})
+            if legacy_history is Dictionary:
+                for country_key in legacy_history.keys():
+                    var legacy_ids: Array = legacy_history[country_key]
+                    for legacy_id in legacy_ids:
+                        var key := str(legacy_id)
+                        var separator := key.find("|")
+                        if separator >= 0:
+                            key = key.substr(separator + 1)
+                        previous_question_ids[key] = true
     if not DIFFICULTIES.has(difficulty):
         difficulty = "medium"
     unlocked_level = clampi(unlocked_level, 1, 11)
@@ -444,7 +456,7 @@ func _save_player_data() -> void:
     config.set_value("settings", "music", music_enabled)
     config.set_value("progress", "unlocked_level", unlocked_level)
     config.set_value("country_progress", "unlocked_index", unlocked_country_index)
-    config.set_value("question_history", "by_country", previous_question_ids)
+    config.set_value("question_history", "global", previous_question_ids)
     config.save(SAVE_PATH)
 
 
@@ -1197,48 +1209,35 @@ func _start_level(level: int) -> void:
 
     var target_count := int(DIFFICULTIES.get(difficulty, DIFFICULTIES["medium"]).get("count", 10))
     target_count = mini(target_count, question_pool.size())
-    var saved_ids: Array = previous_question_ids.get(current_country_code, [])
-    var seen_ids: Dictionary = {}
-    for saved_id in saved_ids:
-        seen_ids[str(saved_id)] = true
 
     var fresh_pool: Array[int] = []
-    var repeat_pool: Array[int] = []
     for candidate_index in question_pool:
         var candidate_item: Dictionary = questions[candidate_index]
         var stable_id := _question_replay_key(candidate_item)
-        if seen_ids.has(stable_id):
-            repeat_pool.append(candidate_index)
-        else:
+        if not previous_question_ids.has(stable_id):
             fresh_pool.append(candidate_index)
 
-    # Never exceed 5% repeats from the immediately previous attempt.
-    var repeat_cap := int(floor(float(target_count) * 0.05))
+    # Strict global no-repeat: never put an already displayed question back into a test.
     var selected_indices := _pick_diverse_questions(fresh_pool, target_count)
-    if selected_indices.size() < target_count and repeat_cap > 0:
-        repeat_pool.shuffle()
-        var allowed_repeats := mini(repeat_cap, target_count - selected_indices.size())
-        for repeat_index in range(allowed_repeats):
-            selected_indices.append(repeat_pool[repeat_index])
-
-    # A sufficiently sized bank should always provide a full fresh test.
-    # If a future country has a smaller bank, keep the test honest and use only fresh items.
     question_pool = selected_indices
     question_order.clear()
     for i in range(question_pool.size()):
         question_order.append(i)
     question_order.shuffle()
 
-    var current_ids: Array[String] = []
-    for selected_index in question_pool:
-        current_ids.append(_question_replay_key(questions[selected_index]))
-    previous_question_ids[current_country_code] = current_ids
-    _save_player_data()
+    if question_order.is_empty():
+        _clear_content()
+        _add_heading("انتهت الأسئلة الجديدة", "لقد أجبت عن كل الأسئلة المتاحة في هذا التحدّي. لن نعيد أي سؤال سبق عرضه.")
+        var back_empty := _make_button("العودة إلى الخريطة")
+        back_empty.pressed.connect(_show_world_map)
+        content.add_child(back_empty)
+        return
+
     _display_question()
 
 func _question_replay_key(item: Dictionary) -> String:
-    # Country scope keeps the shared world-science bank independent for each destination.
-    return current_country_code + "|" + str(item.get("question", ""))
+    # A question is unique across every country, stage, and replay attempt.
+    return str(item.get("question", "")).strip_edges()
 
 
 func _pick_diverse_questions(indices: Array[int], limit: int) -> Array[int]:
@@ -1277,6 +1276,10 @@ func _display_question() -> void:
     answer_buttons.clear()
     _clear_content()
     var item: Dictionary = questions[question_pool[question_order[question_index]]]
+    var displayed_question_id := _question_replay_key(item)
+    if not previous_question_ids.has(displayed_question_id):
+        previous_question_ids[displayed_question_id] = true
+        _save_player_data()
 
     # Premium quiz header: category, destination, score and a luminous progress track.
     var eyebrow := Label.new()
